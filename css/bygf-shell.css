@@ -1,0 +1,236 @@
+/* ==========================================================================
+   BYgf — SHELL BARU (navigasi, header, login, komponen dasar)
+   Hanya lapisan tampilan. Semua id/class yang dipakai JS tetap utuh.
+   ========================================================================== */
+body { font-family: var(--font-body); background: var(--bg-body); color: var(--text-main); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .section-title, .brand-title, .mx-h2, .pd-name { font-family: var(--font-display); letter-spacing: -.01em; }
+:root[data-theme-preset="editorial"] h1, :root[data-theme-preset="editorial"] h2, :root[data-theme-preset="editorial"] .section-title { font-weight: 600; }
+::selection { background: var(--primary); color: #fff; }
+
+/* ---------- Logo BYgf ---------- */
+.bg-logo { display: inline-block; width: 40px; height: 40px; flex: none; color: var(--primary); }
+.bg-logo .bg-logo-bg { fill: var(--primary); } .bg-logo .bg-logo-fg { fill: #fff; font-family: var(--font-display); }
+.bg-wordmark { font-family: var(--font-display); font-weight: 800; letter-spacing: -.03em; }
+.bg-wordmark i { font-style: normal; color: var(--primary); }
+
+/* ---------- Layout utama ---------- */
+.app-container { max-width: none; margin: 0; padding: 1.75rem clamp(1rem, 4vw, 3rem) 3rem calc(var(--nav-w) + clamp(1rem, 4vw, 3rem)); }
+.app-container > * { max-width: 1040px; margin-left: auto; margin-right: auto; }
+.app-header { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-light); }
+.brand-title { font-size: 1.6rem !important; }
+.brand-icon { box-shadow: none; }
+.profile-btn { border-radius: var(--radius-full); }
+
+/* ---------- Navigasi: sidebar lebar (desktop) ---------- */
+.side-nav { width: var(--nav-w); pointer-events: auto; }
+.sn-rail, .sn-scrim, .sn-logo-btn, .sn-close-btn { display: none !important; }
+.sn-panel { position: fixed; left: 0; top: 0; bottom: 0; width: var(--nav-w); transform: none !important; background: var(--nav-bg); color: var(--nav-fg); padding: 1.5rem 1rem; gap: 1.1rem; box-shadow: none; border-right: 1px solid var(--border-light); z-index: 100; }
+.sn-brand { gap: .7rem; padding: .25rem .5rem 1rem; border-bottom: 1px solid var(--nav-hover); }
+.sn-brand-icon { background: none !important; box-shadow: none !important; width: 38px; height: 38px; padding: 0; }
+.sn-brand-text { color: var(--nav-fg); font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -.03em; }
+.sn-illustration { background: transparent; border: 1px dashed var(--nav-hover); color: var(--nav-dim); font-size: 1.15rem; padding: .7rem; letter-spacing: .35rem; border-radius: var(--radius-md); }
+.sn-menu { gap: .15rem; }
+.nav-item { color: var(--nav-dim); border-radius: var(--radius-md); padding: .72rem .85rem; transition: background .15s, color .15s; }
+.nav-item:hover { background: var(--nav-hover); color: var(--nav-fg); }
+.nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-fg); box-shadow: none; }
+.nav-item .nav-icon { filter: none; width: 24px; font-size: 1.1rem; }
+.nav-item.active .nav-icon { filter: none; }
+.nav-label { font-size: .88rem; font-weight: 700; }
+:root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .nav-item.active { box-shadow: 0 0 22px -4px hsla(var(--hue-primary), 95%, 60%, .7); }
+:root[data-theme-preset="playful"] .nav-item.active { border: 2px solid var(--nav-fg); box-shadow: 0 3px 0 var(--nav-fg); }
+:root[data-theme-preset="playful"] .sn-brand { border-color: rgba(43,27,61,.2); }
+
+/* ---------- Sub-tab ---------- */
+.sub-tab-strip { gap: .25rem; overflow-x: auto; scrollbar-width: none; padding: .3rem; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-full); width: max-content; max-width: 100%; margin-bottom: 1.5rem; }
+.sub-tab-pill { border: 0; background: transparent; color: var(--text-muted); padding: .5rem .95rem; font-weight: 700; font-size: .82rem; }
+.sub-tab-pill:hover { color: var(--text-main); }
+.sub-tab-pill.active { background: var(--primary); color: #fff; box-shadow: none; }
+:root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .sub-tab-pill.active { background: var(--text-main); }
+
+/* ---------- Komponen dasar ---------- */
+.card, .mx-card { border-radius: var(--radius-xl); }
+.btn, .mx-btn { font-family: var(--font-body); }
+.btn-primary, .mx-btn-primary { background: var(--primary-gradient); }
+input, select, textarea, .mx-input { border-radius: var(--radius-md); }
+.modal-content { border-radius: var(--radius-xl); border: 1px solid var(--border-light); }
+:root[data-theme-preset="playful"] .modal-content { border: 2px solid var(--border-medium); }
+.modal-header h3, .modal-title { font-family: var(--font-display); }
+.badge { border-radius: var(--radius-sm); }
+
+/* ---------- Layar login ---------- */
+.auth-wrapper { background: var(--bg-body); }
+.auth-hero { background: var(--nav-bg); color: var(--nav-fg); border-radius: 0; }
+.auth-hero h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; color: var(--nav-fg); }
+.auth-hero p, .auth-feature-item span { color: var(--nav-dim); }
+.auth-feature-dot { background: var(--nav-hover); }
+.auth-panel { background: var(--bg-surface); }
+.auth-panel-header h1 { font-family: var(--font-display); font-weight: 800; letter-spacing: -.03em; }
+.auth-hero-icon { background: none !important; box-shadow: none !important; }
+
+/* ---------- Bottom bar (HP & tablet) ---------- */
+@media (max-width: 1023px) {
+    .side-nav { position: fixed; inset: auto 0 0 0; width: 100%; height: auto; z-index: 100; }
+    .sn-panel { display: none !important; }
+    .sn-rail { display: flex !important; flex-direction: row; align-items: stretch; justify-content: flex-start; gap: .1rem; width: 100%; padding: .35rem .4rem calc(.35rem + env(safe-area-inset-bottom)); background: var(--nav-bg); border-top: 1px solid var(--border-light); box-shadow: 0 -8px 24px -12px rgba(0,0,0,.25); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+    .sn-rail::-webkit-scrollbar { display: none; }
+    .sn-rail-divider, .sn-rail-spacer, .sn-rail-avatar { display: none !important; }
+    .sn-rail-btn { flex: 1 0 58px; width: auto; height: auto; min-height: 52px; flex-direction: column; gap: .12rem; padding: .35rem .2rem; border-radius: var(--radius-md); background: transparent; color: var(--nav-dim); font-size: 1.2rem; filter: none; box-shadow: none; }
+    .sn-rail-btn::after { content: attr(title); font-family: var(--font-body); font-size: .6rem; font-weight: 700; white-space: nowrap; }
+    .sn-rail-btn:hover { background: var(--nav-hover); filter: none; }
+    .sn-rail-btn.active { background: var(--nav-active-bg); color: var(--nav-active-fg); filter: none; box-shadow: none; }
+    .app-container { padding: 1rem 1rem calc(88px + env(safe-area-inset-bottom)); }
+    .app-container > * { max-width: none; }
+    .app-container > .sub-tab-strip { max-width: 100%; }
+    .app-header { margin-bottom: 1rem; padding-bottom: .9rem; }
+    .brand-title { font-size: 1.35rem !important; }
+}
+@media (min-width: 1024px) { .app-container > .sub-tab-strip { max-width: 1040px; } }
+
+/* ==========================================================================
+   TATA LETAK PER TEMA (desktop ≥ 1024px). HP/tablet selalu memakai bottom bar.
+   Struktur HTML sama; yang berbeda hanya posisi & bentuk navigasi, header, dan lebar konten.
+   ========================================================================== */
+.bg-logo .bg-logo-fg { font-weight: 800; }
+.sn-brand .bg-logo { width: 36px; height: 36px; }
+
+@media (min-width: 1024px) {
+    /* ---- EDITORIAL: sidebar kiri hangat, konten kolom tunggal berkesan majalah ---- */
+    :root[data-theme-preset="editorial"] { --nav-w: 248px; }
+    :root[data-theme-preset="editorial"] .sn-panel { padding: 1.75rem 1.1rem; }
+    :root[data-theme-preset="editorial"] .app-header .brand-icon { display: none; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .app-header .brand-icon, :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .app-header .brand-icon { display: none; }
+    :root[data-theme-preset="editorial"] .app-header { border-bottom: 2px solid var(--text-main); padding-bottom: 1rem; }
+    :root[data-theme-preset="editorial"] .brand-title { font-size: 2.1rem !important; font-style: italic; }
+    :root[data-theme-preset="editorial"] .section-title { border-bottom: 1px solid var(--border-medium); padding-bottom: .5rem; }
+
+    /* ---- GELAP MODERN: bar navigasi atas melayang, konten lebar ---- */
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) { --nav-w: 0px; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .sn-panel { inset: 0 0 auto 0; width: auto; height: 66px; flex-direction: row; align-items: center; gap: 1.25rem; padding: 0 1.5rem; overflow: visible; border-right: 0; border-bottom: 1px solid var(--border-light); backdrop-filter: blur(16px); }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .sn-brand { border: 0; padding: 0; flex: none; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .sn-illustration { display: none !important; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .sn-menu { flex-direction: row; flex: 1; gap: .15rem; overflow-x: auto; scrollbar-width: none; margin: 0; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .sn-menu::-webkit-scrollbar { display: none; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .nav-item { width: auto; padding: .5rem .85rem; white-space: nowrap; border-radius: 99px; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .nav-item .nav-icon { width: auto; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .app-container { padding: calc(66px + 1.5rem) clamp(1.25rem, 4vw, 4rem) 3rem; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .app-container > * { max-width: 1240px; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .app-header { border: 0; margin-bottom: 1.25rem; padding: 0; }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .brand-title { background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* ---- MINIMAL: rel ikon ramping + label kecil, konten sempit & lega ---- */
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) { --nav-w: 92px; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .sn-panel { padding: 1.25rem .5rem; gap: .9rem; align-items: stretch; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .sn-brand { justify-content: center; padding: 0 0 .9rem; border-color: var(--border-light); }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .sn-brand-text, :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .sn-illustration { display: none !important; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .nav-item { flex-direction: column; justify-content: center; gap: .15rem; padding: .6rem .2rem; text-align: center; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .nav-item .nav-icon { width: auto; font-size: 1.25rem; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .nav-label { font-size: .62rem; font-weight: 600; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .app-container > * { max-width: 880px; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .app-header { border: 0; margin-bottom: 1rem; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .card, :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .mx-card { box-shadow: none; border-color: var(--border-light); }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .brand-title { font-size: 1.3rem !important; }
+
+    /* ---- PLAYFUL: dock melayang di bawah, kartu besar & membulat ---- */
+    :root[data-theme-preset="playful"] { --nav-w: 0px; }
+    :root[data-theme-preset="playful"] .sn-panel { inset: auto auto 1.25rem 50%; transform: translateX(-50%) !important; width: auto; max-width: calc(100vw - 2rem); flex-direction: row; align-items: center; padding: .5rem .6rem; gap: .5rem; overflow-x: auto; scrollbar-width: none; border: 2px solid var(--nav-fg); border-radius: var(--radius-xl); box-shadow: 0 6px 0 rgba(43,27,61,.85); }
+    :root[data-theme-preset="playful"] .sn-brand, :root[data-theme-preset="playful"] .sn-illustration { display: none !important; }
+    :root[data-theme-preset="playful"] .sn-menu { flex-direction: row; gap: .2rem; margin: 0; }
+    :root[data-theme-preset="playful"] .nav-item { width: auto; flex-direction: column; gap: .1rem; padding: .45rem .8rem; min-width: 72px; justify-content: center; text-align: center; }
+    :root[data-theme-preset="playful"] .nav-item .nav-icon { width: auto; font-size: 1.35rem; }
+    :root[data-theme-preset="playful"] .nav-label { font-size: .68rem; }
+    :root[data-theme-preset="playful"] .app-container { padding: 1.5rem clamp(1rem, 4vw, 3rem) 7.5rem; }
+    :root[data-theme-preset="playful"] .app-header { border: 2px solid var(--border-medium); background: var(--bg-surface); border-radius: var(--radius-xl); padding: .9rem 1.2rem; box-shadow: var(--shadow-md); }
+    :root[data-theme-preset="playful"] .brand-title { font-size: 1.9rem !important; color: var(--primary); }
+}
+
+/* Logo & wordmark per tema */
+:root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .bg-logo .bg-logo-bg { fill: url(#bgLogoGrad); }
+:root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .bg-logo .bg-logo-bg { fill: #18181b; }
+:root[data-theme-preset="playful"] .bg-logo .bg-logo-bg { fill: var(--primary); stroke: #2b1b3d; stroke-width: 2.5; }
+:root[data-theme-preset="playful"] .bg-logo .bg-logo-fg { fill: #fff; }
+.bg-wordmark { text-transform: none; display: block !important; }
+.user-profile .user-name, .user-profile .user-role, .user-info { color: var(--text-main); }
+:root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .user-info, :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .user-info * { color: var(--text-main) !important; }
+
+/* Login per tema */
+:root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .auth-hero { background: radial-gradient(circle at 20% 10%, hsla(var(--hue-primary), 95%, 60%, .35), transparent 55%), #0a0a18; }
+:root[data-theme-preset="playful"] .auth-hero { background: #ffc93c; color: #2b1b3d; }
+:root[data-theme-preset="playful"] .auth-hero h2, :root[data-theme-preset="playful"] .auth-hero p, :root[data-theme-preset="playful"] .auth-feature-item span { color: #2b1b3d; }
+:root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .auth-hero { background: #f4f4f5; color: var(--text-main); }
+:root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .auth-hero h2 { color: var(--text-main); }
+@media (max-width: 1023px) { :root[data-theme-preset="playful"] .sn-rail { border: 0; } }
+
+/* ==========================================================================
+   NAVIGASI BAWAH (HP/tablet) — 4 tab + "Lainnya". Markup dibuat js/bottom-nav.js
+   ========================================================================== */
+.bn-bar, .bn-sheet { display: none; }
+@media (max-width: 1023px) {
+    .side-nav .sn-rail { display: none !important; }
+    .bn-bar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 110; gap: .15rem; padding: .4rem .5rem calc(.4rem + env(safe-area-inset-bottom)); background: var(--nav-bg); border-top: 1px solid var(--border-light); box-shadow: 0 -10px 30px -14px rgba(0,0,0,.28); }
+    .bn-item, .bn-cell { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 54px; padding: .35rem .2rem; border: 0; border-radius: var(--radius-lg); background: transparent; color: var(--nav-dim); font-family: var(--font-body); cursor: pointer; transition: background .18s, color .18s, transform .18s; -webkit-tap-highlight-color: transparent; }
+    .bn-item:active, .bn-cell:active { transform: scale(.94); }
+    .bn-ico { position: relative; font-size: 1.35rem; line-height: 1; transition: transform .2s; }
+    .bn-lbl { font-size: .66rem; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+    .bn-item.on { background: var(--nav-active-bg); color: var(--nav-active-fg); }
+    .bn-item.on .bn-ico { transform: translateY(-1px) scale(1.1); }
+    .bn-item:focus-visible, .bn-cell:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .bn-badge { display: none; position: absolute; top: -.35rem; right: -.6rem; min-width: 1.05rem; height: 1.05rem; padding: 0 .25rem; border-radius: 99px; background: #ef4444; color: #fff; font-size: .62rem; font-weight: 800; line-height: 1.05rem; text-align: center; box-shadow: 0 0 0 2px var(--nav-bg); }
+    .bn-badge.show { display: block; }
+
+    .bn-sheet { display: block; position: fixed; inset: 0; z-index: 120; }
+    .bn-sheet[hidden] { display: none; }
+    .bn-backdrop { position: absolute; inset: 0; background: rgba(10,10,20,.5); opacity: 0; transition: opacity .22s; }
+    .bn-panel { position: absolute; left: 0; right: 0; bottom: 0; max-width: 560px; margin: 0 auto; padding: .6rem 1rem calc(1.25rem + env(safe-area-inset-bottom)); background: var(--bg-surface); color: var(--text-main); border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: 0 -16px 40px -12px rgba(0,0,0,.4); transform: translateY(100%); transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+    .bn-sheet.open .bn-backdrop { opacity: 1; } .bn-sheet.open .bn-panel { transform: none; }
+    .bn-grab { width: 42px; height: 4px; border-radius: 4px; background: var(--border-medium); margin: 0 auto .8rem; }
+    .bn-title { font-weight: 800; font-size: 1rem; margin-bottom: .8rem; color: var(--text-main); }
+    .bn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+    .bn-cell { min-height: 84px; background: var(--bg-surface-hover); color: var(--text-main); border: 1px solid var(--border-light); }
+    .bn-cell .bn-ico { font-size: 1.7rem; } .bn-cell .bn-lbl { font-size: .72rem; text-align: center; white-space: normal; line-height: 1.2; }
+    .bn-cell.on { background: var(--nav-active-bg); color: var(--nav-active-fg); border-color: transparent; }
+
+    /* varian per tema */
+    :root[data-theme-preset="editorial"] .bn-bar { box-shadow: none; border-top: 2px solid var(--text-main); }
+    :root[data-theme-preset="editorial"] .bn-item { border-radius: 0; }
+    :root[data-theme-preset="editorial"] .bn-item.on { background: transparent; box-shadow: inset 0 3px 0 var(--nav-active-bg); color: var(--nav-fg); }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .bn-bar { left: .6rem; right: .6rem; bottom: .6rem; padding-bottom: .4rem; border: 1px solid var(--border-medium); border-radius: 22px; background: color-mix(in srgb, var(--nav-bg) 82%, transparent); backdrop-filter: blur(18px); box-shadow: 0 10px 40px -10px rgba(0,0,0,.7), 0 0 24px -6px var(--primary); }
+    :root:is([data-theme-preset="neon"],[data-theme-preset="laut"]) .bn-item.on { background: var(--nav-active-bg); box-shadow: 0 6px 18px -4px var(--primary); }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .bn-bar { box-shadow: none; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .bn-item.on { background: transparent; color: var(--text-main); }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .bn-item.on .bn-lbl { font-weight: 800; }
+    :root:is([data-theme-preset="minimal"],[data-theme-preset="senja"]) .bn-item:not(.on) .bn-lbl { opacity: .75; }
+    :root[data-theme-preset="playful"] .bn-bar { left: .7rem; right: .7rem; bottom: .7rem; padding-bottom: .4rem; border: 2.5px solid #2b1b3d; border-radius: 26px; background: #ffc93c; box-shadow: 0 5px 0 #2b1b3d; }
+    :root[data-theme-preset="playful"] .bn-item { color: #5b4126; }
+    :root[data-theme-preset="playful"] .bn-item.on { background: #fff; color: #2b1b3d; box-shadow: 0 3px 0 #2b1b3d; border: 2px solid #2b1b3d; }
+}
+@media (prefers-reduced-motion: reduce) { .bn-panel, .bn-backdrop, .bn-item, .bn-ico { transition: none; } }
+
+/* ==========================================================================
+   Brand kit: logo "by", wordmark & ikon navigasi (SVG, ikut warna tema)
+   ========================================================================== */
+.bg-logo .bg-logo-glyph { stroke: #f7f1e6; }
+:root[data-theme-preset="playful"] .bg-logo .bg-logo-glyph { stroke: #fff; }
+.bg-wm { display: block; height: 1.15em; width: auto; overflow: visible; }
+.bg-wm .bg-wm-gf { stroke: var(--primary); }
+.brand-title.bg-wordmark, h1.bg-wordmark { font-size: 2rem; line-height: 1; }
+.brand-title .bg-wm, h1.bg-wordmark .bg-wm { height: 1.2em; }
+.sn-brand-text .bg-wm { height: 1.7rem; }
+:root[data-theme="dark"] .sn-brand-text .bg-wm-gf, .sn-brand-text .bg-wm-gf { stroke: color-mix(in srgb, var(--primary) 78%, #fff); }
+svg.ni { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.nav-item .nav-icon, .sn-rail-btn, .bn-ico { display: inline-flex; align-items: center; justify-content: center; }
+.nav-item .nav-icon svg.ni { width: 1.3rem; height: 1.3rem; }
+.bn-cell .bn-ico svg.ni { width: 1.7rem; height: 1.7rem; }
+.bn-item.on svg.ni { stroke-width: 2.1; }
+.sn-illustration { display: flex; justify-content: center; gap: .9rem; color: var(--nav-dim); } .sn-illustration svg.ni { width: 1.25rem; height: 1.25rem; }
+
+/* Penyesuaian khusus Laut & Senja (tata letak dipinjam dari neon/minimal) */
+:root[data-theme-preset="laut"] .bg-logo .bg-logo-bg { fill: var(--primary); }
+:root[data-theme-preset="laut"] .btn-primary { box-shadow: 0 8px 20px -8px hsla(var(--hue-primary), 80%, 30%, .55); }
+:root[data-theme-preset="laut"] .brand-title .bg-wm-gf, :root[data-theme-preset="laut"] .bg-wm-gf { stroke: var(--primary); }
+:root[data-theme-preset="senja"] .bg-logo .bg-logo-bg { fill: var(--primary); }
+:root[data-theme-preset="senja"] .bg-logo .bg-logo-glyph { stroke: #fff; }
+:root[data-theme-preset="senja"] .bn-bar { background: #120b19; border-top-color: rgba(255,190,150,.14); }
+:root[data-theme-preset="senja"] .bn-item.on { color: #1a0f1c; }
+:root[data-theme-preset="senja"] .sn-rail, :root[data-theme-preset="senja"] .sn-panel { background: #120b19; }
+:root[data-theme-preset="senja"] .sub-tab.active, :root[data-theme-preset="senja"] .sub-tab-strip .active { background: var(--primary-gradient); color: #1a0f1c; border-color: transparent; }
+@media (max-width: 1023px) { :root[data-theme-preset="senja"] .bn-item.on { background: var(--primary-gradient); color: #1a0f1c; } :root[data-theme-preset="senja"] .bn-item.on .bn-lbl { opacity: 1; } }

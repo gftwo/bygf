@@ -1,0 +1,137 @@
+/* ── NEW HOME SCREEN STYLES ── */
+
+/* Hero Balance */
+.home-hero {
+    background: var(--primary-gradient);
+    border-radius: var(--radius-xl);
+    padding: 1.75rem 1.75rem 2.25rem;
+    margin-bottom: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 30px -8px hsla(var(--hue-primary), var(--sat-primary), 50%, 0.4);
+}
+.home-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+}
+.home-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+}
+.home-hero-greeting {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0.25rem;
+    position: relative; z-index: 1;
+}
+.home-hero-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.65);
+    position: relative; z-index: 1;
+}
+.home-hero-amount {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0.25rem 0 1.25rem;
+    position: relative; z-index: 1;
+}
+.home-hero-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    position: relative; z-index: 1;
+}
+.home-mini-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-md);
+    padding: 0.875rem 1rem;
+    min-height: 70px;
+}
+.home-mini-card .bc-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0.4rem;
+}
+.home-mini-card .bc-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: white;
+}
+
+/* Quick Stats Row */
+.home-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+.home-stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.home-stat-icon {
+    width: 34px; height: 34px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.home-stat-pill.income .home-stat-icon {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+.home-stat-pill.expense .home-stat-icon {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+}
+.home-stat-val {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+}
+.home-stat-lbl {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 0.1rem;
+}
+
+/* Tx Card */
+.home-tx-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-light);
+}
+.home-tx-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}

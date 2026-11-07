@@ -1,0 +1,45 @@
+/* ==========================================================================
+   DESIGN SYSTEM & VARIABLES (LIGHT & DARK MODE)
+   ========================================================================== */
+:root {
+    --hue-primary: 244; 
+    --sat-primary: 75%;
+    
+    --primary: hsl(var(--hue-primary), var(--sat-primary), 59%);
+    --primary-dark: hsl(var(--hue-primary), var(--sat-primary), 45%);
+    --primary-light: hsl(var(--hue-primary), var(--sat-primary), 90%);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), var(--sat-primary), 59%), hsl(var(--hue-primary), var(--sat-primary), 70%));
+    
+    --success: #10b981; --success-dark: #059669; --success-light: #d1fae5;
+    --danger: #ef4444; --danger-dark: #dc2626; --danger-light: #fee2e2;
+    --warning: #f59e0b; --warning-dark: #d97706; --warning-light: #fef3c7;
+
+    --premium-gold: #fbbf24;
+    --premium-gradient: linear-gradient(135deg, #f59e0b, #fbbf24, #fcd34d);
+
+    --bg-body: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-hover: #f1f5f9;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+    
+    --text-main: #0f172a; --text-muted: #64748b; --text-light: #94a3b8;
+    --border-light: #e2e8f0; --border-medium: #cbd5e1;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+    --shadow-premium: 0 10px 25px -5px rgba(245, 158, 11, 0.3);
+    
+    --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 28px; --radius-full: 9999px;
+    --transition-fast: 150ms ease; --transition-normal: 250ms ease; --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] {
+    --bg-body: #0f172a; --bg-surface: #1e293b; --bg-surface-hover: #334155; --bg-glass: rgba(30, 41, 59, 0.85);
+    --text-main: #f8fafc; --text-muted: #94a3b8; --text-light: #64748b;
+    --border-light: #334155; --border-medium: #475569;
+    --primary-light: hsla(var(--hue-primary), var(--sat-primary), 59%, 0.15);
+    --success-light: rgba(16, 185, 129, 0.15); --danger-light: rgba(239, 68, 68, 0.15); --warning-light: rgba(245, 158, 11, 0.15);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5); --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4); --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+}

@@ -1,0 +1,145 @@
+/* ==========================================================================
+   BYgf — 4 TEMA
+   editorial (default) · neon (gelap modern) · minimal · playful
+   Setiap tema mendefinisikan ulang seluruh token desain aplikasi, sehingga
+   semua tab ikut berubah tanpa menyentuh logika. Atribut dipasang oleh
+   App.Theme.changePreset() pada <html data-theme-preset="...">.
+   ========================================================================== */
+:root {
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --nav-w: 264px;
+}
+
+/* ---------- 1. EDITORIAL HANGAT (default) ---------- */
+:root[data-theme-preset="editorial"] {
+    --hue-primary: 14;
+    --font-display: 'Fraunces', Georgia, serif; --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --bg-body: #f3ede2; --bg-surface: #fbf8f1; --bg-surface-hover: #f0e8d9; --bg-glass: rgba(251,248,241,.9);
+    --text-main: #2a2018; --text-muted: #75654f; --text-light: #a39581;
+    --border-light: #e4d9c5; --border-medium: #d3c4a8;
+    --primary: hsl(var(--hue-primary), 58%, 42%); --primary-dark: hsl(var(--hue-primary), 60%, 32%);
+    --primary-light: hsl(var(--hue-primary), 55%, 91%);
+    --primary-gradient: linear-gradient(var(--primary), var(--primary));
+    --success: #2f7d5b; --success-dark: #1f5c42; --success-light: #dcefe4;
+    --danger: #b4412f; --danger-dark: #8f3122; --danger-light: #f6dfd9;
+    --warning: #b9801a; --warning-dark: #8f6112; --warning-light: #f6e8c8;
+    --shadow-sm: 0 1px 0 rgba(42,32,24,.06); --shadow-md: 0 2px 0 rgba(42,32,24,.05), 0 6px 16px -8px rgba(42,32,24,.15);
+    --shadow-lg: 0 2px 0 rgba(42,32,24,.05), 0 14px 30px -14px rgba(42,32,24,.22); --shadow-float: 0 20px 44px -16px rgba(42,32,24,.3);
+    --radius-sm: 5px; --radius-md: 9px; --radius-lg: 13px; --radius-xl: 16px;
+    --nav-bg: #2a2018; --nav-fg: #f3ede2; --nav-dim: rgba(243,237,226,.6); --nav-hover: rgba(243,237,226,.08);
+    --nav-active-bg: #f3ede2; --nav-active-fg: #2a2018;
+}
+:root[data-theme-preset="editorial"] .ambient-bg { background: radial-gradient(ellipse at 100% 0%, rgba(200,120,70,.10), transparent 55%), radial-gradient(ellipse at 0% 100%, rgba(120,140,90,.08), transparent 50%); }
+:root[data-theme-preset="editorial"] .card { border-width: 1px; box-shadow: var(--shadow-md); }
+:root[data-theme-preset="editorial"] .btn-primary { box-shadow: 0 2px 0 hsl(var(--hue-primary), 60%, 28%); }
+
+/* ---------- 2. GELAP FUTURISTIK ---------- */
+:root[data-theme-preset="neon"] {
+    --hue-primary: 265;
+    --font-display: 'Space Grotesk', system-ui, sans-serif; --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --bg-body: #06060d; --bg-surface: #0f1020; --bg-surface-hover: #181a30; --bg-glass: rgba(15,16,32,.82);
+    --text-main: #eceeff; --text-muted: #9a9fc8; --text-light: #646a96;
+    --border-light: rgba(150,140,255,.16); --border-medium: rgba(150,140,255,.28);
+    --primary: hsl(var(--hue-primary), 95%, 68%); --primary-dark: hsl(var(--hue-primary), 80%, 55%);
+    --primary-light: hsla(var(--hue-primary), 95%, 68%, .16);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 90%, 62%), hsl(calc(var(--hue-primary) - 80), 95%, 56%));
+    --success: #34e0a1; --success-dark: #1bb97f; --success-light: rgba(52,224,161,.14);
+    --danger: #ff5c7a; --danger-dark: #ff3d63; --danger-light: rgba(255,92,122,.14);
+    --warning: #ffc247; --warning-dark: #ffb020; --warning-light: rgba(255,194,71,.14);
+    --shadow-sm: 0 0 0 1px rgba(150,140,255,.12); --shadow-md: 0 0 0 1px rgba(150,140,255,.14), 0 10px 30px -12px hsla(var(--hue-primary), 95%, 60%, .45);
+    --shadow-lg: 0 0 0 1px rgba(150,140,255,.16), 0 18px 50px -16px hsla(var(--hue-primary), 95%, 60%, .5); --shadow-float: 0 24px 60px -16px hsla(var(--hue-primary), 95%, 60%, .6);
+    --radius-sm: 8px; --radius-md: 13px; --radius-lg: 18px; --radius-xl: 24px;
+    --nav-bg: rgba(10,10,22,.92); --nav-fg: #eceeff; --nav-dim: #8b90bb; --nav-hover: rgba(150,140,255,.1);
+    --nav-active-bg: var(--primary-gradient); --nav-active-fg: #fff;
+}
+:root[data-theme-preset="neon"] .ambient-bg { background: radial-gradient(circle at 12% 0%, hsla(var(--hue-primary), 95%, 60%, .28), transparent 45%), radial-gradient(circle at 95% 85%, rgba(0,220,255,.16), transparent 50%); }
+:root[data-theme-preset="neon"] .card { backdrop-filter: blur(10px); }
+:root[data-theme-preset="neon"] .btn-primary { box-shadow: 0 0 24px -4px hsla(var(--hue-primary), 95%, 60%, .7); }
+
+/* ---------- 3. MINIMAL BERSIH ---------- */
+:root[data-theme-preset="minimal"] {
+    --hue-primary: 240;
+    --font-display: 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif;
+    --bg-body: #fafafa; --bg-surface: #ffffff; --bg-surface-hover: #f4f4f5; --bg-glass: rgba(255,255,255,.9);
+    --text-main: #111114; --text-muted: #6b6b76; --text-light: #a1a1aa;
+    --border-light: #ececef; --border-medium: #dcdce1;
+    --primary: #18181b; --primary-dark: #000; --primary-light: #f0f0f3;
+    --primary-gradient: linear-gradient(#18181b, #18181b);
+    --success: #16a34a; --success-dark: #15803d; --success-light: #e7f6ec;
+    --danger: #dc2626; --danger-dark: #b91c1c; --danger-light: #fdeaea;
+    --warning: #d97706; --warning-dark: #b45309; --warning-light: #fdf1dc;
+    --shadow-sm: none; --shadow-md: 0 1px 2px rgba(0,0,0,.04); --shadow-lg: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px -12px rgba(0,0,0,.08); --shadow-float: 0 16px 40px -12px rgba(0,0,0,.18);
+    --radius-sm: 6px; --radius-md: 8px; --radius-lg: 10px; --radius-xl: 12px;
+    --nav-bg: #ffffff; --nav-fg: #111114; --nav-dim: #6b6b76; --nav-hover: #f4f4f5;
+    --nav-active-bg: #f1f1f3; --nav-active-fg: #111114;
+}
+:root[data-theme-preset="minimal"] .ambient-bg { background: none; }
+:root[data-theme-preset="minimal"] .card { box-shadow: var(--shadow-md); }
+
+/* ---------- 4. PLAYFUL BERWARNA ---------- */
+:root[data-theme-preset="playful"] {
+    --hue-primary: 335;
+    --font-display: 'Nunito', system-ui, sans-serif; --font-body: 'Nunito', system-ui, sans-serif;
+    --bg-body: #fff3dc; --bg-surface: #ffffff; --bg-surface-hover: #fff0cf; --bg-glass: rgba(255,255,255,.92);
+    --text-main: #2b1b3d; --text-muted: #7b6a8f; --text-light: #ad9fbd;
+    --border-light: #2b1b3d1f; --border-medium: #2b1b3d40;
+    --primary: hsl(var(--hue-primary), 88%, 58%); --primary-dark: hsl(var(--hue-primary), 80%, 44%); --primary-light: hsl(var(--hue-primary), 100%, 94%);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 90%, 60%), hsl(calc(var(--hue-primary) + 40), 95%, 62%));
+    --success: #14b87a; --success-dark: #0d9460; --success-light: #d4f7e8;
+    --danger: #f0405f; --danger-dark: #cf2745; --danger-light: #ffe0e6;
+    --warning: #ff9f1c; --warning-dark: #e08000; --warning-light: #ffecc7;
+    --shadow-sm: 0 2px 0 rgba(43,27,61,.12); --shadow-md: 0 4px 0 rgba(43,27,61,.14); --shadow-lg: 0 6px 0 rgba(43,27,61,.14), 0 18px 30px -14px rgba(43,27,61,.2); --shadow-float: 0 8px 0 rgba(43,27,61,.14), 0 24px 40px -16px rgba(43,27,61,.3);
+    --radius-sm: 12px; --radius-md: 18px; --radius-lg: 24px; --radius-xl: 30px;
+    --nav-bg: #ffc93c; --nav-fg: #2b1b3d; --nav-dim: rgba(43,27,61,.65); --nav-hover: rgba(43,27,61,.08);
+    --nav-active-bg: #ffffff; --nav-active-fg: #2b1b3d;
+}
+:root[data-theme-preset="playful"] .ambient-bg { background: radial-gradient(circle at 90% 8%, rgba(255,95,160,.18), transparent 40%), radial-gradient(circle at 5% 90%, rgba(60,200,180,.18), transparent 45%); }
+:root[data-theme-preset="playful"] .card { border: 2px solid var(--border-medium); }
+:root[data-theme-preset="playful"] .btn { border: 2px solid rgba(43,27,61,.85); box-shadow: 0 3px 0 rgba(43,27,61,.85); font-weight: 800; }
+:root[data-theme-preset="playful"] .btn:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(43,27,61,.85); }
+
+
+/* ---------- 5. LAUT (terang, biru-teal) — tata letak: menu atas ---------- */
+:root[data-theme-preset="laut"] {
+    --hue-primary: 190;
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif; --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --bg-body: #eef6f8; --bg-surface: #ffffff; --bg-surface-hover: #e3f0f3; --bg-glass: rgba(255,255,255,.88);
+    --text-main: #0d2b36; --text-muted: #517481; --text-light: #8aa7b2;
+    --border-light: #d5e6ea; --border-medium: #b9d3da;
+    --primary: hsl(var(--hue-primary), 80%, 33%); --primary-dark: hsl(var(--hue-primary), 85%, 25%);
+    --primary-light: hsl(var(--hue-primary), 60%, 91%);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 80%, 36%), hsl(calc(var(--hue-primary) + 24), 78%, 42%));
+    --success: #1c8a62; --success-dark: #146b4b; --success-light: #d6f0e6;
+    --danger: #d1435b; --danger-dark: #a8304a; --danger-light: #fbe1e6;
+    --warning: #c68412; --warning-dark: #9a650b; --warning-light: #faecc9;
+    --shadow-sm: 0 1px 2px rgba(13,43,54,.06); --shadow-md: 0 6px 20px -10px rgba(13,43,54,.2);
+    --shadow-lg: 0 16px 36px -14px rgba(13,43,54,.28); --shadow-float: 0 22px 48px -16px rgba(13,43,54,.35);
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 22px;
+    --nav-bg: rgba(255,255,255,.94); --nav-fg: #0d2b36; --nav-dim: #5f8591; --nav-hover: rgba(15,110,130,.08);
+    --nav-active-bg: var(--primary-gradient); --nav-active-fg: #fff;
+}
+:root[data-theme-preset="laut"] .ambient-bg { background: radial-gradient(circle at 8% 0%, hsla(var(--hue-primary), 80%, 60%, .18), transparent 45%), radial-gradient(circle at 96% 90%, hsla(calc(var(--hue-primary) + 40), 80%, 65%, .14), transparent 50%); }
+:root[data-theme-preset="laut"] .card { border-radius: var(--radius-lg); }
+
+/* ---------- 6. SENJA (gelap hangat, ungu-oranye) — tata letak: rel ikon ---------- */
+:root[data-theme-preset="senja"] {
+    --hue-primary: 24;
+    --font-display: 'Fraunces', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif;
+    --bg-body: #17101f; --bg-surface: #211730; --bg-surface-hover: #2b1f3d; --bg-glass: rgba(33,23,48,.86);
+    --text-main: #f6ece4; --text-muted: #b9a6bd; --text-light: #85748f;
+    --border-light: rgba(255,190,150,.13); --border-medium: rgba(255,190,150,.24);
+    --primary: hsl(var(--hue-primary), 92%, 62%); --primary-dark: hsl(var(--hue-primary), 85%, 50%);
+    --primary-light: hsla(var(--hue-primary), 92%, 62%, .16);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 92%, 58%), hsl(calc(var(--hue-primary) + 316), 70%, 52%));
+    --success: #5fd6a2; --success-dark: #36b784; --success-light: rgba(95,214,162,.14);
+    --danger: #ff6f78; --danger-dark: #f0505c; --danger-light: rgba(255,111,120,.15);
+    --warning: #ffc255; --warning-dark: #f0a92c; --warning-light: rgba(255,194,85,.15);
+    --shadow-sm: 0 0 0 1px rgba(255,190,150,.08); --shadow-md: 0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lg: 0 16px 40px -14px rgba(0,0,0,.7); --shadow-float: 0 24px 56px -16px rgba(0,0,0,.8);
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px; --radius-xl: 24px;
+    --nav-bg: #120b19; --nav-fg: #f6ece4; --nav-dim: #a8949f; --nav-hover: rgba(255,190,150,.09);
+    --nav-active-bg: var(--primary-gradient); --nav-active-fg: #1a0f1c;
+}
+:root[data-theme-preset="senja"] .ambient-bg { background: radial-gradient(circle at 100% 0%, hsla(var(--hue-primary), 92%, 60%, .22), transparent 48%), radial-gradient(circle at 0% 100%, rgba(150,70,200,.2), transparent 50%); }
+:root[data-theme-preset="senja"] .btn-primary { color: #1a0f1c; }

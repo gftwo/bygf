@@ -1,0 +1,27 @@
+/* Dasar global (reset, tipografi, utilitas). Token tema ada di bygf-themes.css */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-body); color: var(--text-main);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.ambient-bg {
+    position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 50%);
+    z-index: -1; pointer-events: none; transition: background 0.5s ease;
+}
+
+.app-container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1.5rem 2.5rem 84px; display: none; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 640px) { .app-container { padding: 1rem 1rem 2rem 76px; } .grid-2 { grid-template-columns: 1fr; gap: 0.75rem; } }
+
+h1, h2, h3, h4 { font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+p { color: var(--text-muted); }
+.text-sm { font-size: 0.875rem; } .text-xs { font-size: 0.75rem; }
+.font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-primary { color: var(--primary); }
+.text-center { text-align: center; }

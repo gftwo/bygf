@@ -1,0 +1,24 @@
+/* ==========================================================================
+   BYgf — Tahap 2: penyesuaian tampilan per modul (hanya CSS, tanpa mengubah logika)
+   ========================================================================== */
+
+/* Profil di header: warna mengikuti token tema */
+.profile-btn { color: var(--text-main); }
+.profile-btn-info .font-bold, .profile-btn-info #userDisplayName { color: var(--text-main); }
+.profile-btn-info .text-muted, .profile-btn-info #userRoleBadge { color: var(--text-muted); }
+
+/* Laporan: kartu ringkasan memakai permukaan tema (bukan kaca transparan khusus kartu saldo) */
+#repSummaryCards .home-mini-card { background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); backdrop-filter: none; }
+#repSummaryCards .home-mini-card .bc-label { color: var(--text-muted); }
+#repSummaryCards .home-mini-card .bc-value { color: var(--text-main); }
+#view-laporan .btn-icon { background: var(--bg-surface-hover) !important; color: var(--text-main); border: 1px solid var(--border-light); }
+
+/* Tema Gelap: kontrol tanggal/tab laporan agar terbaca */
+:root[data-theme="dark"] input[type="date"] { color-scheme: dark; }
+:root[data-theme="dark"] .tx-type-toggle { background: var(--bg-surface-hover); }
+
+/* Playful: tombol ikon & input pencarian Task agar terlihat di latar krem */
+:root[data-theme-preset="playful"] #view-laporan .btn-icon { box-shadow: 0 3px 0 var(--nav-fg); border: 2px solid var(--nav-fg); }
+
+/* Minimal: permukaan datar */
+:root[data-theme-preset="minimal"] .card, :root[data-theme-preset="minimal"] .home-stat-card { box-shadow: none; }
