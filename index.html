@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light" data-theme-preset="editorial">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BYgf | Catatan &amp; Keseharian</title>
+    
+    <!-- PWA & Meta -->
+    <meta name="theme-color" content="#4f46e5" id="metaThemeColor">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BYgf">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="BYgf">
+    <meta name="description" content="BYgf — keuangan, tugas, kuliah, makan, dan catatan dalam satu tempat">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800;900" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <!-- ── Tugas Pro: Popup Pengingat Jadwal Hari Ini ── -->
+    <div id="todoReminderPopup">
+        <div class="trp-card">
+            <div class="trp-header">
+                <span class="trp-icon">📋</span>
+                <div style="flex:1; min-width:0;">
+                    <h3 class="trp-title">Jadwal Kamu Hari Ini</h3>
+                    <p class="trp-sub" id="trpSubtitle">Memuat tugas...</p>
+                </div>
+                <button class="trp-close" id="trpClose" title="Tutup">✕</button>
+            </div>
+            <div class="trp-list" id="trpList"></div>
+            <label class="trp-dont-show">
+                <input type="checkbox" id="trpDontShowToday">
+                <span>Jangan tampilkan lagi hari ini</span>
+            </label>
+            <button class="btn btn-primary" style="width:100%;padding:0.85rem;font-size:0.9rem;" id="trpOpenTodo">✅ Buka Tugas</button>
+        </div>
+    </div>
+
+    <!-- PWA Install Banner -->
+    <div id="installBanner">
+        <svg class="bg-logo" viewBox="0 0 48 48" role="img" aria-label="BYgf"><rect class="bg-logo-bg" width="48" height="48" rx="13"/><g class="bg-logo-glyph" transform="translate(24 24) scale(.58) translate(-27 -23)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g></svg>
+        <div class="ib-text">
+            <p class="ib-title">Pasang di Layar Utama</p>
+            <p class="ib-sub">Akses lebih cepat seperti app native 🚀</p>
+        </div>
+        <button class="ib-btn" id="installBtn">Install</button>
+        <button class="ib-close" id="installClose">✕</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" integrity="sha384-wHFvAtjmgnkA2PJcMsDaCgdipf7X7YV44X/igbLHpvGiq6T5/PvFKl93grpvtbQT" crossorigin="anonymous"></script>
+    <script src="js/notify-queue.js"></script>
+    
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/home-popups.css">
+    <link rel="stylesheet" href="css/kuliah.css">
+    <link rel="stylesheet" href="css/reminder.css">
+    <link rel="stylesheet" href="css/modules.css">
+    <link rel="stylesheet" href="css/bygf-themes.css">
+    <link rel="stylesheet" href="css/bygf-shell.css">
+    <link rel="stylesheet" href="css/bygf-modules.css">
+
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="bgLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#18d4ff"/></linearGradient></defs></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ni-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></symbol><symbol id="ni-keuangan" viewBox="0 0 24 24"><path d="M17 7V5.5A1.5 1.5 0 0 0 15.5 4H6a3 3 0 0 0-3 3"/><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M21 12h-4a2 2 0 0 0 0 4h4"/><circle cx="17.2" cy="14" r=".7" fill="currentColor"/></symbol><symbol id="ni-task" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol><symbol id="ni-kuliah" viewBox="0 0 24 24"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.8v4.2c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.2"/><path d="M21.5 9.5v5.5"/></symbol><symbol id="ni-makan" viewBox="0 0 24 24"><path d="M5 3v6.5a2.5 2.5 0 0 0 5 0V3"/><path d="M7.5 3v18"/><path d="M18.5 21V3c-2 1.2-3.2 3.6-3.2 6.5 0 1.8.9 3 2.2 3h1"/></symbol><symbol id="ni-catatan" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M3 7.5h4M3 12h4M3 16.5h4"/><path d="M12 8h4M12 12h4"/></symbol><symbol id="ni-notes" viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v8l-6 6H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M20 14h-4a2 2 0 0 0-2 2v4"/><path d="M8 9h8M8 13h3"/></symbol><symbol id="ni-laporan" viewBox="0 0 24 24"><path d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5"/><path d="M9 17v-2.5M12 17v-4.5M15 17v-6.5"/></symbol><symbol id="ni-setting" viewBox="0 0 24 24"><path d="M4 7h9"/><path d="M17 7h3"/><circle cx="15" cy="7" r="2"/><path d="M4 17h3"/><path d="M11 17h9"/><circle cx="9" cy="17" r="2"/><path d="M4 12h11"/><path d="M19 12h1"/><circle cx="17" cy="12" r="2"/></symbol><symbol id="ni-admin" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.2-2.9 7.6-7 9.5-4.1-1.9-7-5.3-7-9.5V6z"/><path d="M9.2 12l2 2 3.6-3.8"/></symbol><symbol id="ni-more" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></symbol></svg>
+    <div class="ambient-bg"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="auth-view" id="authView">
+        <div class="auth-bg">
+            <div class="auth-orb auth-orb-1"></div>
+            <div class="auth-orb auth-orb-2"></div>
+            <div class="auth-orb auth-orb-3"></div>
+        </div>
+
+        <div class="auth-wrapper">
+            <div class="auth-hero">
+                <div class="auth-hero-brand">
+                    <div class="auth-hero-icon" style="font-size:0;width:72px;height:72px;border-radius:18px;overflow:hidden;margin:0 auto 1rem;box-shadow:0 8px 24px rgba(99,102,241,0.35);">
+                        <svg class="bg-logo" viewBox="0 0 48 48" role="img" aria-label="BYgf"><rect class="bg-logo-bg" width="48" height="48" rx="13"/><g class="bg-logo-glyph" transform="translate(24 24) scale(.58) translate(-27 -23)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g></svg>
+                    </div>
+                    <h2>Satu tempat<br>untuk seluruh harimu</h2>
+                    <p id="authSubtitle">Catat keuangan, tugas, kuliah, makan, dan ide — semua tersinkron.</p>
+                </div>
+                <div class="auth-hero-features">
+                    <div class="auth-feature-item"><div class="auth-feature-dot">📊</div><span>Keuangan, analitik &amp; target</span></div>
+                    <div class="auth-feature-item"><div class="auth-feature-dot">🎯</div><span>Tugas, kuliah &amp; catatan harian</span></div>
+                    <div class="auth-feature-item"><div class="auth-feature-dot">🔒</div><span>Data Aman & Tersinkronisasi</span></div>
+                </div>
+            </div>
+
+            <div class="auth-panel">
+                <div class="auth-panel-header">
+                    <h1 class="bg-wordmark"><svg class="bg-wm" viewBox="0 0 106 48" role="img" aria-label="bygf"><g transform="translate(0 1)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"><g stroke="currentColor"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g><g class="bg-wm-gf"><circle cx="65" cy="22" r="10"/><path d="M75 22V35q0 8.5-9 8.5-4.5 0-7.5-2.5"/><path d="M90 32V9q0-6.5 7-6.5 2 0 4 .8"/><path d="M83.5 14H98"/></g></g></svg></h1>
+                    <p>Masuk atau buat akun baru untuk mulai.</p>
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tabLogin" type="button" onclick="App.UI.toggleAuth('login')">Masuk</button>
+                    <button class="auth-tab" id="tabRegister" type="button" onclick="App.UI.toggleAuth('register')">Daftar</button>
+                </div>
+
+                <form id="loginForm" onsubmit="App.Auth.handleLogin(event)" class="auth-form-slide">
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon">👤</span>
+                        <input type="text" id="loginUsername" placeholder="Username" required pattern="[a-zA-Z0-9_]+" autocomplete="username">
+                    </div>
+                    <div class="auth-input-group has-toggle">
+                        <span class="auth-input-icon">🔑</span>
+                        <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+                        <button type="button" class="auth-pwd-toggle" onclick="App.UI.togglePwd('loginPassword', this)" title="Tampilkan password">👁</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnLogin" style="margin-top: 0.5rem; padding: 1rem; font-size: 1rem;">Masuk</button>
+                    <p class="auth-footer-note">Belum punya akun? <a onclick="App.UI.toggleAuth('register')">Daftar di sini</a></p>
+                </form>
+
+                <form id="registerForm" onsubmit="App.Auth.handleRegister(event)" class="auth-form-slide" style="display: none;">
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon">✏️</span>
+                        <input type="text" id="regName" placeholder="Nama Lengkap" required autocomplete="name">
+                    </div>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon">👤</span>
+                        <input type="text" id="regUsername" placeholder="Username" required pattern="[a-zA-Z0-9_]+" autocomplete="username">
+                    </div>
+                    <div class="auth-input-group has-toggle">
+                        <span class="auth-input-icon">🔑</span>
+                        <input type="password" id="regPassword" placeholder="Password" required autocomplete="new-password">
+                        <button type="button" class="auth-pwd-toggle" onclick="App.UI.togglePwd('regPassword', this)" title="Tampilkan password">👁</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnRegister" style="margin-top: 0.5rem; padding: 1rem; font-size: 1rem;">Buat Akun</button>
+                    <p class="auth-footer-note">Sudah punya akun? <a onclick="App.UI.toggleAuth('login')">Masuk di sini</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon" style="width:40px;height:40px;padding:0;overflow:hidden;border-radius:10px;background:none;">
+                    <svg class="bg-logo" viewBox="0 0 48 48" role="img" aria-label="BYgf"><rect class="bg-logo-bg" width="48" height="48" rx="13"/><g class="bg-logo-glyph" transform="translate(24 24) scale(.58) translate(-27 -23)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g></svg>
+                </div>
+                <div>
+                    <h1 class="brand-title bg-wordmark"><svg class="bg-wm" viewBox="0 0 106 48" role="img" aria-label="bygf"><g transform="translate(0 1)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"><g stroke="currentColor"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g><g class="bg-wm-gf"><circle cx="65" cy="22" r="10"/><path d="M75 22V35q0 8.5-9 8.5-4.5 0-7.5-2.5"/><path d="M90 32V9q0-6.5 7-6.5 2 0 4 .8"/><path d="M83.5 14H98"/></g></g></svg></h1>
+                    <p class="text-xs font-medium text-muted" style="display:flex;align-items:center;gap:5px;">
+                        <span class="sync-dot" id="syncStatusDot"></span>
+                        <span id="syncStatusText">Memuat...</span>
+                        <span id="currentDateStr" style="display:none;"></span>
+                    </p>
+                </div>
+            </div>
+            
+            <button type="button" class="hdr-search" id="globalSearchBtn" aria-label="Cari di semua tab (tekan /)" title="Cari (/)"><svg class="ni" aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+            <div style="position: relative;">
+                <button class="profile-btn" id="profileBtn" onclick="App.UI.toggleProfileDropdown()" type="button">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="profile-btn-info">
+                        <span class="font-bold text-sm" id="userDisplayName">User</span>
+                        <span class="text-xs text-muted" id="userRoleBadge">Reguler</span>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 0.7rem; margin-left: 0.1rem;">▾</span>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="pd-header">
+                        <div class="pd-avatar" id="pdAvatar">U</div>
+                        <div>
+                            <div class="pd-name" id="pdName">User</div>
+                            <div class="pd-role" id="pdRole">Pengguna Reguler</div>
+                        </div>
+                    </div>
+                    <div class="pd-body">
+                        <div class="pd-stat-row">
+                            <div class="pd-stat">
+                                <div class="pd-stat-val" id="pdTxCount">0</div>
+                                <div class="pd-stat-lbl">Transaksi</div>
+                            </div>
+                            <div class="pd-stat">
+                                <div class="pd-stat-val" id="pdBudgetCount">0</div>
+                                <div class="pd-stat-lbl">Budget Aktif</div>
+                            </div>
+                        </div>
+                        <button class="pd-menu-item" id="btnPdSettings" onclick="App.UI.closeProfileDropdown(); App.UI.switchTabByName('settings');">
+                            <div class="pd-menu-icon" style="background: var(--primary-light);">⚙️</div>
+                            Pengaturan Akun
+                        </button>
+                        <div class="pd-menu-sep"></div>
+                        <button class="pd-menu-item danger" onclick="App.UI.closeProfileDropdown(); App.UI.showLogoutModal();">
+                            <div class="pd-menu-icon" style="background: var(--danger-light);">🚪</div>
+                            Keluar dari Akun
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sub-tab strip (muncul kalau grup nav aktif punya beberapa sub-halaman) -->
+        <div class="sub-tab-strip" id="subTabStrip" style="display:none;"></div>
+
+        <!-- 0. TAB ADMIN PANEL -->
+        <main class="app-section" id="view-admin">
+            <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); color: white; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">🛡️</div>
+                            <div>
+                                <h2 style="color: white; margin: 0; font-size: 1.25rem;">Admin Panel</h2>
+                                <p style="color: rgba(255,255,255,0.6); font-size: 0.75rem; margin: 0;">BYgf Control Center</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25);" onclick="App.Admin.loadData()">🔄 Refresh</button>
+                </div>
+                <div class="admin-stat-grid" style="margin-top: 1.25rem; margin-bottom: 0;">
+                    <div class="admin-stat-card" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1);">
+                        <div class="admin-stat-icon">👥</div>
+                        <div class="admin-stat-val" style="color: white;" id="adminTotUsers">0</div>
+                        <div class="admin-stat-lbl" style="color: rgba(255,255,255,0.6);">Total Akun</div>
+                    </div>
+                    <div class="admin-stat-card" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1);">
+                        <div class="admin-stat-icon">👑</div>
+                        <div class="admin-stat-val" style="color: #fbbf24;" id="adminTotPremium">0</div>
+                        <div class="admin-stat-lbl" style="color: rgba(255,255,255,0.6);">Premium</div>
+                    </div>
+                    <div class="admin-stat-card" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1);">
+                        <div class="admin-stat-icon">📝</div>
+                        <div class="admin-stat-val" style="color: #34d399;" id="adminTotTx">0</div>
+                        <div class="admin-stat-lbl" style="color: rgba(255,255,255,0.6);">Total Transaksi</div>
+                    </div>
+                    <div class="admin-stat-card" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1);">
+                        <div class="admin-stat-icon">💾</div>
+                        <div class="admin-stat-val" style="color: #93c5fd;" id="adminMode">Lokal</div>
+                        <div class="admin-stat-lbl" style="color: rgba(255,255,255,0.6);">Mode DB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-mode-banner" id="adminDummyBanner" style="display: none;">
+                ⚠️ Mode Lokal Aktif — Data diambil dari localStorage browser ini. Pengguna antar-perangkat tidak dapat terlihat.
+            </div>
+
+            <div class="card">
+                <div class="section-title" style="margin-bottom: 1rem;">
+                    <span style="font-size: 1rem;">👥 Daftar Pengguna Terdaftar</span>
+                </div>
+                <input type="text" id="adminSearch" placeholder="🔍 Cari nama atau username..." oninput="App.Admin.renderUsers()" style="margin-bottom: 1rem;">
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Pengguna</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>Transaksi</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserTable">
+                            <tr><td colspan="6" class="text-center" style="padding: 2rem; color: var(--text-muted);">Memuat data pengguna...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- 1. TAB INPUT -->
+        <main class="app-section active" id="view-input">
+
+            <!-- Hero Balance Strip -->
+            <div class="home-hero">
+                <div class="home-hero-greeting" id="homeGreeting">Selamat datang 👋</div>
+                <div class="home-hero-label">Total Saldo Bersih</div>
+                <div class="home-hero-amount" id="homeNetBalance">Rp 0</div>
+                <div class="home-hero-cards" id="balanceCards">
+                    <div class="home-mini-card bc-cash skeleton"></div>
+                    <div class="home-mini-card bc-saldo skeleton"></div>
+                </div>
+            </div>
+
+            <!-- Rincian Sub-Dompet -->
+            <div class="card" style="padding: 0.9rem 1.1rem; margin-bottom: 1rem;">
+                <button type="button" onclick="App.UI.toggleSubWalletBreakdown()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="font-bold text-sm">👛 Rincian Saldo per Dompet</span>
+                    <span id="subWalletToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="subWalletBreakdown" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);"></div>
+            </div>
+
+            <!-- Quick Stats Row -->
+            <div class="home-stats-row">
+                <div class="home-stat-pill income">
+                    <span class="home-stat-icon">↑</span>
+                    <div>
+                        <div class="home-stat-val" id="homeMonthIn">Rp 0</div>
+                        <div class="home-stat-lbl">Masuk bulan ini</div>
+                    </div>
+                </div>
+                <div class="home-stat-pill expense">
+                    <span class="home-stat-icon">↓</span>
+                    <div>
+                        <div class="home-stat-val" id="homeMonthOut">Rp 0</div>
+                        <div class="home-stat-lbl">Keluar bulan ini</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Respons (Template Transaksi Cepat) -->
+            <div class="card" style="padding: 0.9rem 1.1rem; margin-bottom: 1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem;">
+                    <span class="font-bold text-sm">⚡ Quick Respons</span>
+                    <button type="button" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.QuickTemplate.openManage()">Kelola</button>
+                </div>
+                <div id="quickTemplateChips" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem;"></div>
+            </div>
+
+            <!-- Catat Transaksi Card - Modern Redesign -->
+            <div class="home-tx-card">
+                <div class="home-tx-header">
+                    <div class="home-tx-title">
+                        <div class="home-tx-icon-wrap">✍️</div>
+                        <span>Catat Transaksi</span>
+                    </div>
+                    <button type="button" class="btn btn-sm" style="background: var(--primary-light); color: var(--primary-dark); font-weight: 700;" onclick="App.QuickScan.open()">📸 Scan Mutasi</button>
+                </div>
+                <form id="txForm" onsubmit="App.Handlers.addTransaction(event)">
+                    <!-- Type Toggle -->
+                    <div class="tx-type-toggle">
+                        <button type="button" class="tx-type-btn active" id="txTypeBtnIn" onclick="App.UI.setTxType('in')">
+                            <span>⬆</span> Pemasukan
+                        </button>
+                        <button type="button" class="tx-type-btn" id="txTypeBtnOut" onclick="App.UI.setTxType('out')">
+                            <span>⬇</span> Pengeluaran
+                        </button>
+                    </div>
+
+                    <!-- Amount input big -->
+                    <div class="tx-amount-wrap">
+                        <span class="tx-currency">Rp</span>
+                        <input type="text" id="txAmountDisplay" class="tx-amount-input" placeholder="0" inputmode="numeric"
+                            oninput="App.UI.syncTxAmount(this)" autocomplete="off">
+                    </div>
+                    <input type="hidden" id="txIn">
+                    <input type="hidden" id="txOut">
+                    <div class="error-text" id="err-tx">Nominal wajib diisi</div>
+
+                    <div class="grid-2" style="margin-top:1rem;">
+                        <div class="form-group"><label>📅 Tanggal</label><input type="date" id="txDate" required></div>
+                        <div class="form-group"><label>🏦 Akun</label>
+                            <select id="txAccount" required onchange="document.getElementById('txSubWalletWrap').style.display = this.value === 'saldo' ? 'block' : 'none';">
+                                <option value="cash">💵 Cash / Tunai</option>
+                                <option value="saldo">🪪 Saldo Bank / E-Wallet</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="txSubWalletWrap" style="display:none;">
+                        <label>👛 Dompet</label>
+                        <select id="txSubWallet">
+                            <option value="seabank">🏦 SeaBank</option>
+                            <option value="krombank">🟣 KromBank</option>
+                            <option value="gopay">🟢 GoPay</option>
+                            <option value="dana">🔵 DANA</option>
+                            <option value="shopeepay">👛 ShopeePay</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>📂 Kategori</label><select id="txCategory" required></select></div>
+                    <div class="form-group"><label>📝 Keterangan</label><input type="text" id="txNote" placeholder="Cth: Gaji bulanan, Bensin, dll"></div>
+
+                    <div class="form-group" style="background: var(--bg-body); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                        <label class="switch-wrapper" style="margin: 0;">
+                            <div><span class="font-bold text-sm">Otomatisasi Rutin</span><p class="text-xs text-muted" style="margin-top:0.25rem;">Jadikan transaksi berulang otomatis.</p></div>
+                            <input type="checkbox" id="txRecurring" onchange="document.getElementById('recurringOpts').style.display = this.checked ? 'block' : 'none'; if(this.checked && !document.getElementById('txRecurringStart').value) document.getElementById('txRecurringStart').value = document.getElementById('txDate').value;">
+                            <div class="switch"></div>
+                        </label>
+                        <div id="recurringOpts" style="display: none; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed var(--border-medium);">
+                            <label>Ulangi Setiap</label>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input type="number" id="txRecurringInterval" value="1" min="1" max="365" style="width:80px; flex-shrink:0;">
+                                <select id="txRecurringType" style="flex:1;">
+                                    <option value="daily">Hari</option>
+                                    <option value="weekly">Minggu</option>
+                                    <option value="monthly" selected>Bulan</option>
+                                </select>
+                            </div>
+                            <p class="text-xs text-muted" style="margin-top:0.4rem;">Contoh: isi 3 + "Bulan" buat pengulangan tiap 3 bulan (cicilan, langganan tahunan dibagi, dll).</p>
+
+                            <label style="margin-top:0.9rem;">Tanggal Mulai</label>
+                            <input type="date" id="txRecurringStart">
+                            <p class="text-xs text-muted" style="margin-top:0.4rem;">Default-nya ikut tanggal transaksi di atas, tapi bisa diubah bebas.</p>
+
+                            <label style="margin-top:0.9rem;">Berakhir Pada <span class="text-muted" style="font-weight:400;">(opsional)</span></label>
+                            <input type="date" id="txRecurringEnd">
+                            <p class="text-xs text-muted" style="margin-top:0.4rem;">Kosongkan kalau mau berulang terus tanpa batas.</p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem; margin-top: 0.25rem;">Simpan Transaksi</button>
+                </form>
+            </div>
+        </main>
+
+        <!-- 2. TAB HISTORY -->
+        <main class="app-section" id="view-history">
+            <div class="card">
+                <div class="section-title"><span>🕰️ Riwayat Transaksi</span></div>
+                <div style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-light);">
+                    <div class="grid-2" style="margin-bottom: 1rem;">
+                        <div><label class="text-xs">Dari</label><input type="date" id="filterStart" onchange="App.UI.renderHistory()"></div>
+                        <div><label class="text-xs">Sampai</label><input type="date" id="filterEnd" onchange="App.UI.renderHistory()"></div>
+                    </div>
+                    <div class="grid-2" style="margin-bottom: 1rem;">
+                        <input type="text" id="filterSearch" placeholder="🔍 Cari nama/kategori..." oninput="App.Handlers.debounceSearch()">
+                        <select id="filterType" onchange="App.UI.renderHistory()"><option value="all">Semua Tipe</option><option value="in">Pemasukan (+)</option><option value="out">Pengeluaran (-)</option></select>
+                    </div>
+                    <div class="grid-2">
+                        <select id="filterCategory" onchange="App.UI.renderHistory()"></select>
+                        <select id="filterAccount" onchange="App.UI.renderHistory()"><option value="">Semua Akun</option><option value="cash">💵 Cash</option><option value="saldo">🪪 Saldo Bank/E-Wallet (Semua)</option><option value="saldo:seabank">↳ 🏦 SeaBank</option><option value="saldo:krombank">↳ 🟣 KromBank</option><option value="saldo:gopay">↳ 🟢 GoPay</option><option value="saldo:dana">↳ 🔵 DANA</option><option value="saldo:shopeepay">↳ 👛 ShopeePay</option></select>
+                    </div>
+                    <div style="text-align: right; margin-top: 0.5rem;"><button class="btn btn-sm text-primary btn-outline" style="border:none;" onclick="App.Handlers.resetFilters()">Reset Filter</button></div>
+                </div>
+
+                <div id="historyList" style="position: relative;">
+                    <div class="skeleton sk-title"></div><div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div><div class="skeleton" style="height: 60px;"></div>
+                </div>
+                
+                <div id="historyLock" class="premium-lock" style="display:none!important;"></div>
+            </div>
+        </main>
+
+        <!-- Floating button Riwayat Penyesuaian Saldo (cuma muncul di tab Riwayat) -->
+        <button type="button" id="adjustmentFAB" onclick="App.UI.openAdjustmentPanel()" style="display:none;">
+            🔄<span class="tp-nav-badge" id="adjustmentFABBadge"></span>
+        </button>
+
+        <!-- Panel Riwayat Penyesuaian Saldo -->
+        <div id="adjustmentPanelOverlay" onclick="if(event.target===this) App.UI.closeAdjustmentPanel()">
+            <div id="adjustmentPanel">
+                <div class="modal-header" style="margin-bottom:0.5rem;">
+                    <h2 style="font-size:1.05rem;">🔄 Riwayat Penyesuaian Saldo</h2>
+                    <button class="modal-close" onclick="App.UI.closeAdjustmentPanel()">&times;</button>
+                </div>
+                <p class="text-xs text-muted" style="margin-bottom:0.9rem;">Hasil dari fitur Sinkronkan Saldo, dipisah biar riwayat transaksi biasa tetap bersih.</p>
+                <div id="adjustmentHistoryList" class="list-group"></div>
+            </div>
+        </div>
+
+        <!-- 3. TAB ANALYTICS -->
+        <!-- 3. TAB LAPORAN -->
+        <main class="app-section" id="view-laporan">
+            <div class="card">
+                <h2 class="section-title">📄 Laporan Keuangan</h2>
+                <div class="tx-type-toggle" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <button type="button" class="tx-type-btn active" id="repPeriodMonthBtn" onclick="App.UI.setReportPeriod('month')">Bulanan</button>
+                    <button type="button" class="tx-type-btn" id="repPeriodWeekBtn" onclick="App.UI.setReportPeriod('week')">Mingguan</button>
+                    <button type="button" class="tx-type-btn" id="repPeriodCustomBtn" onclick="App.UI.setReportPeriod('custom')">Custom</button>
+                </div>
+                <div id="repCustomDateWrap" style="display:none; margin-bottom:1rem;">
+                    <div class="grid-2">
+                        <div class="form-group"><label>Dari</label><input type="date" id="repDateFrom" onchange="App.UI.renderReport()"></div>
+                        <div class="form-group"><label>Sampai</label><input type="date" id="repDateTo" onchange="App.UI.renderReport()"></div>
+                    </div>
+                </div>
+                <div id="repNavWrap" style="display:flex; align-items:center; justify-content:center; gap:0.75rem;">
+                    <button type="button" class="btn btn-icon" style="background:var(--bg-body);" onclick="App.UI.shiftReportOffset(-1)">◀</button>
+                    <p class="text-xs text-muted font-semibold" id="repPeriodLabel" style="text-align:center; min-width:150px;"></p>
+                    <button type="button" class="btn btn-icon" style="background:var(--bg-body);" onclick="App.UI.shiftReportOffset(1)">▶</button>
+                </div>
+            </div>
+
+            <div id="repSummaryCards" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;"></div>
+
+            <div class="card">
+                <h3 class="text-sm font-semibold text-center" style="margin-bottom:0.25rem;">📊 Pengeluaran Harian</h3>
+                <p class="text-xs text-muted text-center" style="margin-bottom:1rem;" id="repBorosLabel"></p>
+                <div style="position:relative; height:220px; width:100%;"><canvas id="chartDaily"></canvas></div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h3 class="text-sm font-semibold" style="margin:0;">🗂️ Per Kategori</h3>
+                    <button type="button" id="repCategoryFilterBtn" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.UI.toggleReportCategoryFilter()">⚙️ Filter Kategori</button>
+                </div>
+                <div id="repCategoryFilterPanel" style="display:none; margin-bottom:1rem; padding:0.9rem; background:var(--bg-body); border-radius:var(--radius-md); border:1px solid var(--border-light);">
+                    <p class="text-xs text-muted" style="margin-bottom:0.65rem;">Tap kategori untuk sembunyikan/tampilkan. Yang <span style="text-decoration:line-through;">tercoret &amp; pudar</span> berarti disembunyikan dari laporan ini.</p>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+                        <button type="button" class="btn btn-sm btn-outline" style="flex:1;" onclick="App.UI.setAllReportCategories(true)">✅ Tampilkan Semua</button>
+                        <button type="button" class="btn btn-sm btn-outline" style="flex:1;" onclick="App.UI.setAllReportCategories(false)">🚫 Sembunyikan Semua</button>
+                    </div>
+                    <div id="repCategoryFilterList" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+                </div>
+                <div id="repCategoryList"></div>
+            </div>
+
+            <button type="button" class="btn btn-primary" style="width:100%; padding:1rem; margin-bottom:1.25rem; font-size:0.95rem;" onclick="App.Handlers.exportReportPDF()">📄 Export Laporan PDF</button>
+
+            <!-- Grafik Pengeluaran (dipindah dari tab Kelola) -->
+            <div class="card">
+                <h2 class="section-title">📊 Grafik Pengeluaran</h2>
+                <div class="form-group" style="margin-bottom: 2.5rem;"><h3 class="text-sm font-semibold text-center" style="margin-bottom: 1rem;">Kategori Bulan Ini</h3><div style="position: relative; height: 250px; width: 100%;"><canvas id="chartCategory"></canvas></div></div>
+                <div class="form-group"><h3 class="text-sm font-semibold text-center" style="margin-bottom: 1rem;">Trend Arus Kas (6 Bulan)</h3><div style="position: relative; height: 250px; width: 100%;"><canvas id="chartTrend"></canvas></div></div>
+            </div>
+        </main>
+
+        <!-- 4. TAB PLANNING (BUDGET & TARGET) -->
+        <main class="app-section" id="view-planning">
+            <!-- Tagihan & Cicilan (Paylater) -->
+            <section class="paylater-wrapper" id="paylaterSection">
+                <div class="paylater-header">
+                    <h3 class="text-sm font-bold" style="color: var(--text-main); margin: 0;">💳 Tagihan & Cicilan</h3>
+                    <button class="btn btn-sm btn-outline" onclick="App.UI.showModal('paylaterModal')">+ Tambah</button>
+                </div>
+                <div class="paylater-list" id="paylaterList">
+                    <div class="skeleton" style="height: 60px;"></div>
+                </div>
+                <div style="margin-top: 1rem; border-top: 1px dashed var(--border-light); padding-top: 1rem; text-align: right; display: flex; justify-content: space-between; align-items: center;">
+                    <span class="text-sm text-muted">Total Tagihan Aktif:</span>
+                    <span class="font-bold text-lg text-danger" id="paylaterTotalAmount">Rp 0</span>
+                </div>
+            </section>
+
+            <!-- Utang Piutang Section -->
+            <section class="debt-wrapper" id="debtSection">
+                <div class="debt-header">
+                    <div>
+                        <h3 class="text-sm font-bold" style="color: var(--text-main); margin: 0;">🤝 Utang & Piutang</h3>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="App.UI.showModal('debtModal')">+ Catat</button>
+                </div>
+                <div id="debtList">
+                    <div class="skeleton" style="height: 58px;"></div>
+                </div>
+                <div style="margin-top: 1rem; border-top: 1px dashed var(--border-light); padding-top: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display:flex; gap:1.25rem;">
+                        <span class="text-sm text-muted">Hutang: <span class="text-danger" style="font-weight:700;" id="debtTotalUtang">Rp 0</span></span>
+                        <span class="text-sm text-muted">Piutang: <span class="text-success" style="font-weight:700;" id="debtTotalPiutang">Rp 0</span></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Budget -->
+            <div class="card">
+                <div class="section-title"><span>💸 Rencana Budget</span><button class="btn btn-primary btn-sm" onclick="App.Handlers.openBudgetModal()">+ Buat Budget</button></div>
+                <div id="budgetList" class="list-group"><div class="skeleton" style="height: 100px;"></div></div>
+            </div>
+
+            <!-- Transfer Antar Akun -->
+            <div class="card">
+                <div class="section-title"><span>⇄ Transfer Antar Akun</span><button class="btn btn-primary btn-sm" onclick="App.UI.showModal('transferModal')">+ Transfer</button></div>
+
+                <button type="button" onclick="App.UI.toggleTransferHistory()" style="width:100%; background:var(--bg-body); border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="text-sm font-bold">🕒 Riwayat Transfer <span class="text-muted" style="font-weight:500;">(<span id="transferHistoryCount">0</span>)</span></span>
+                    <span id="transferHistoryToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="transfersList" class="list-group" style="display:none; margin-top:0.75rem;"><div class="skeleton" style="height: 70px;"></div></div>
+            </div>
+
+        </main>
+
+        <!-- 4B. TAB ALOKASI -->
+        <main class="app-section" id="view-alokasi">
+            <div class="card">
+                <div class="section-title"><span>🎯 Alokasi Budget Bulanan</span><button class="btn btn-outline btn-sm" onclick="App.UI.toggleAllocSettings()">⚙️ Atur</button></div>
+
+                <div id="allocSettingsPanel" style="display:none; margin-bottom:1.25rem; padding-bottom:1.25rem; border-bottom:1px dashed var(--border-medium);">
+                    <div class="form-group">
+                        <label>Total Budget Bulanan (Rp)</label>
+                        <input type="text" id="allocTotal" inputmode="numeric" oninput="App.Utils.formatInput(this)">
+                    </div>
+                    <label class="switch-wrapper" style="margin-bottom:0.9rem;">
+                        <div><span class="font-bold text-sm">Custom Persentase</span><p class="text-xs text-muted" style="margin:0.1rem 0 0;">Default 50/20/30, bisa diubah di sini</p></div>
+                        <input type="checkbox" id="allocCustomPct" onchange="document.getElementById('allocPctFields').style.display = this.checked ? 'block' : 'none';">
+                        <div class="switch"></div>
+                    </label>
+                    <div id="allocPctFields" style="display:none;">
+                        <div class="grid-2">
+                            <div class="form-group"><label>🍚 Pokok (%)</label><input type="number" id="allocPctPokok" min="0" max="100" oninput="App.UI.updateAllocPctHint()"></div>
+                            <div class="form-group"><label>🎓 Kuliah (%)</label><input type="number" id="allocPctKuliah" min="0" max="100" oninput="App.UI.updateAllocPctHint()"></div>
+                        </div>
+                        <div class="form-group"><label>🎉 Fleksibel (%)</label><input type="number" id="allocPctFleksibel" min="0" max="100" oninput="App.UI.updateAllocPctHint()"></div>
+                        <p class="text-xs" id="allocPctTotalHint"></p>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="width:100%;" onclick="App.Handlers.saveAllocationSettings()">💾 Simpan Pengaturan</button>
+                </div>
+
+                <div id="allocSummaryHeader" style="background:var(--bg-body); border-radius:var(--radius-lg); padding:1.1rem; margin-bottom:1rem; text-align:center;"></div>
+                <div style="position:relative; height:160px; margin-bottom:1.25rem;"><canvas id="chartAllocDonut"></canvas></div>
+                <div id="allocProgressCards" style="display:flex; flex-direction:column; gap:0.85rem;"></div>
+                <div id="allocDailyTips" style="margin-top:1rem;"></div>
+            </div>
+
+            <div class="card" id="allocInsightCard" style="display:none; background: var(--primary-light); border: 1px solid var(--primary);"></div>
+
+            <div class="card">
+                <button type="button" onclick="App.UI.toggleAllocCategoryMap()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="font-bold text-sm">🗂️ Pemetaan Kategori</span>
+                    <span id="allocCategoryMapToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="allocCategoryMapList" style="display:none; margin-top:0.9rem;"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">📊 Rencana vs Realisasi (6 Bulan)</h2>
+                <div style="position: relative; height: 250px; width: 100%;"><canvas id="chartAllocTrend"></canvas></div>
+            </div>
+
+            <div class="card">
+                <button type="button" onclick="App.UI.toggleAllocMonthlyReport()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="font-bold text-sm">📋 Laporan Akhir Bulan</span>
+                    <span id="allocMonthlyReportToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <p class="text-xs text-muted" style="margin-top:0.5rem;">Rekap tiap pos per bulan: alokasi, terpakai, dan sisanya.</p>
+                <div id="allocMonthlyReportList" style="display:none; margin-top:0.9rem;"></div>
+            </div>
+        </main>
+
+        <!-- 5. TAB SETTINGS -->
+        <main class="app-section" id="view-settings">
+
+            <div class="card">
+                <h2 class="section-title">⚙️ Konfigurasi Utama</h2>
+                
+                <div class="form-group" id="darkModeRow" style="padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+                    <label class="switch-wrapper">
+                        <div><span class="font-bold">Mode Gelap (Dark Mode)</span></div>
+                        <input type="checkbox" id="setTheme" onchange="App.Theme.toggle(this.checked)">
+                        <div class="switch"></div>
+                    </label>
+                </div>
+
+                <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
+                    <h3 class="font-bold" style="margin-bottom: 0.15rem;">✨ Tema & Tata Letak</h3>
+                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.6rem;" id="presetGrid">
+                        <button class="preset-card" id="preset-editorial" onclick="App.Theme.changePreset('editorial')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#f3ede2,#b8452a);"></div>
+                            <div class="preset-card-title">Editorial</div>
+                            <div class="preset-card-sub">Hangat, krem &amp; serif</div>
+                        </button>
+                        <button class="preset-card" id="preset-neon" onclick="App.Theme.changePreset('neon')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#06060d,#7c5cff);"></div>
+                            <div class="preset-card-title">Gelap Modern</div>
+                            <div class="preset-card-sub">Gelap, aksen neon</div>
+                        </button>
+                        <button class="preset-card" id="preset-minimal" onclick="App.Theme.changePreset('minimal')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#ffffff,#18181b);"></div>
+                            <div class="preset-card-title">Minimal</div>
+                            <div class="preset-card-sub">Putih bersih, fokus konten</div>
+                        </button>
+                        <button class="preset-card" id="preset-playful" onclick="App.Theme.changePreset('playful')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#ffc93c,#ff4f9a);"></div>
+                            <div class="preset-card-title">Playful</div>
+                            <div class="preset-card-sub">Cerah, bulat &amp; ceria</div>
+                        </button>
+                        <button class="preset-card" id="preset-laut" onclick="App.Theme.changePreset('laut')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#eef6f8,#0f8aa3);"></div>
+                            <div class="preset-card-title">Laut</div>
+                            <div class="preset-card-sub">Terang, biru-teal &amp; segar</div>
+                        </button>
+                        <button class="preset-card" id="preset-senja" onclick="App.Theme.changePreset('senja')">
+                            <div class="preset-preview" style="background: linear-gradient(135deg,#17101f,#ff8a3d);"></div>
+                            <div class="preset-card-title">Senja</div>
+                            <div class="preset-card-sub">Gelap hangat, ungu &amp; jingga</div>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div><h3 class="font-bold">Kategori Kustom</h3></div><button class="btn btn-outline btn-sm" onclick="App.UI.showModal('catModal')">+ Tambah</button>
+                    </div>
+                    <div class="list-group" id="settingsCatList"></div>
+                </div>
+
+                <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div><h3 class="font-bold">🔄 Transaksi Otomatis</h3></div><button class="btn btn-outline btn-sm" onclick="App.UI.showModal('premiumModal')" id="btnUpgradeRec" style="display:none;">Upgrade</button>
+                    </div>
+                    <div class="list-group" id="settingsRecurringList"></div>
+                </div>
+
+                <!-- Import, Export Area -->
+                <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
+                    <h3 class="font-bold" style="margin-bottom: 1rem;">🛡️ Cadangan &amp; Sampah</h3>
+                    <div class="grid-2" style="gap:0.75rem;">
+                        <button class="btn btn-outline" onclick="App.Backup.openTrash()">🗑️ Sampah Transaksi</button>
+                        <button class="btn btn-outline" onclick="App.Backup.openHistory()">🕒 Riwayat Cadangan</button>
+                    </div>
+                </div>
+
+                <div class="form-group" id="notifyCard"></div>
+
+                <div class="form-group" id="guardCard"></div>
+
+                <div class="form-group">
+                    <h3 class="font-bold" style="margin-bottom: 1rem;">📦 Import & Export Data</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div class="grid-2">
+                            <button class="btn btn-outline" onclick="App.Handlers.exportData('json')">Export JSON <span class="badge" style="background:var(--warning-light); color:var(--warning-dark); border-radius:4px; padding:2px 4px;">PRO</span></button>
+                            <button class="btn btn-outline" onclick="App.Handlers.exportData('csv')">Export CSV (Full Backup)</button>
+                        </div>
+                        <label class="btn btn-outline" style="text-align: center; cursor:pointer;">
+                            📥 Import File Data Backup (JSON/CSV)
+                            <input type="file" accept=".csv, .json" onchange="App.Handlers.importFile(event)" style="display:none;">
+                        </label>
+                        <button class="btn btn-danger btn-block" onclick="App.Handlers.exportPDF()">📄 Unduh Laporan PDF <span class="badge" style="background:white; color:var(--danger); border-radius:4px; padding:2px 4px;">PRO</span></button>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="button" class="text-xs font-bold" style="background:none; border:none; color:var(--primary); cursor:pointer; padding:0.5rem;" onclick="App.UI.openChangelog()">📜 Lihat Riwayat Update</button>
+                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.8</p>
+                </div>
+            </div>
+        </main>
+
+
+        <!-- 6. TAB KULIAH -->
+        <main class="app-section" id="view-kuliah">
+            <div class="card" style="padding: 1.5rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+                    <div>
+                        <h2 class="font-bold" style="margin-bottom: 0.15rem;">🎓 Kuliah</h2>
+                    </div>
+                    <span class="kp-tag kp-tag-muted" id="kpTotalSks" style="font-size:0.7rem;padding:0.35rem 0.7rem;">0 SKS / minggu</span>
+                </div>
+            </div>
+
+            <div class="card" style="padding:0.6rem;">
+                <div class="kp-itabs">
+                    <button type="button" class="kp-itab active" data-kptab="jadwal" onclick="KuliahPro.switchTab('jadwal', this)">🗓️ Jadwal</button>
+                    <button type="button" class="kp-itab" data-kptab="absensi" onclick="KuliahPro.switchTab('absensi', this)">📋 Absensi</button>
+                    <button type="button" class="kp-itab" data-kptab="tugas" onclick="KuliahPro.switchTab('tugas', this)">📝 Tugas<span class="kp-tab-badge" id="kpTaskTabBadge"></span></button>
+                </div>
+            </div>
+
+            <!-- ===== PANE: JADWAL ===== -->
+            <div class="kp-pane" id="kpPane-jadwal">
+                <div class="card">
+                    <div class="kp-week-nav">
+                        <button type="button" class="kp-week-btn" onclick="KuliahPro.shiftWeek(-1)">‹</button>
+                        <div class="kp-week-label" id="kpWeekLabel">-</div>
+                        <button type="button" class="kp-week-btn" onclick="KuliahPro.shiftWeek(1)">›</button>
+                    </div>
+                    <div class="kp-day-strip" id="kpDayStrip"></div>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                        <h3 class="font-bold" id="kpSelectedDayLabel" style="margin:0;">Senin</h3>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="KuliahPro.openCourseModal()">+ Matkul</button>
+                    </div>
+                    <div id="kpScheduleList"></div>
+                </div>
+                <div class="card" id="kpUnscheduled" style="display:none;"></div>
+            </div>
+
+            <!-- ===== PANE: ABSENSI ===== -->
+            <div class="kp-pane" id="kpPane-absensi" style="display:none;">
+                <div class="card" id="kpAttendStats" style="display:none;"></div>
+                <div class="card">
+                    <div class="form-group" style="margin-bottom:0.75rem;max-width:220px;">
+                        <label>Tanggal</label>
+                        <input type="date" id="kpAbsenDate">
+                    </div>
+                    <div id="kpAbsenToday"></div>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                        <h3 class="font-bold" style="margin:0;">📊 Rekap Kehadiran</h3>
+                        <select id="kpAbsenFilter" style="width:auto;min-width:160px;padding:0.5rem 2rem 0.5rem 0.85rem;font-size:0.82rem;"></select>
+                    </div>
+                    <div class="kp-summary-grid" id="kpAbsenSummary"></div>
+                    <div class="admin-table-container">
+                        <table class="admin-table">
+                            <thead><tr><th>Tanggal</th><th>Matkul</th><th>Status</th><th>Alasan</th><th></th></tr></thead>
+                            <tbody id="kpAbsenTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PANE: TUGAS ===== -->
+            <div class="kp-pane" id="kpPane-tugas" style="display:none;">
+                <div class="card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                        <h3 class="font-bold" style="margin:0;">📝 Tugas Kuliah</h3>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="KuliahPro.openTaskModal()">+ Tugas</button>
+                    </div>
+                    <div id="kpTaskList"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modal: Tambah/Ubah Matkul -->
+        <div id="kpCourseModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('kpCourseModal')">
+            <div class="modal-content" style="max-width:460px;">
+                <div class="modal-header">
+                    <h2 id="kpCourseModalTitle">Tambah Matkul</h2>
+                    <button class="modal-close" onclick="App.UI.closeModal('kpCourseModal')">&times;</button>
+                </div>
+                <form onsubmit="KuliahPro.saveCourse(event)">
+                    <input type="hidden" id="kpCourseId">
+                    <input type="hidden" id="kpCourseEditDate">
+                    <div class="form-group">
+                        <label>Nama Mata Kuliah</label>
+                        <input type="text" id="kpCourseNama" placeholder="cth. Algoritma & Struktur Data" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hari</label>
+                        <select id="kpCourseHari" required>
+                            <option value="-1">Belum dijadwalkan</option>
+                            <option value="0">Senin</option>
+                            <option value="1">Selasa</option>
+                            <option value="2">Rabu</option>
+                            <option value="3">Kamis</option>
+                            <option value="4">Jum'at</option>
+                            <option value="5">Sabtu</option>
+                            <option value="6">Minggu</option>
+                        </select>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Jam Mulai</label>
+                            <input type="time" id="kpCourseJamMulai" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Jam Selesai</label>
+                            <input type="time" id="kpCourseJamSelesai" required>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>SKS</label>
+                            <input type="number" id="kpCourseSks" min="1" max="6" value="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mode</label>
+                            <select id="kpCourseMode">
+                                <option value="offline">🏫 Offline</option>
+                                <option value="online">💻 Online</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Lokasi / Link</label>
+                        <input type="text" id="kpCourseLokasi" placeholder="cth. Ruang 301 / Link Zoom">
+                    </div>
+                    <div class="form-group" id="kpCourseScopeWrap" style="display:none;">
+                        <label>Berlaku Untuk</label>
+                        <div class="kp-scope-choice">
+                            <div class="kp-scope-opt active" data-scope="week" onclick="KuliahPro.setScope('week', this)">Minggu ini saja</div>
+                            <div class="kp-scope-opt" data-scope="forever" onclick="KuliahPro.setScope('forever', this)">Seterusnya</div>
+                        </div>
+                        <input type="hidden" id="kpCourseScope" value="week">
+                    </div>
+                    <div style="display:flex; gap:0.6rem; margin-top:0.5rem;">
+                        <button type="button" class="btn btn-danger" id="kpCourseDeleteBtn" style="display:none;" onclick="KuliahPro.deleteCourse()">🗑️</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="App.UI.closeModal('kpCourseModal')">Batal</button>
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Tandai Tidak Hadir -->
+        <div id="kpAttendanceModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('kpAttendanceModal')">
+            <div class="modal-content" style="max-width:420px;">
+                <div class="modal-header">
+                    <h2>Tidak Hadir</h2>
+                    <button class="modal-close" onclick="App.UI.closeModal('kpAttendanceModal')">&times;</button>
+                </div>
+                <form onsubmit="KuliahPro.saveAttendanceReason(event)">
+                    <input type="hidden" id="kpAttendKey">
+                    <p class="text-sm text-muted" id="kpAttendCourseLabel" style="margin-bottom:1rem;"></p>
+                    <div class="form-group">
+                        <label>Alasan</label>
+                        <select id="kpAttendReason" required>
+                            <option value="sakit">🤒 Sakit</option>
+                            <option value="izin">✉️ Izin</option>
+                            <option value="alpa">🚫 Tanpa Keterangan (Alpa)</option>
+                            <option value="libur">🏖️ Libur / Kelas Diliburkan</option>
+                            <option value="lainnya">📝 Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan (opsional)</label>
+                        <textarea id="kpAttendNote" rows="2" placeholder="cth. Surat dokter, keperluan keluarga, dll."></textarea>
+                    </div>
+                    <div style="display:flex; gap:0.6rem;">
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="App.UI.closeModal('kpAttendanceModal')">Batal</button>
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Tambah/Ubah Tugas -->
+        <div id="kpTaskModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('kpTaskModal')">
+            <div class="modal-content" style="max-width:460px;">
+                <div class="modal-header">
+                    <h2 id="kpTaskModalTitle">Tambah Tugas</h2>
+                    <button class="modal-close" onclick="App.UI.closeModal('kpTaskModal')">&times;</button>
+                </div>
+                <form onsubmit="KuliahPro.saveTask(event)">
+                    <input type="hidden" id="kpTaskId">
+                    <div class="form-group">
+                        <label>Judul Tugas</label>
+                        <input type="text" id="kpTaskJudul" placeholder="cth. Laporan Praktikum Bab 3" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mata Kuliah</label>
+                        <select id="kpTaskCourse"><option value="">Umum / Tidak terkait</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="datetime-local" id="kpTaskDeadline" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan</label>
+                        <textarea id="kpTaskKeterangan" rows="3" placeholder="Detail tugas..."></textarea>
+                    </div>
+                    <div style="display:flex; gap:0.6rem;">
+                        <button type="button" class="btn btn-danger" id="kpTaskDeleteBtn" style="display:none;" onclick="KuliahPro.deleteTask()">🗑️</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="App.UI.closeModal('kpTaskModal')">Batal</button>
+                        <button type="submit" class="btn btn-primary" style="flex:1;">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar navigasi kanan -->
+        <nav class="side-nav">
+            <div class="sn-rail">
+                <button type="button" class="sn-logo-btn" id="snLogoBtn" title="Tampilkan/sembunyikan menu" onclick="SNav.toggle()"><svg class="bg-logo" viewBox="0 0 48 48" role="img" aria-label="BYgf"><rect class="bg-logo-bg" width="48" height="48" rx="13"/><g class="bg-logo-glyph" transform="translate(24 24) scale(.58) translate(-27 -23)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g></svg></button>
+                <div class="sn-rail-divider"></div>
+                <button type="button" class="sn-rail-btn active" data-group="home" title="Beranda" onclick="App.UI.switchMainGroup('home')"><svg class="ni" aria-hidden="true"><use href="#ni-home"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="keuangan" title="Keuangan" onclick="App.UI.switchMainGroup('keuangan')"><svg class="ni" aria-hidden="true"><use href="#ni-keuangan"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="kuliah" title="Kuliah" onclick="App.UI.switchMainGroup('kuliah')"><svg class="ni" aria-hidden="true"><use href="#ni-kuliah"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="daily" title="Tugas" onclick="App.UI.switchMainGroup('daily')"><svg class="ni" aria-hidden="true"><use href="#ni-task"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="makan" title="Makan" onclick="App.UI.switchMainGroup('makan')"><svg class="ni" aria-hidden="true"><use href="#ni-makan"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="notes" title="Notes" onclick="App.UI.switchMainGroup('notes')"><svg class="ni" aria-hidden="true"><use href="#ni-notes"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="laporan" title="Laporan" onclick="App.UI.switchMainGroup('laporan')"><svg class="ni" aria-hidden="true"><use href="#ni-laporan"/></svg></button>
+                <button type="button" class="sn-rail-btn" data-group="settings" title="Setting" onclick="App.UI.switchMainGroup('settings')"><svg class="ni" aria-hidden="true"><use href="#ni-setting"/></svg></button>
+                <button type="button" class="sn-rail-btn" id="railAdminBtn" data-group="admin" title="Admin" style="display:none;" onclick="App.UI.switchTab('admin', document.getElementById('navAdminTab'))"><svg class="ni" aria-hidden="true"><use href="#ni-admin"/></svg></button>
+                <div class="sn-rail-spacer"></div>
+                <button type="button" class="sn-rail-avatar" title="Akun & Setelan" onclick="App.UI.switchMainGroup('settings')">👤</button>
+            </div>
+            <div class="sn-scrim" id="snScrim" onclick="SNav.close()"></div>
+            <div class="sn-panel" id="snPanel">
+                <div class="sn-brand">
+                    <span class="sn-brand-icon"><svg class="bg-logo" viewBox="0 0 48 48" role="img" aria-label="BYgf"><rect class="bg-logo-bg" width="48" height="48" rx="13"/><g class="bg-logo-glyph" transform="translate(24 24) scale(.58) translate(-27 -23)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g></svg></span>
+                    <span class="sn-brand-text bg-wordmark"><svg class="bg-wm" viewBox="0 0 106 48" role="img" aria-label="bygf"><g transform="translate(0 1)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"><g stroke="currentColor"><path d="M5 2.5V32"/><circle cx="15" cy="22" r="10"/><path d="M31 12L40.8 31"/><path d="M49 12L38.5 36.5Q37 40 33 41.5"/></g><g class="bg-wm-gf"><circle cx="65" cy="22" r="10"/><path d="M75 22V35q0 8.5-9 8.5-4.5 0-7.5-2.5"/><path d="M90 32V9q0-6.5 7-6.5 2 0 4 .8"/><path d="M83.5 14H98"/></g></g></svg></span>
+                    <button type="button" class="sn-close-btn" title="Tutup menu" onclick="SNav.close()">✕</button>
+                </div>
+                <div class="sn-illustration" aria-hidden="true"><svg class="ni" aria-hidden="true"><use href="#ni-keuangan"/></svg><svg class="ni" aria-hidden="true"><use href="#ni-task"/></svg><svg class="ni" aria-hidden="true"><use href="#ni-kuliah"/></svg><svg class="ni" aria-hidden="true"><use href="#ni-makan"/></svg></div>
+                <div class="sn-menu">
+                    <button class="nav-item active" id="navGroupHome" onclick="App.UI.switchMainGroup('home')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-home"/></svg></span><span class="nav-label">Beranda</span></button>
+                    <button class="nav-item" id="navGroupKeuangan" onclick="App.UI.switchMainGroup('keuangan')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-keuangan"/></svg></span><span class="nav-label">Keuangan</span></button>
+                    <button class="nav-item" id="navGroupKuliah" onclick="App.UI.switchMainGroup('kuliah')"><span class="nav-icon nav-icon-wrap"><svg class="ni" aria-hidden="true"><use href="#ni-kuliah"/></svg><span class="tp-nav-badge" id="kpNavBadge"></span></span><span class="nav-label">Kuliah</span></button>
+                    <button class="nav-item" id="navGroupDaily" onclick="App.UI.switchMainGroup('daily')"><span class="nav-icon nav-icon-wrap"><svg class="ni" aria-hidden="true"><use href="#ni-task"/></svg><span class="tp-nav-badge" id="dailyNavBadge"></span></span><span class="nav-label">Tugas</span></button>
+                    <button class="nav-item" id="navGroupMakan" onclick="App.UI.switchMainGroup('makan')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-makan"/></svg></span><span class="nav-label">Makan</span></button>
+                    <button class="nav-item" id="navGroupNotes" onclick="App.UI.switchMainGroup('notes')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-notes"/></svg></span><span class="nav-label">Notes</span></button>
+                    <button class="nav-item" id="navGroupLaporan" onclick="App.UI.switchMainGroup('laporan')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-laporan"/></svg></span><span class="nav-label">Laporan</span></button>
+                    <button class="nav-item" id="navGroupSettings" onclick="App.UI.switchMainGroup('settings')"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-setting"/></svg></span><span class="nav-label">Setting</span></button>
+                    <button class="nav-item" id="navAdminTab" style="display: none;" onclick="App.UI.switchTab('admin', this)"><span class="nav-icon"><svg class="ni" aria-hidden="true"><use href="#ni-admin"/></svg></span><span class="nav-label">Admin</span></button>
+                </div>
+            </div>
+        </nav>
+
+        <script src="js/side-nav.js"></script>
+    </div> <!-- End App Container -->
+
+    <!-- =======================================================================
+         MODALS
+         ======================================================================= -->
+
+    <!-- Finance Alert Popup (Budget hampir habis + Konfirmasi transaksi otomatis) -->
+    <div id="financeAlertPopup" class="modal-overlay" onclick="if(event.target===this) App.UI.closeStartupAlertPopup()">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2>🔔 Perlu Perhatian</h2>
+                <button class="modal-close" onclick="App.UI.closeStartupAlertPopup()">&times;</button>
+            </div>
+            <div id="fapBody"></div>
+            <label class="hpp-dont-show" style="display:flex; align-items:center; gap:0.5rem; margin-top:1rem; padding-top:0.9rem; border-top:1px solid var(--border-light); cursor:pointer;">
+                <input type="checkbox" id="fapDontShowToday" style="accent-color:var(--primary); width:16px; height:16px; cursor:pointer; flex-shrink:0;">
+                <span class="text-xs text-muted">Jangan tampilkan lagi untuk hari ini</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Riwayat Update / Changelog -->
+    <div id="changelogModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('changelogModal')">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2>📜 Riwayat Update</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('changelogModal')">&times;</button>
+            </div>
+            <div id="changelogList"></div>
+        </div>
+    </div>
+
+    <!-- Sinkronkan Saldo dengan Kenyataan -->
+    <div id="syncBalanceModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('syncBalanceModal')">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h2>🔄 Sinkronkan Saldo</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('syncBalanceModal')">&times;</button>
+            </div>
+            <p class="text-xs text-muted" style="margin-bottom:1.1rem;">Isi saldo yang beneran ada sekarang (cek langsung di app/dompet fisiknya). Selisihnya bakal otomatis dicatat sebagai penyesuaian, gak masuk hitungan budget.</p>
+            <div id="syncBalanceFields"></div>
+            <button type="button" class="btn btn-primary" style="width:100%; padding:0.85rem; margin-top:0.5rem;" onclick="App.Handlers.submitSyncBalance()">✅ Sinkronkan Sekarang</button>
+        </div>
+    </div>
+
+    <!-- Quick Respons: isi nominal & keterangan lalu auto-kirim -->
+    <div id="quickAddModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('quickAddModal')">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="qaModalTitle">⚡ Quick Respons</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('quickAddModal')">&times;</button>
+            </div>
+            <form onsubmit="App.QuickTemplate.submitQuickAdd(event)">
+                <input type="hidden" id="qaTemplateId">
+                <p class="text-xs text-muted" id="qaAccountInfo" style="margin:-0.35rem 0 1rem;"></p>
+                <div class="form-group">
+                    <label>Nominal</label>
+                    <input type="text" id="qaAmount" inputmode="numeric" placeholder="0" oninput="App.Utils.formatInput(this)" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <input type="text" id="qaNote">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:0.85rem;">✅ Kirim</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kelola Template Quick Respons -->
+    <div id="manageTemplatesModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('manageTemplatesModal')">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h2>⚡ Kelola Quick Respons</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('manageTemplatesModal')">&times;</button>
+            </div>
+            <div id="qtManageList" style="margin-bottom:1.25rem;"></div>
+            <div style="border-top:1px dashed var(--border-medium); padding-top:1.1rem;">
+                <p class="font-bold text-sm" style="margin-bottom:0.75rem;">+ Tambah Template Baru</p>
+                <div class="grid-2">
+                    <div class="form-group"><label>Ikon (emoji)</label><input type="text" id="qtIcon" placeholder="🍔" maxlength="4" value="⚡"></div>
+                    <div class="form-group"><label>Nama</label><input type="text" id="qtName" placeholder="Cth: Makan Siang"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Jenis</label>
+                        <select id="qtType"><option value="out">Pengeluaran</option><option value="in">Pemasukan</option></select>
+                    </div>
+                    <div class="form-group"><label>Akun</label>
+                        <select id="qtAccount" onchange="document.getElementById('qtSubWalletWrap').style.display = this.value === 'saldo' ? 'block' : 'none';"><option value="cash">💵 Cash</option><option value="saldo">🪪 Saldo</option></select>
+                    </div>
+                </div>
+                <div class="form-group" id="qtSubWalletWrap" style="display:none;">
+                    <label>👛 Dompet</label>
+                    <select id="qtSubWallet">
+                        <option value="seabank">🏦 SeaBank</option>
+                        <option value="krombank">🟣 KromBank</option>
+                        <option value="gopay">🟢 GoPay</option>
+                        <option value="dana">🔵 DANA</option>
+                        <option value="shopeepay">👛 ShopeePay</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Kategori</label><select id="qtCategory"></select></div>
+                <button type="button" class="btn btn-primary" style="width:100%;" onclick="App.QuickTemplate.addTemplate()">+ Simpan Template</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Scan Modal (Input Cepat dari Screenshot Mutasi) -->
+    <div id="scanModal" class="modal-overlay" onclick="if(event.target===this) App.QuickScan.close()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📸 Input Cepat dari Screenshot</h2>
+                <button class="modal-close" onclick="App.QuickScan.close()">&times;</button>
+            </div>
+
+            <div id="scanDropZone" class="scan-drop" onclick="document.getElementById('scanFileInput').click()">
+                <div class="scan-drop-icon">🧾</div>
+                <div class="font-bold text-sm">Ketuk untuk pilih screenshot mutasi</div>
+                <div class="text-xs text-muted" style="margin-top:0.25rem;">Bisa pilih lebih dari 1 sekaligus. Hasilnya tetap bisa direvisi dulu sebelum disimpan.</div>
+            </div>
+            <input type="file" id="scanFileInput" accept="image/*" multiple style="display:none;" onchange="App.QuickScan.handleFiles(this.files)">
+
+            <div id="scanOverallProgress" class="scan-progress-overall" style="display:none;">
+                <div class="scan-spinner"></div>
+                <span id="scanOverallProgressText">Membaca gambar...</span>
+            </div>
+
+            <div id="scanDraftList" style="margin-top:1rem;"></div>
+
+            <div id="scanFooter" style="display:none; margin-top:0.5rem; gap:0.6rem;">
+                <button type="button" class="btn btn-outline" style="flex:1;" onclick="document.getElementById('scanFileInput').click()">+ Foto Lagi</button>
+                <button type="button" class="btn btn-primary" style="flex:2;" onclick="App.QuickScan.commitAll()">✅ Tambahkan <span id="scanCommitCount">0</span> Transaksi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div id="editModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('editModal')">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Ubah Transaksi</h2><button class="modal-close" onclick="App.UI.closeModal('editModal')">&times;</button></div>
+            <div id="editRunningBalanceBox" style="background:var(--bg-body); border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="text-xs text-muted" id="editRunningBalanceLabel">Sisa saldo saat itu</span>
+                    <div style="display:flex; align-items:center; gap:0.45rem;">
+                        <span class="font-bold text-sm" id="editRunningBalance">—</span>
+                        <button type="button" id="editRunningBalanceInfoBtn" onclick="App.UI.toggleRunningBalanceDetail()" title="Lihat rincian saldo" style="width:20px; height:20px; border-radius:50%; border:none; background:var(--warning-light); color:var(--warning-dark); font-size:0.7rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">!</button>
+                    </div>
+                </div>
+                <div id="editRunningBalanceDetail" style="display:none; margin-top:0.7rem; padding-top:0.7rem; border-top:1px dashed var(--border-medium);"></div>
+            </div>
+            <form onsubmit="App.Handlers.saveEdit(event)">
+                <input type="hidden" id="edit-id">
+                <div class="grid-2">
+                    <div class="form-group"><label>Tanggal</label><input type="date" id="edit-tanggal" required></div>
+                    <div class="form-group"><label>Sumber Dana</label>
+                        <select id="edit-jenis-akun" required onchange="document.getElementById('editSubWalletWrap').style.display = this.value === 'saldo' ? 'block' : 'none';">
+                            <option value="cash">💵 Cash / Tunai</option>
+                            <option value="saldo">🪪 Saldo Bank / E-Wallet</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="editSubWalletWrap" style="display:none;">
+                    <label>👛 Dompet</label>
+                    <select id="edit-sub-wallet">
+                        <option value="seabank">🏦 SeaBank</option>
+                        <option value="krombank">🟣 KromBank</option>
+                        <option value="gopay">🟢 GoPay</option>
+                        <option value="dana">🔵 DANA</option>
+                        <option value="shopeepay">👛 ShopeePay</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Pemasukan (+)</label><input type="text" id="edit-pemasukan" inputmode="numeric" oninput="App.Utils.formatInput(this)"></div>
+                    <div class="form-group"><label>Pengeluaran (-)</label><input type="text" id="edit-pengeluaran" inputmode="numeric" oninput="App.Utils.formatInput(this)"></div>
+                </div>
+                <div class="form-group"><label>Kategori</label><select id="edit-kategori" required></select></div>
+                <div class="form-group"><label>Keterangan</label><input type="text" id="edit-keterangan"></div>
+                <div class="form-group" style="background: var(--bg-body); padding: 0.85rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                    <label class="switch-wrapper" style="margin:0;">
+                        <div><span class="font-bold text-sm">🚫 Kecualikan dari Budget</span><p class="text-xs text-muted" style="margin-top:0.15rem;">Transaksi ini gak akan ngurangin jatah budget kategori ini.</p></div>
+                        <input type="checkbox" id="edit-exclude-budget">
+                        <div class="switch"></div>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-danger" id="btnDeleteTx" style="width: 100%; margin-bottom: 0.5rem;">Hapus Transaksi</button>
+                    <div class="grid-2"><button type="button" class="btn btn-secondary" onclick="App.UI.closeModal('editModal')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals for Budget, Category, Paylater -->
+    <div id="budgetModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('budgetModal')"><div class="modal-content"><div class="modal-header"><h2>Atur Limit Budget</h2><button class="modal-close" onclick="App.UI.closeModal('budgetModal')">&times;</button></div><form onsubmit="App.Handlers.addBudget(event)"><div class="form-group"><label>Kategori</label><select id="bCategory" required></select></div><div class="form-group"><label>Batas (Rp)</label><input type="text" id="bAmount" required inputmode="numeric" oninput="App.Utils.formatInput(this)"></div><div class="form-group"><label>Periode</label><select id="bPeriod" required><option value="monthly">Bulanan</option><option value="weekly">Mingguan</option></select></div><div class="grid-2"><button type="button" class="btn btn-secondary" onclick="App.UI.closeModal('budgetModal')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div></form></div></div>
+    <div id="transferModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('transferModal')">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header"><h2>⇄ Transfer Antar Akun</h2><button class="modal-close" onclick="App.UI.closeModal('transferModal')">&times;</button></div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Dari</label>
+                    <select id="tfDari" onchange="document.getElementById('tfDariSubWrap').style.display = this.value === 'saldo' ? 'block' : 'none';">
+                        <option value="saldo">🪪 Saldo Bank</option>
+                        <option value="cash">💵 Cash / Tunai</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ke</label>
+                    <select id="tfKe" onchange="document.getElementById('tfKeSubWrap').style.display = this.value === 'saldo' ? 'block' : 'none';">
+                        <option value="cash">💵 Cash / Tunai</option>
+                        <option value="saldo">🪪 Saldo Bank</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group" id="tfDariSubWrap">
+                    <label>👛 Dompet Asal</label>
+                    <select id="tfDariSub">
+                        <option value="seabank">🏦 SeaBank</option>
+                        <option value="krombank">🟣 KromBank</option>
+                        <option value="gopay">🟢 GoPay</option>
+                        <option value="dana">🔵 DANA</option>
+                        <option value="shopeepay">👛 ShopeePay</option>
+                    </select>
+                </div>
+                <div class="form-group" id="tfKeSubWrap" style="display:none;">
+                    <label>👛 Dompet Tujuan</label>
+                    <select id="tfKeSub">
+                        <option value="seabank">🏦 SeaBank</option>
+                        <option value="krombank">🟣 KromBank</option>
+                        <option value="gopay">🟢 GoPay</option>
+                        <option value="dana">🔵 DANA</option>
+                        <option value="shopeepay">👛 ShopeePay</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>Jumlah (Rp)</label><input type="text" id="tfJumlah" inputmode="numeric" oninput="App.Utils.formatInput(this)" placeholder="0"></div>
+            <div class="form-group"><label>Tanggal</label><input type="date" id="tfTanggal"></div>
+            <div class="form-group"><label>Catatan (opsional)</label><input type="text" id="tfCatatan" placeholder="Cth: Top up GoPay, dll"></div>
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="App.UI.closeModal('transferModal')">Batal</button>
+                <button class="btn btn-primary" onclick="App.Handlers.saveTransfer()">Simpan Transfer</button>
+            </div>
+        </div>
+    </div>
+    <div id="payoffModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('payoffModal')">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h2>💳 Bayar Tagihan</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('payoffModal')">&times;</button>
+            </div>
+            <input type="hidden" id="payoffId">
+            <div style="background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1rem;">
+                <div class="text-xs text-muted" style="margin-bottom:0.2rem;">Tagihan</div>
+                <div class="font-bold" id="payoffNama" style="font-size:1rem;"></div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.2rem;">
+                    <span class="text-xs text-muted">Sisa hutang:</span>
+                    <span class="font-bold text-danger" id="payoffSisa"></span>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Bayar dari Akun</label>
+                    <select id="payoffAkun">
+                        <option value="cash">💵 Cash / Tunai</option>
+                        <option value="saldo">🪪 Saldo Bank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Bayar</label>
+                    <input type="date" id="payoffTanggal">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Jumlah Dibayar (Rp)</label>
+                <input type="text" id="payoffJumlah" inputmode="numeric" oninput="App.Utils.formatInput(this)">
+            </div>
+            <div class="form-group">
+                <label>Keterangan (opsional)</label>
+                <input type="text" id="payoffCatatan" placeholder="Cth: Lunas GoPaylater Mei">
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                <button id="payoffFullBtn" class="btn btn-primary" style="background:linear-gradient(135deg,#10b981,#059669);">✅ Tandai LUNAS Sepenuhnya</button>
+                <button id="payoffPartBtn" class="btn" style="background:var(--warning-light); color:var(--warning-dark); font-weight:700;">💸 Bayar Sebagian</button>
+                <button class="btn btn-secondary" onclick="App.UI.closeModal('payoffModal')">Batal</button>
+            </div>
+        </div>
+    </div>
+    <div id="catModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('catModal')"><div class="modal-content" style="max-width: 400px;"><div class="modal-header"><h2>Kategori Baru</h2><button class="modal-close" onclick="App.UI.closeModal('catModal')">&times;</button></div><div class="form-group"><label>Nama</label><input type="text" id="catName" required></div><div class="form-group"><label>Ikon (Emoji)</label><input type="text" id="catIcon" required maxlength="2"></div><div class="grid-2"><button class="btn btn-secondary" onclick="App.UI.closeModal('catModal')">Batal</button><button class="btn btn-primary" onclick="App.Handlers.addCategory()">Simpan</button></div></div></div>
+    <div id="trashModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('trashModal')">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-header"><h2>🗑️ Sampah Transaksi</h2><button class="modal-close" onclick="App.UI.closeModal('trashModal')">&times;</button></div>
+            <p class="text-xs text-muted" style="margin-bottom:0.85rem;">Transaksi yang dihapus disimpan di sini dulu (maks. 200 terakhir) sebelum benar-benar hilang, jadi kalau kehapus gak sengaja masih bisa dipulihkan.</p>
+            <div id="trashList" style="max-height:50vh; overflow-y:auto; display:flex; flex-direction:column; gap:0.6rem;"></div>
+            <button class="btn btn-outline btn-block" style="margin-top:1rem;" onclick="App.Backup.emptyTrash()">Kosongkan Sampah Permanen</button>
+        </div>
+    </div>
+    <div id="backupHistoryModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('backupHistoryModal')">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-header"><h2>🛡️ Cadangan Lokal</h2><button class="modal-close" onclick="App.UI.closeModal('backupHistoryModal')">&times;</button></div>
+            <p class="text-xs text-muted" style="margin-bottom:0.85rem;">Setiap kali data berubah, salinan sebelumnya otomatis disimpan di HP/laptop ini (10 versi terakhir) — kalau data online tiba-tiba kosong/kacau, kamu bisa pulihkan dari sini.</p>
+            <div id="backupHistoryList" style="max-height:50vh; overflow-y:auto; display:flex; flex-direction:column; gap:0.6rem;"></div>
+        </div>
+    </div>
+    <div id="debtModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('debtModal')">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header"><h2>🤝 Catat Utang / Piutang</h2><button class="modal-close" onclick="App.UI.closeModal('debtModal')">&times;</button></div>
+            <div class="form-group">
+                <label>Jenis</label>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                    <label id="debtTypeLabelUtang" style="display:flex; align-items:center; gap:0.5rem; padding:0.75rem 1rem; border-radius:var(--radius-md); border:2px solid var(--danger); background:var(--danger-light); cursor:pointer; font-weight:700; color:var(--danger-dark); transition:all 0.2s;">
+                        <input type="radio" name="debtType" value="utang" checked onchange="App.Handlers.onDebtTypeChange()" style="display:none;">
+                        🔴 Hutang saya
+                    </label>
+                    <label id="debtTypeLabelPiutang" style="display:flex; align-items:center; gap:0.5rem; padding:0.75rem 1rem; border-radius:var(--radius-md); border:2px solid var(--border-medium); background:var(--bg-body); cursor:pointer; font-weight:600; color:var(--text-muted); transition:all 0.2s;">
+                        <input type="radio" name="debtType" value="piutang" onchange="App.Handlers.onDebtTypeChange()" style="display:none;">
+                        🟢 Piutang saya
+                    </label>
+                </div>
+                <p id="debtTypeHint" class="text-xs text-muted" style="margin-top:0.5rem;">Hutang = uang yang kamu pinjam / wajib bayar</p>
+            </div>
+            <div class="form-group"><label id="debtNamaLabel">Nama Pemberi Hutang / Konteks</label><input type="text" id="debtNama" placeholder="Cth: Pinjam ke Budi, Kartu Kredit BCA" required></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Jumlah (Rp)</label><input type="text" id="debtJumlah" inputmode="numeric" oninput="App.Utils.formatInput(this)" required></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="debtTanggal"></div>
+            </div>
+            <div class="form-group">
+                <label id="debtAkunLabel">Masuk ke Akun</label>
+                <select id="debtAkun">
+                    <option value="cash">💵 Cash / Tunai</option>
+                    <option value="saldo">🪪 Saldo Bank / E-Wallet</option>
+                </select>
+                <p id="debtAkunHint" class="text-xs text-muted" style="margin-top:0.35rem;">Uang pinjaman diterima ke akun mana? Saldo akun ini akan <b>bertambah</b>.</p>
+            </div>
+            <div class="form-group"><label>Catatan (opsional)</label><input type="text" id="debtCatatan" placeholder="Cth: Pinjam buat bayar SPP"></div>
+            <div class="grid-2">
+                <button class="btn btn-secondary" onclick="App.UI.closeModal('debtModal')">Batal</button>
+                <button class="btn btn-primary" onclick="App.Handlers.saveDebt()">Simpan</button>
+            </div>
+        </div>
+    </div>
+    <div id="settleDebtModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('settleDebtModal')">
+        <div class="modal-content" style="max-width:430px;">
+            <div class="modal-header"><h2 id="settleDebtTitle">💸 Lunasi Hutang</h2><button class="modal-close" onclick="App.UI.closeModal('settleDebtModal')">&times;</button></div>
+            <input type="hidden" id="settleDebtId">
+            <input type="hidden" id="settleDebtType">
+            <div id="settleDebtInfo" style="border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1rem; border:1px solid;"></div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label id="settleDebtAkunLabel">Bayar dari Akun</label>
+                    <select id="settleDebtAkun">
+                        <option value="cash">💵 Cash / Tunai</option>
+                        <option value="saldo">🪪 Saldo Bank</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Tanggal Bayar</label><input type="date" id="settleDebtTanggal"></div>
+            </div>
+            <div class="form-group"><label>Jumlah Dibayar (Rp)</label><input type="text" id="settleDebtJumlah" inputmode="numeric" oninput="App.Utils.formatInput(this)"></div>
+            <div class="form-group"><label>Keterangan (opsional)</label><input type="text" id="settleDebtCatatan"></div>
+            <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                <button id="settleDebtFullBtn" class="btn btn-primary">✅ Lunasi Sepenuhnya</button>
+                <button id="settleDebtPartBtn" class="btn" style="background:var(--warning-light); color:var(--warning-dark); font-weight:700;">💸 Bayar Sebagian</button>
+                <button class="btn btn-secondary" onclick="App.UI.closeModal('settleDebtModal')">Batal</button>
+            </div>
+        </div>
+    </div>
+    <div id="paylaterModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('paylaterModal')"><div class="modal-content"><div class="modal-header"><h2>Tagihan Baru</h2><button class="modal-close" onclick="App.UI.closeModal('paylaterModal')">&times;</button></div><form onsubmit="App.Handlers.addPaylater(event)"><div class="form-group"><label>Nama Tagihan</label><input type="text" id="plName" required></div><div class="form-group"><label>Jumlah (Rp)</label><input type="text" id="plAmount" required inputmode="numeric" oninput="App.Utils.formatInput(this)"></div><div class="form-group"><label for="plDue">Jatuh tempo tiap tanggal <span class="text-muted">(opsional, 1–31)</span></label><input type="number" id="plDue" min="1" max="31" inputmode="numeric" placeholder="Contoh: 15"></div><div class="grid-2"><button type="button" class="btn btn-secondary" onclick="App.UI.closeModal('paylaterModal')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div></form></div></div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('logoutModal')">
+        <div class="modal-content" style="max-width: 360px;">
+            <div class="logout-modal-content">
+                <div class="logout-modal-avatar" id="logoutAvatar">U</div>
+                <h3 style="margin-bottom: 0.4rem;">Keluar dari Akun?</h3>
+                <p class="text-sm text-muted" style="margin-bottom: 0.5rem;">Halo, <strong id="logoutName">User</strong>.</p>
+                <p class="text-sm text-muted" style="margin-bottom: 2rem;">Data akan tetap aman di cloud. Kamu bisa masuk kembali kapan saja.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-danger btn-block" style="padding: 0.875rem;" onclick="App.Auth.handleLogout()">🚪 Ya, Keluar Sekarang</button>
+                    <button class="btn btn-secondary btn-block" onclick="App.UI.closeModal('logoutModal')">Tidak, Tetap di Sini</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin User Detail Modal -->
+    <div id="adminDetailModal" class="modal-overlay" onclick="if(event.target===this) App.UI.closeModal('adminDetailModal')">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h2>👤 Detail Pengguna</h2>
+                <button class="modal-close" onclick="App.UI.closeModal('adminDetailModal')">&times;</button>
+            </div>
+            <div id="adminDetailContent">
+                <p class="text-sm text-muted">Memuat...</p>
+            </div>
+            <div id="adminDetailActions" style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;"></div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-overlay" style="z-index: 11000;"><div class="modal-content" style="max-width: 350px; text-align: center; padding: 2rem;"><div style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--warning);">⚠️</div><h3 style="margin-bottom: 0.5rem;" id="confirmTitle">Konfirmasi</h3><p class="text-sm text-muted" style="margin-bottom: 2rem;" id="confirmMsg">Apakah Anda yakin?</p><div class="grid-2"><button class="btn btn-secondary" onclick="App.UI.resolveConfirm(false)">Batal</button><button class="btn btn-danger" id="btnConfirmYes" onclick="App.UI.resolveConfirm(true)">Lanjutkan</button></div></div></div>
+
+    <!-- =======================================================================
+         APPLICATION LOGIC (JS)
+         ======================================================================= -->
+    <script type="module" src="js/app/main.js"></script>
+
+    <script src="js/tugas-reminder.js"></script>
+
+    <!-- ============ TAB KULIAH: jadwal, absensi, tugas ============ -->
+    <script src="js/kuliah-pro.js"></script>
+    <script src="js/modules/core.js"></script>
+    <script src="js/modules/daily.js"></script>
+    <script src="js/modules/lecture.js"></script>
+    <script src="js/modules/meal.js"></script>
+    <script src="js/modules/notes.js"></script>
+    <script src="js/modules/journal.js"></script>
+    <script src="js/modules/goals.js"></script>
+    <script src="js/modules/home.js"></script>
+    <script src="js/modules/search.js"></script>
+    <script src="js/bottom-nav.js"></script>
+
+</body>
+</html>
