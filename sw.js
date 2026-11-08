@@ -1,7 +1,7 @@
 /* BYgf — Service worker: membuat aplikasi bisa dibuka offline (hanya cache aset; TANPA notifikasi push).
    Strategi: file aplikasi = jaringan dulu (selalu dapat versi terbaru saat online), cache sebagai cadangan offline.
    Data pengguna tidak disimpan di sini — tetap di localStorage + Firebase. Naikkan VERSION saat merilis agar cache lama dibersihkan. */
-const VERSION = 'bygf-v9.8';
+const VERSION = 'bygf-v9.9';
 const PRECACHE = [
  "./",
  "css/auth.css",
@@ -22,7 +22,6 @@ const PRECACHE = [
  "icons/icon-512.png",
  "icons/icon-maskable-512.png",
  "index.html",
- "js/app/admin.js",
  "js/app/auth.js",
  "js/app/backup.js",
  "js/app/config.js",
@@ -47,8 +46,10 @@ const PRECACHE = [
  "js/modules/core.js",
  "js/modules/daily.js",
  "js/modules/goals.js",
+ "js/modules/fun.js",
  "js/modules/home.js",
  "js/modules/journal.js",
+ "js/modules/vault.js",
  "js/modules/lecture.js",
  "js/modules/meal.js",
  "js/modules/notes.js",
