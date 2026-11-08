@@ -36,3 +36,8 @@ Semua langkah di bawah gratis. Kamu hanya butuh akun GitHub dan HP Android.
 - APK ini ditandatangani mode *debug* (cukup untuk pemakaian pribadi). Memasang APK versi baru di atas yang lama berjalan normal selama dibuat dari repo yang sama.
 - Pembaruan: ulangi langkah A–C; data tidak hilang (tersimpan di Firebase).
 - Login Firebase memakai alamat `https://localhost` di dalam app; bila login gagal, di Firebase Console → Authentication → Settings → Authorized domains pastikan `localhost` ada (biasanya sudah ada).
+
+## Tambahan v9.9
+- **Brankas Sandi** (menu Brankas / Lainnya → Brankas): buat *kunci utama* sekali. **Jangan sampai lupa** — tidak ada cara memulihkannya. Sandi tersimpan terenkripsi, jadi backup JSON & Firebase hanya berisi data acak yang tak bisa dibaca tanpa kunci utama.
+- **Mode offline**: buka aplikasi tanpa internet tetap bisa mengisi semua form. Di pojok atas akan tertulis "Offline · belum tersinkron" sampai internet kembali, lalu data terkirim otomatis. Untuk pertama kali (login) tetap butuh internet.
+- **Penting setelah memperbarui:** buka aplikasi sekali saat online agar sandi polos peninggalan versi lama otomatis dihapus dari database.

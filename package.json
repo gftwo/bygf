@@ -1,6 +1,6 @@
 {
   "name": "bygf-android",
-  "version": "9.8.0",
+  "version": "9.9.0",
   "private": true,
   "description": "Pembungkus Android (Capacitor) untuk BYgf. Situs web tetap dilayani apa adanya dari root repo (GitHub Pages).",
   "scripts": {
