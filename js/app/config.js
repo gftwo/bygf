@@ -24,6 +24,12 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.9', date: 'November 2026', items: [
+            'Brankas Sandi menggantikan panel Admin: simpan kata sandi pribadi, terenkripsi AES-256 dengan kunci utama milikmu (tidak disimpan di mana pun), kunci otomatis, salin sandi dengan penghapusan clipboard, dan generator sandi acak',
+            'Keamanan: sandi akun tidak lagi disimpan polos di database; sandi polos peninggalan versi lama dihapus otomatis saat login',
+            'Mode offline: aplikasi tetap terbuka dan formulir tetap bisa diisi tanpa internet; perubahan tersimpan di perangkat dan dikirim otomatis saat online kembali (ada penanda "belum tersinkron")',
+            'Fitur lucu: maskot Bybi (mood & streak harian), 9 lencana dengan konfeti, kartu "Hari ini di masa lalu", roda "Makan apa?", dan satu kejutan tersembunyi',
+        ] },
         { version: 'v9.8', date: 'November 2026', items: [
             'Pengingat di HP (aplikasi Android): notifikasi tetap muncul walau aplikasi ditutup — isi keuangan harian, tagihan & cicilan, transaksi otomatis, tugas, deadline tugas kuliah, 30 menit sebelum kuliah, catat absen, dan laporan mingguan',
             'Setelan → "Pengingat di HP": pilih jam dan nyalakan/matikan tiap jenis; ada pratinjau jadwal (juga di browser)',

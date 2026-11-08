@@ -14,6 +14,7 @@
     const MORE = [
         { g: 'makan', icon: 'makan', label: 'Makan' },
         { g: 'notes', icon: 'notes', label: 'Notes' },
+        { g: 'vault', icon: 'vault', label: 'Brankas' },
         { g: 'laporan', icon: 'laporan', label: 'Laporan' },
         { g: 'settings', icon: 'setting', label: 'Setting' }
     ];
@@ -62,8 +63,7 @@
         const more = $('bnMore'); if (more) more.classList.toggle('on', inMore);
     }
     function openSheet() {
-        const admin = window.App && App.State && App.State.isAdmin;
-        const list = admin ? MORE.concat([{ g: 'admin', icon: 'admin', label: 'Admin' }]) : MORE;
+        const list = MORE;
         $('bnGrid').innerHTML = list.map(m => item(m, 'bn-cell' + (m.g === active ? ' on' : ''))).join('');
         lastFocus = document.activeElement; sheet.hidden = false; $('bnMore').setAttribute('aria-expanded', 'true');
         requestAnimationFrame(() => { sheet.classList.add('open'); const f = sheet.querySelector('.bn-cell.on, .bn-cell'); if (f) f.focus(); });

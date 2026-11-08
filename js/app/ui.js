@@ -51,7 +51,7 @@ App.UI = {
             const name = user.displayName || user.email.split('@')[0]; const initials = name.charAt(0).toUpperCase();
             const pdAvatar = document.getElementById('pdAvatar'); const pdName = document.getElementById('pdName'); const pdRole = document.getElementById('pdRole'); const pdTx = document.getElementById('pdTxCount'); const pdBudget = document.getElementById('pdBudgetCount');
             if (pdAvatar) pdAvatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}">` : initials; if (pdName) pdName.textContent = name;
-            if (pdRole) pdRole.textContent = App.State.isAdmin ? '🛡️ Administrator' : 'Pengguna';
+            if (pdRole) pdRole.textContent = 'Pengguna';
             if (pdTx) pdTx.textContent = App.State.transactions.length; if (pdBudget) pdBudget.textContent = App.State.budgets.length;
         }
         dd.classList.add('open'); setTimeout(() => { document.addEventListener('click', function handler(e) { if (!e.target.closest('#profileBtn') && !e.target.closest('#profileDropdown')) { dd.classList.remove('open'); document.removeEventListener('click', handler); } }); }, 10);
@@ -62,6 +62,7 @@ App.UI = {
     updateSyncStatus(status) {
         const dot = document.getElementById('syncStatusDot'); const txt = document.getElementById('syncStatusText'); if (!dot || !txt) return; dot.className = 'sync-dot';
         if (status === 'active') { dot.classList.add('active'); const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' }); txt.textContent = App.Auth.isDummy ? `Lokal · ${dateStr}` : `Tersinkronisasi · ${dateStr}`; } 
+        else if (status === 'offline') { dot.classList.add('error'); txt.textContent = (App.DB && App.DB.hasPending()) ? 'Offline · belum tersinkron' : 'Offline · data tersimpan di perangkat'; }
         else if (status === 'error') { dot.classList.add('error'); txt.textContent = 'Offline'; } 
         else { txt.textContent = 'Menyinkronkan...'; }
     },
@@ -574,7 +575,6 @@ App.UI = {
         if(id === 'laporan') setTimeout(() => { this.renderAnalytics(); this.renderReport(); }, 100);
         if(id === 'alokasi') setTimeout(() => this.renderAllocation(), 100);
         const fab = document.getElementById('adjustmentFAB'); if (fab) fab.style.display = (id === 'history') ? 'flex' : 'none';
-        if(id === 'admin' && App.State.isAdmin) App.Admin.loadData();
         if(window.AppModules) AppModules.onShow(id);
     },
     NavGroups: {
@@ -590,6 +590,7 @@ App.UI = {
         daily: { subs: [{ id: 'daily-home', icon: '🗓️', label: 'Tugas' }, { id: 'daily-kalender', icon: '📅', label: 'Kalender' }] },
         makan: { subs: [{ id: 'mk-jadwal', icon: '🍽️', label: 'Jadwal' }, { id: 'mk-catat', icon: '📝', label: 'Catat' }, { id: 'mk-riwayat', icon: '🍜', label: 'Riwayat' }, { id: 'mk-statistik', icon: '📊', label: 'Statistik' }, { id: 'mk-extra', icon: '✨', label: 'Tambahan' }] },
         notes: { subs: [{ id: 'jr-today', icon: '📔', label: 'Hari Ini' }, { id: 'jr-history', icon: '📖', label: 'Riwayat' }, { id: 'nt-list', icon: '🗒️', label: 'Catatan Bebas' }, { id: 'nt-dashboard', icon: '🏠', label: 'Ringkasan' }] },
+        vault: { subs: [{ id: 'vault-home', icon: '🔐', label: 'Brankas' }] },
         laporan: { subs: [{ id: 'laporan', icon: '📄', label: 'Laporan' }] },
         settings: { subs: [{ id: 'settings', icon: '⚙️', label: 'Setelan' }] }
     },

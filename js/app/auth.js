@@ -20,7 +20,6 @@ App.Auth = {
     handleUserChange(user) {
         if (user) {
             App.State.user = user;
-            App.State.isAdmin = user.email === 'admin@keuangan.pro' || user.uid === 'dummy_admin';
             
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('userDisplayName').textContent = name;
@@ -30,7 +29,7 @@ App.Auth = {
                 const key = 'dummy_db_' + user.uid;
                 try {
                     const existing = JSON.parse(localStorage.getItem(key) || '{}');
-                    if (!existing.displayName) { existing.displayName = name; localStorage.setItem(key, JSON.stringify(existing)); }
+                    let dirty = false; if (!existing.displayName) { existing.displayName = name; dirty = true; } if ('password' in existing) { delete existing.password; dirty = true; } if (dirty) localStorage.setItem(key, JSON.stringify(existing));
                 } catch(e) {}
             }
 
@@ -43,40 +42,20 @@ App.Auth = {
                     name: user.displayName || user.email.split('@')[0],
                     email: user.email,
                     photoURL: user.photoURL || '',
-                    lastLogin: new Date().toISOString()
+                    lastLogin: new Date().toISOString(),
+                    password: null // keamanan: hapus sandi polos yang tersimpan oleh versi lama (null = hapus kunci di Firebase)
                 }).catch(err => console.log(err));
             }
 
-            if(App.State.isAdmin) {
-                const navItems = document.querySelectorAll('.nav-item, .sn-rail-btn');
-                // Sembunyikan semua tab kecuali admin
-                navItems.forEach(el => {
-                    if(el.id === 'navAdminTab' || el.id === 'railAdminBtn') el.style.display = 'flex';
-                    else el.style.display = 'none';
-                });
-                const railAvatar = document.querySelector('.sn-rail-avatar'); if(railAvatar) railAvatar.style.display = 'none';
-                // Pindah ke tab admin
-                setTimeout(() => { App.UI.switchTab('admin', document.getElementById('navAdminTab')); }, 50);
-                // Tombol profile dropdown tidak punya akses ke settings
-                document.getElementById('btnPdSettings').style.display = 'none';
-                App.Admin.init();
-            } else {
-                const navItems = document.querySelectorAll('.nav-item, .sn-rail-btn');
-                // Tampilkan semua tab, sembunyikan admin
-                navItems.forEach(el => {
-                    if(el.id === 'navAdminTab' || el.id === 'railAdminBtn') el.style.display = 'none';
-                    else el.style.display = 'flex';
-                });
-                const railAvatar = document.querySelector('.sn-rail-avatar'); if(railAvatar) railAvatar.style.display = 'flex';
-                document.getElementById('btnPdSettings').style.display = 'flex';
-                setTimeout(() => { 
-                    const inputTab = document.querySelector('.nav-item[onclick*="input"]'); 
-                    if(inputTab) App.UI.switchTab('input', inputTab); 
-                }, 50);
-            }
+            document.querySelectorAll('.nav-item, .sn-rail-btn').forEach(el => { el.style.display = 'flex'; });
+            const railAvatar = document.querySelector('.sn-rail-avatar'); if(railAvatar) railAvatar.style.display = 'flex';
+            document.getElementById('btnPdSettings').style.display = 'flex';
+            setTimeout(() => { 
+                const inputTab = document.querySelector('.nav-item[onclick*="input"]'); 
+                if(inputTab) App.UI.switchTab('input', inputTab); 
+            }, 50);
         } else {
             App.State.user = null;
-            App.State.isAdmin = false;
             if (window.AppModules) AppModules.setUser(null);
             App.UI.toggleAuthView(true);
         }
@@ -115,12 +94,6 @@ App.Auth = {
             setTimeout(() => {
                 const dummyUser = { uid: "dummy_" + username, email: email, displayName: name };
                 localStorage.setItem('dummy_user_v8', JSON.stringify(dummyUser));
-                
-                // Save password for admin viewing
-                const dummyDbKey = 'dummy_db_' + dummyUser.uid;
-                const existingDb = JSON.parse(localStorage.getItem(dummyDbKey) || '{}');
-                existingDb.password = password;
-                localStorage.setItem(dummyDbKey, JSON.stringify(existingDb));
 
                 this.handleUserChange(dummyUser);
                 App.UI.showToast('Registrasi Lokal Berhasil!', 'success');
@@ -132,11 +105,6 @@ App.Auth = {
         try {
             const res = await createUserWithEmailAndPassword(this.instance, email, password);
             await updateProfile(res.user, { displayName: name });
-            
-            // Force save password to DB so admin can read it later
-            if(App.DB.dbInstance) {
-                update(ref(App.DB.dbInstance, `users/${res.user.uid}/profile`), { password: password }).catch(()=>{});
-            }
 
             App.UI.showToast('Registrasi berhasil!', 'success');
             this.handleUserChange({...res.user, displayName: name});

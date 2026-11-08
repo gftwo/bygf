@@ -85,7 +85,7 @@
                     if (amt <= 0) { err.textContent = 'Masukkan jumlah lebih dari 0.'; err.hidden = false; return; }
                     if (!dep && amt > g.saved) { err.textContent = 'Jumlah melebihi dana yang terkumpul.'; err.hidden = false; return; }
                     g.saved += sign * amt; g.history.unshift({ id: uid(), at: new Date().toISOString(), amount: sign * amt, note: b.querySelector('#glMemo').value.trim() }); g.history = g.history.slice(0, 100);
-                    save(); api.close(); render(); Mx.toast(dep ? 'Setoran dicatat' : 'Penarikan dicatat');
+                    save(); api.close(); render(); Mx.toast(dep ? 'Setoran dicatat' : 'Penarikan dicatat'); if (dep && g.target > 0 && g.saved >= g.target && window.BYFun) { BYFun.confetti(); Mx.toast('🎉 Target "' + g.name + '" tercapai!', 'success'); }
                 });
             } });
     }

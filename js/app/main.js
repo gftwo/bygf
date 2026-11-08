@@ -3,7 +3,6 @@ import { App } from './core.js';
 import './state.js';
 import './config.js';
 import './auth.js';
-import './admin.js';
 import './premium.js';
 import './db.js';
 import './theme.js';

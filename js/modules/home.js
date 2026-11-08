@@ -55,21 +55,48 @@
             ? `<div class="hm-journal"><span class="hm-emoji">${entry.rating ? RATE[entry.rating] : '📝'}</span><div><b>${entry.rating ? 'Rating ' + entry.rating + '/5' : 'Jurnal terisi'}</b><small>${esc((entry.good || entry.problem || entry.note || entry.lesson || '').slice(0, 90))}</small></div></div>`
             : `<p class="mx-muted">Belum diisi. Ceritakan suasana harimu — hanya butuh satu menit.</p><button type="button" class="mx-btn mx-btn-primary" data-go="notes" data-sub="jr-today">Isi jurnal hari ini</button>`;
 
+        const F = window.BYFun, fun = F ? (() => {
+            const days = F.activityDays(), st = F.streak(days), sc = F.todayScore(), mood = F.MOODS[Math.min(4, sc.score)], stg = F.stage(days.size), nx = [[3, 'Anak Bybi'], [14, 'Bybi Remaja'], [45, 'Bybi Dewasa'], [120, 'Bybi Legenda']].find(x => x[0] > days.size);
+            const badges = F.badgeList(), got = badges.filter(b => b.ok).length, tb = F.throwback();
+            const bybi = card('hm-bybi', 'Bybi', `<div class="fn-wrap"><button type="button" class="fn-bybi-btn" data-fn="tap" aria-label="Sentuh Bybi">${F.face(mood.face)}</button><div class="fn-info"><div class="fn-bubble" id="fnSay" aria-live="polite">${esc(F._pick(mood.say))}</div>
+                <div class="fn-meta"><span class="mx-pill">${stg[1]} ${stg[2]}</span><span class="mx-pill">🔥 Streak ${st} hari</span><span class="mx-pill">📅 ${days.size} hari aktif</span></div>
+                <div class="fn-dots" role="img" aria-label="${sc.done} dari ${sc.total} kegiatan hari ini beres">${sc.parts.map(p => `<span class="fn-dot${p[1] ? ' on' : ''}" title="${p[0]}">${p[1] ? '✓' : ''}</span>`).join('')}<small class="mx-muted">${sc.done}/${sc.total} beres hari ini</small></div>
+                ${nx ? `<small class="mx-muted">Tumbuh jadi ${nx[1]} setelah ${nx[0] - days.size} hari aktif lagi</small>` : '<small class="mx-muted">Bybi sudah mencapai bentuk terakhir 🎉</small>'}</div></div>`);
+            const badgeCard = card('hm-badge', `🏅 Lencana (${got}/${badges.length})`, `<div class="fn-badges">${badges.map(b => `<div class="fn-badge ${b.ok ? 'on' : 'off'}" title="${esc(b.name + ' — ' + b.how)}"><span class="fn-bi">${b.ok ? b.icon : '🔒'}</span><small>${esc(b.name)}</small></div>`).join('')}</div><small class="mx-muted">Ketuk-tahan lencana untuk melihat syaratnya.</small>`);
+            const tbCard = tb ? card('hm-throw', '📮 Hari ini di masa lalu', `<div class="hm-journal"><span class="hm-emoji">${tb[0].rating ? RATE[tb[0].rating] : '📝'}</span><div><b>${esc(tb[1])} · ${esc(Mx.fmtDate(tb[0].date))}</b><small>${esc((tb[0].good || tb[0].note || tb[0].lesson || tb[0].problem || tb[0].tomorrow || '').slice(0, 140))}</small></div></div>`, `<button type="button" class="hm-link" data-fn="open-journal" data-date="${esc(tb[0].date)}">Baca ›</button>`) : '';
+            return { bybi, badgeCard, tbCard };
+        })() : { bybi: '', badgeCard: '', tbCard: '' };
         el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">${greeting()}${name ? ', ' + esc(name) : ''} 👋</h2><p class="mx-muted">${esc(Mx.fmtDateLong(t0))}</p></div></div>
-        <div class="hm-quick" role="group" aria-label="Aksi cepat"><button type="button" class="mx-btn" data-go="keuangan" data-sub="input">💸 Catat transaksi</button><button type="button" class="mx-btn" data-go="daily" data-sub="daily-home">✅ Tugas</button><button type="button" class="mx-btn" data-go="kuliah" data-sub="ck-catat">✍️ Catat kuliah</button><button type="button" class="mx-btn" data-go="notes" data-sub="jr-today">📔 Jurnal</button></div>
+        <div class="hm-quick" role="group" aria-label="Aksi cepat"><button type="button" class="mx-btn" data-go="keuangan" data-sub="input">💸 Catat transaksi</button><button type="button" class="mx-btn" data-go="daily" data-sub="daily-home">✅ Tugas</button><button type="button" class="mx-btn" data-go="kuliah" data-sub="ck-catat">✍️ Catat kuliah</button><button type="button" class="mx-btn" data-go="notes" data-sub="jr-today">📔 Jurnal</button><button type="button" class="mx-btn" data-fn="spin">🎲 Makan apa?</button></div>
+        ${fun.bybi}
         <div class="hm-grid">
         ${card('hm-fin', '💰 Keuangan', `<div class="hm-bal">${esc(bal || '—')}</div><small class="mx-muted">Saldo bersih</small><div class="hm-two"><div><span class="hm-in">⬆ ${esc(Mx.fmtRp(fin.in))}</span><small>masuk bulan ini</small></div><div><span class="hm-out">⬇ ${esc(Mx.fmtRp(fin.out))}</span><small>keluar bulan ini</small></div></div>`, more('keuangan', 'input', 'Buka'))}
         ${card('hm-jr', '📔 Jurnal hari ini', jr)}
         ${card('hm-kuliah', '🎓 Kuliah hari ini', kuliahBody, more('kuliah', 'kuliah', 'Jadwal'))}
         ${card('hm-tugas', '✅ Tugas', tugasRows.length ? tugasRows.join('') : Mx.empty('🎉', 'Tidak ada tugas yang perlu dikejar'), more('daily', 'daily-home', 'Semua tugas'))}
-        ${card('hm-meal', '🍽️ Makan hari ini', mealBody, more('makan', 'mk-jadwal', 'Jadwal'))}
+        ${card('hm-meal', '🍽️ Makan hari ini', mealBody, `<button type="button" class="hm-link" data-fn="spin">🎲 Acak</button> ` + more('makan', 'mk-jadwal', 'Jadwal'))}
+        ${fun.tbCard}${fun.badgeCard}
         </div>`;
     }
 
     AppModules.register('home', {
         label: 'Beranda', views: ['home-today'], normalize: () => ({}), validate: () => [],
-        init() { const r = root(); if (!r) return; r.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go, b.dataset.sub); }); },
-        show() { render(); },
+        init() {
+            const r = root(); if (!r) return; let taps = 0;
+            r.addEventListener('click', e => {
+                const b = e.target.closest('[data-go]'); if (b) { go(b.dataset.go, b.dataset.sub); return; }
+                const f = e.target.closest('[data-fn]'); if (!f || !window.BYFun) return;
+                if (f.dataset.fn === 'spin') BYFun.spinFood();
+                else if (f.dataset.fn === 'open-journal') { const j = mod('journal'); if (j && j.openDate) j.openDate(f.dataset.date); else go('notes', 'jr-today'); }
+                else if (f.dataset.fn === 'tap') {
+                    const say = r.querySelector('#fnSay'), sv = f.querySelector('svg'); taps++;
+                    if (say) say.textContent = BYFun.TAPS[Math.floor(Math.random() * BYFun.TAPS.length)];
+                    if (sv) { sv.classList.remove('fn-boing'); void sv.getBoundingClientRect(); sv.classList.add('fn-boing'); }
+                    if (taps % 5 === 0) BYFun.confetti(90);
+                }
+            });
+        },
+        show() { render(); if (window.BYFun) setTimeout(() => BYFun.celebrateNew(), 400); },
         refresh() { const r = root(); if (r && r.classList.contains('active')) render(); }
     });
 })();
