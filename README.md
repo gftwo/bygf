@@ -1,7 +1,7 @@
 # BYgf — Catatan Pribadi & Keseharian
 
 Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan keseharian.
-Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
+Dihosting di **GitHub Pages**, data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
 **Versi saat ini: v9.10.1**
