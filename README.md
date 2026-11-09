@@ -161,7 +161,7 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 
 ## Roadmap 5 Bulan ke Depan (Desember 2026 – April 2027)
 
-Penomoran baru: **angka depan naik setiap bulan** (v10.0, v11.0, v12.0, …). Tiap rilis bulanan punya satu **fitur/tab unggulan** ("wah") plus minimal 5 perubahan pendukung. Perbaikan kecil di tengah bulan memakai v10.1, v10.2, dst. Urutan prioritas tetap: **Stabilitas > Keamanan > Akurasi Data > Fungsionalitas > Performa > Tampilan**. Ini rencana, bisa digeser.
+Urutan prioritas tetap: **Stabilitas > Keamanan > Akurasi Data > Fungsionalitas > Performa > Tampilan**. Ini rencana, bisa digeser.
 
 ### 🚀 v10.0 — Desember 2026 · *Tab baru: Sehat & Kebiasaan*
 **Unggulan:** tab **Sehat** — pelacak kebiasaan harian (minum air, tidur, olahraga, ibadah, bebas jajan) dengan centang cepat, streak, dan kalender panas (heatmap) per bulan; terhubung ke maskot Bybi.
