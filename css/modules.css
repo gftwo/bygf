@@ -274,13 +274,13 @@ body.role-admin #globalSearchBtn{display:none}
 
 /* ---- Tata letak Dashboard Keuangan (Input) ---- */
 .in-grid{display:grid;gap:1rem;margin-top:1rem;align-items:start}
-.in-main{min-width:0;order:2}.in-side{display:grid;gap:.75rem;min-width:0;order:3}
+/* Rincian Saldo + Quick Respons berada DI ATAS form Catat Transaksi (berdampingan di layar lebar) */
+.in-main{min-width:0;order:2}.in-side{display:grid;gap:.75rem;min-width:0;order:1;align-items:start}
 .in-fold{width:100%;background:none;border:0;padding:0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:inherit;font:inherit}
 .in-fold:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
 #view-input .home-stats-row{margin-bottom:0}
-@media (min-width:1024px){
-  .in-grid{grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr)}
-  .in-main{order:1}.in-side{order:2;position:sticky;top:1rem}
+@media (min-width:720px){
+  .in-side{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 /* ---- Kartu Setelan terlipat ---- */
@@ -306,3 +306,11 @@ body.role-admin #globalSearchBtn{display:none}
 .vt-custom{margin:.5rem 0 .75rem}.vt-sub{display:block;font-size:.85rem;margin-bottom:.4rem}
 .vt-crow{display:flex;justify-content:space-between;align-items:center;padding:.35rem .5rem;border:1px solid var(--border-medium,#e5e5e5);border-radius:10px;margin-bottom:.35rem;font-size:.9rem}
 .qt-edit>summary{list-style:none}.qt-edit>summary::-webkit-details-marker{display:none}
+
+/* Tombol lipat "Pengaman & Cadangan Data" — tampil seperti tombol yang nyaman ditekan */
+.st-btn>summary{padding:.85rem 1rem;border:1px solid var(--border-medium,#e2e2e2);border-radius:14px;background:var(--bg-card,#fff);min-height:48px;transition:background .15s,transform .1s,box-shadow .15s;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.st-btn>summary:hover{background:var(--primary-light,rgba(0,0,0,.04));box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.st-btn>summary:active{transform:scale(.985)}
+.st-btn[open]>summary{border-color:var(--primary);margin-bottom:1rem}
+.st-btn>summary small{display:none}
+@media (min-width:480px){.st-btn>summary small{display:inline}}

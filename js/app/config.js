@@ -24,6 +24,10 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.10.2', date: 'November 2026', items: [
+            'Dasbor Input: Rincian Saldo per Dompet dan Quick Respons dipindah ke atas form Catat Transaksi (berdampingan di layar lebar); tidak ada lagi tampilan terpotong di Windows',
+            'Setelan: "Cadangan & Sampah" digabung ke "Pengaman & Cadangan Data", dan judulnya kini berupa tombol lipat yang lebih nyaman ditekan'
+        ] },
         { version: 'v9.10', date: 'November 2026', items: [
             'Daftar pengingat di HP kini terlipat; pratinjau & keterangan panjang dihapus',
             'Brankas: kategori Facebook, Instagram, Gmail, Game, Other dengan logo dari web (cadangan emoji bila offline)',
