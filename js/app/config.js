@@ -29,7 +29,8 @@ App.Config = {
             'Brankas: kategori Facebook, Instagram, Gmail, Game, Other dengan logo dari web (cadangan emoji bila offline)',
             'Dasbor Input ditata ulang: statistik di atas, form & panel samping 2 kolom',
             'Tab Tugas: kartu "Hari ini" (tugas hari ini + terlambat) di paling atas',
-            'Quick Respons terlipat; Pengaman Data + Import/Export digabung & terlipat',
+            'Quick Respons: chip tetap terlihat, form tambah/ubah template di dalam Kelola terlipat; Pengaman Data + Import/Export digabung & terlipat',
+            'Brankas: bisa menambah & menghapus kategori sendiri (tersimpan terenkripsi)',
             'Bayar Tagihan & Utang-Piutang: pilih Cash atau e-wallet dengan saldo masing-masing',
             'Statistik kehadiran dihapus'
         ] },

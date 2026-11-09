@@ -12,9 +12,15 @@
     const KEY = 'vault', ITER = 250000, CHECK = 'BYGF-VAULT-OK', IDLE_MS = 120000, AWAY_MS = 60000, CLIP_MS = 30000;
     // [kunci, nama, domain untuk logo dari web (null = tanpa logo web), emoji cadangan bila logo gagal dimuat/offline]
     const CATS = [['facebook', 'Facebook', 'facebook.com', '📘'], ['instagram', 'Instagram', 'instagram.com', '📷'], ['gmail', 'Gmail', 'mail.google.com', '✉️'], ['game', 'Game', null, '🎮'], ['other', 'Other', null, '🔖']];
-    const CAT = Object.fromEntries(CATS.map(c => [c[0], c]));
-    const catKey = k => CAT[k] ? k : 'other'; // kategori versi lama (akun/kampus/uang/sosial/lain) → Other
-    const logo = (k, cls) => { const c = CAT[catKey(k)]; return c[2] ? `<img class="vt-logo ${cls || ''}" src="https://www.google.com/s2/favicons?domain=${c[2]}&sz=64" alt="" width="24" height="24" loading="lazy" referrerpolicy="no-referrer" data-fb="${c[3]}">` : `<span class="vt-logo-emoji ${cls || ''}" aria-hidden="true">${c[3]}</span>`; };
+    const OTHER = CATS[CATS.length - 1], BASE = CATS.slice(0, -1);
+    let session = null, ui = { q: '', cat: '', reveal: new Set(), fails: 0, lockUntil: 0, busy: false }, idleT = null, hiddenAt = 0, writeQ = Promise.resolve();
+    const customOf = () => (session && Array.isArray(session.cats)) ? session.cats : [];
+    const allCats = () => [...BASE, ...customOf().map(c => [c.k, c.name, null, c.emoji]), OTHER]; // "Other" selalu terakhir
+    const catOf = k => allCats().find(c => c[0] === k);
+    const catKey = k => catOf(k) ? k : 'other'; // kategori tak dikenal / dihapus → Other
+    const cleanCats = a => (Array.isArray(a) ? a : []).filter(c => c && typeof c === 'object' && /^[\w-]{1,40}$/.test(String(c.k || '')) && String(c.name || '').trim()).slice(0, 30).map(c => ({ k: String(c.k), name: String(c.name).trim().slice(0, 24), emoji: String(c.emoji || '🔖').slice(0, 4) }));
+    const parsePayload = a => Array.isArray(a) ? { items: a, cats: [] } : { items: Array.isArray(a && a.items) ? a.items : [], cats: cleanCats(a && a.cats) }; // format lama = array saja
+    const logo = (k, cls) => { const c = catOf(catKey(k)); return c[2] ? `<img class="vt-logo ${cls || ''}" src="https://www.google.com/s2/favicons?domain=${c[2]}&sz=64" alt="" width="24" height="24" loading="lazy" referrerpolicy="no-referrer" data-fb="${c[3]}">` : `<span class="vt-logo-emoji ${cls || ''}" aria-hidden="true">${c[3]}</span>`; };
     const { esc, uid } = Mx;
     const D = () => AppModules.get(KEY), root = () => document.getElementById('view-vault-home');
     const hasCrypto = () => !!(window.crypto && crypto.subtle && window.isSecureContext !== false);
@@ -66,7 +72,6 @@
     }
 
     // ----- sesi (memori saja) -----
-    let session = null, ui = { q: '', cat: '', reveal: new Set(), fails: 0, lockUntil: 0, busy: false }, idleT = null, hiddenAt = 0, writeQ = Promise.resolve();
     const curUid = () => (window.App && App.State.user && App.State.user.uid) || '';
     function touch() { clearTimeout(idleT); if (session) idleT = setTimeout(() => lock('Terkunci otomatis karena tidak ada aktivitas'), IDLE_MS); }
     function lock(msg) {
@@ -76,7 +81,7 @@
     }
     function persist() { // enkripsi ulang seluruh isi lalu simpan (antrean agar urutan tulis aman)
         const s = session; if (!s) return Promise.resolve();
-        const snapshot = JSON.stringify(s.items);
+        const snapshot = JSON.stringify({ v: 2, items: s.items, cats: s.cats || [] }); // kategori kustom ikut terenkripsi
         writeQ = writeQ.then(async () => {
             if (session !== s) return;
             const e = await seal(s.key, snapshot); D().data = e; s.lastCt = e.ct; AppModules.changed(KEY);
@@ -87,7 +92,7 @@
     async function setup(pass) {
         const salt = crypto.getRandomValues(new Uint8Array(16)), key = await derive(pass, salt);
         D().salt = b64(salt); D().check = await seal(key, CHECK); D().data = null;
-        session = { key, items: [], salt: D().salt, uid: curUid(), lastCt: '' };
+        session = { key, items: [], cats: [], salt: D().salt, uid: curUid(), lastCt: '' };
         await persist(); touch();
     }
     async function unlock(pass) {
@@ -95,8 +100,9 @@
         const key = await derive(pass, unb64(d.salt));
         let ok = false; try { ok = (await open(key, d.check)) === CHECK; } catch (e) { ok = false; }
         if (!ok) throw new Error('salah');
-        let items = []; if (d.data) { try { const a = JSON.parse(await open(key, d.data)); items = Array.isArray(a) ? a : []; } catch (e) { throw new Error('rusak'); } }
-        session = { key, items: items.filter(i => i && typeof i === 'object' && i.id).map(i => Object.assign(i, { category: catKey(i.category) })), salt: d.salt, uid: curUid(), lastCt: d.data ? d.data.ct : '' };
+        let pl = { items: [], cats: [] }; if (d.data) { try { pl = parsePayload(JSON.parse(await open(key, d.data))); } catch (e) { throw new Error('rusak'); } }
+        session = { key, items: [], cats: pl.cats, salt: d.salt, uid: curUid(), lastCt: d.data ? d.data.ct : '' };
+        session.items = pl.items.filter(i => i && typeof i === 'object' && i.id).map(i => Object.assign(i, { category: catKey(i.category) }));
         touch();
     }
 
@@ -133,13 +139,38 @@
             <div class="vt-acts"><button type="button" class="mx-icon" data-act="edit" aria-label="Ubah">✏️</button><button type="button" class="mx-icon" data-act="del" aria-label="Hapus">🗑️</button></div></article>`;
         }).join('');
     }
+    function customHTML() {
+        const c = customOf();
+        return `<b class="vt-sub">Kategori kustom</b>` + (c.length ? c.map(x => `<div class="vt-crow" data-k="${esc(x.k)}"><span>${esc(x.emoji)} ${esc(x.name)}</span><button type="button" class="mx-icon" data-act="delcat" aria-label="Hapus kategori ${esc(x.name)}">🗑️</button></div>`).join('') : '<p class="mx-muted">Belum ada. Tekan "+ Kategori" di atas daftar.</p>');
+    }
+    function catForm() {
+        Mx.modal({
+            title: 'Kategori baru', size: 380,
+            body: `<form id="vtCatForm" autocomplete="off"><div class="mx-field"><label for="vtCN">Nama kategori</label><input id="vtCN" class="mx-input" maxlength="24" required placeholder="Cth: Bank, Kantor"></div>
+            <div class="mx-field"><label for="vtCE">Ikon (emoji)</label><input id="vtCE" class="mx-input" maxlength="4" value="🔖"></div>
+            <p class="vt-err" id="vtCErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Simpan kategori</button></form>`,
+            onMount(m) {
+                m.el.classList.add('vt-modal-ov'); const $ = id => m.el.querySelector('#' + id); touch();
+                $('vtCatForm').addEventListener('submit', e => {
+                    e.preventDefault(); if (!session) { m.close(); return; }
+                    const name = $('vtCN').value.trim(), emoji = $('vtCE').value.trim() || '🔖';
+                    const dup = allCats().some(c => String(c[1]).toLocaleLowerCase('id-ID') === name.toLocaleLowerCase('id-ID'));
+                    if (!name || dup) { $('vtCErr').textContent = name ? 'Nama kategori sudah ada' : 'Isi nama kategori'; $('vtCErr').hidden = false; return; }
+                    if (customOf().length >= 30) { $('vtCErr').textContent = 'Maksimal 30 kategori kustom'; $('vtCErr').hidden = false; return; }
+                    session.cats = [...customOf(), { k: 'c' + uid().replace(/[^\w-]/g, '').slice(0, 12), name, emoji }];
+                    persist(); m.close(); render(); Mx.toast('Kategori ditambahkan');
+                });
+                setTimeout(() => $('vtCN').focus(), 0);
+            }
+        });
+    }
     function viewOpen() {
         return `<div class="mx-head"><div><h2 class="mx-h2">🔐 Brankas Sandi</h2><p class="mx-muted">${session.items.length} sandi · terenkripsi AES-256 · kunci otomatis bila tidak dipakai 2 menit</p></div>
         <div class="mx-row"><button type="button" class="mx-btn mx-btn-primary" data-act="add">+ Tambah</button><button type="button" class="mx-btn" data-act="lock">🔒 Kunci</button></div></div>
         <div class="mx-tools"><input type="search" id="vtQ" class="mx-input" placeholder="Cari judul, pengguna, catatan…" value="${esc(ui.q)}" aria-label="Cari sandi"></div>
-        <div class="mx-tools vt-chips"><button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua</button>${CATS.map(([k, v]) => `<button type="button" class="mx-chip vt-chip${ui.cat === k ? ' on' : ''}" data-act="cat" data-c="${k}">${logo(k, 'vt-chip-ico')}${v}</button>`).join('')}</div>
+        <div class="mx-tools vt-chips"><button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua</button>${allCats().map(([k, v]) => `<button type="button" class="mx-chip vt-chip${ui.cat === k ? ' on' : ''}" data-act="cat" data-c="${k}">${logo(k, 'vt-chip-ico')}${esc(v)}</button>`).join('')}<button type="button" class="mx-chip" data-act="addcat" aria-label="Tambah kategori">+ Kategori</button></div>
         <div class="mx-card vt-list" id="vtList">${listHTML()}</div>
-        <details class="vt-adv"><summary>Pengaturan brankas</summary><div class="mx-row"><button type="button" class="mx-btn" data-act="chpass">Ubah kunci utama</button><button type="button" class="mx-btn mx-btn-danger" data-act="reset">Reset brankas…</button></div></details>`;
+        <details class="vt-adv"><summary>Pengaturan brankas</summary><div class="vt-custom" id="vtCustom">${customHTML()}</div><div class="mx-row"><button type="button" class="mx-btn" data-act="chpass">Ubah kunci utama</button><button type="button" class="mx-btn mx-btn-danger" data-act="reset">Reset brankas…</button></div></details>`;
     }
     function render() {
         const el = root(); if (!el) return;
@@ -161,7 +192,7 @@
             <div class="mx-field"><label for="vtW">Sandi</label><div class="vt-pwrow"><input id="vtW" type="password" class="mx-input" maxlength="200" required value="${esc(it.password)}" autocomplete="off"><button type="button" class="mx-icon" id="vtEye" aria-label="Tampilkan sandi">👁️</button></div>
             <div class="vt-meter" aria-hidden="true"><i id="vtBar2"></i></div><small class="mx-muted" id="vtBarTxt2"></small></div>
             <div class="vt-gen"><button type="button" class="mx-btn mx-btn-sm" id="vtGen">🎲 Buat sandi acak</button><label>Panjang <input type="number" id="vtLen" class="mx-input" min="8" max="64" value="16"></label><label class="vt-agree"><input type="checkbox" id="vtSym" checked> Simbol</label></div>
-            <div class="mx-field"><label id="vtCL">Kategori</label><div class="vt-catpick" role="radiogroup" aria-labelledby="vtCL">${CATS.map(([k, v]) => `<label class="vt-catopt"><input type="radio" name="vtC" value="${k}" ${catKey(it.category) === k ? 'checked' : ''}><span>${logo(k, 'vt-chip-ico')}${v}</span></label>`).join('')}</div></div>
+            <div class="mx-field"><label id="vtCL">Kategori</label><div class="vt-catpick" role="radiogroup" aria-labelledby="vtCL">${allCats().map(([k, v]) => `<label class="vt-catopt"><input type="radio" name="vtC" value="${k}" ${catKey(it.category) === k ? 'checked' : ''}><span>${logo(k, 'vt-chip-ico')}${esc(v)}</span></label>`).join('')}</div><small class="mx-muted">Mau kategori lain? Tutup form ini lalu tekan "+ Kategori" di atas daftar.</small></div>
             <div class="mx-field"><label for="vtL">Alamat situs (opsional)</label><input id="vtL" class="mx-input" maxlength="200" placeholder="https://…" value="${esc(it.url)}"></div>
             <div class="mx-field"><label for="vtN">Catatan (opsional)</label><textarea id="vtN" class="mx-input" maxlength="300">${esc(it.note)}</textarea></div>
             <p class="vt-err" id="vtFErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Simpan</button></form>`,
@@ -189,6 +220,14 @@
 
     const acts = {
         add: () => itemForm(null),
+        addcat: () => catForm(),
+        delcat: async el => {
+            const row = el.closest('.vt-crow'), c = row && customOf().find(x => x.k === row.dataset.k); if (!c) return;
+            const n = session.items.filter(i => i.category === c.k).length;
+            if (!(await Mx.confirm(`Hapus kategori "${c.name}"?` + (n ? ` ${n} sandi di dalamnya dipindah ke Other.` : '')))) return;
+            session.items.forEach(i => { if (i.category === c.k) i.category = 'other'; }); session.cats = customOf().filter(x => x.k !== c.k);
+            if (ui.cat === c.k) ui.cat = ''; persist(); render(); Mx.toast('Kategori dihapus');
+        },
         edit: el => { const i = find(el); if (i) itemForm(i); },
         del: async el => { const i = find(el); if (!i || !(await Mx.confirm(`Hapus sandi "${i.title}"?`))) return; session.items = session.items.filter(x => x.id !== i.id); ui.reveal.delete(i.id); persist(); render(); Mx.toast('Sandi dihapus'); },
         reveal: el => { const i = find(el); if (!i) return; if (ui.reveal.has(i.id)) ui.reveal.delete(i.id); else { ui.reveal.add(i.id); setTimeout(() => { if (ui.reveal.delete(i.id)) render(); }, 15000); } render(); },
@@ -269,7 +308,7 @@
         refresh() { // data berubah dari akun/perangkat lain, atau ganti akun
             if (session && (session.uid !== curUid() || D().salt !== session.salt)) { lock(session.uid !== curUid() ? '' : 'Kunci utama diganti di perangkat lain — brankas dikunci'); return; }
             if (session && D().data && D().data.ct !== session.lastCt) { // isi diubah di perangkat lain: baca ulang
-                const s = session, p = D().data; open(s.key, p).then(t => { if (session === s) { const a = JSON.parse(t); s.items = Array.isArray(a) ? a : s.items; s.lastCt = p.ct; render(); } }).catch(() => lock('Isi brankas berubah — buka kembali'));
+                const s = session, p = D().data; open(s.key, p).then(t => { if (session === s) { const pl = parsePayload(JSON.parse(t)); s.cats = pl.cats; s.items = pl.items.filter(i => i && typeof i === 'object' && i.id).map(i => Object.assign(i, { category: catKey(i.category) })); s.lastCt = p.ct; render(); } }).catch(() => lock('Isi brankas berubah — buka kembali'));
             }
             const r = root(); if (r && r.classList.contains('active') && !document.querySelector('.vt-modal-ov')) render();
         },

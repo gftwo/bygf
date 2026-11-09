@@ -663,12 +663,6 @@ App.UI = {
         el.style.display = show ? 'block' : 'none';
         if (icon) icon.style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)';
     },
-    toggleQuickRespons() { // Quick Respons terlipat secara bawaan; status buka/tutup diingat per perangkat
-        const b = document.getElementById('quickBody'), icon = document.getElementById('quickFoldIcon'), btn = document.getElementById('quickFold'); if (!b) return;
-        const show = b.style.display === 'none'; b.style.display = show ? 'block' : 'none';
-        if (icon) icon.style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)'; if (btn) btn.setAttribute('aria-expanded', String(show));
-        try { localStorage.setItem('bygf.quickOpen', show ? '1' : '0'); } catch (e) { /* abaikan */ }
-    },
     toggleTransferHistory() {
         const el = document.getElementById('transfersList'); const icon = document.getElementById('transferHistoryToggleIcon');
         if (!el) return;

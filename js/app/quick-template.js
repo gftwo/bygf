@@ -3,7 +3,6 @@ import { App } from './core.js';
 App.QuickTemplate = {
     render() {
         const box = document.getElementById('quickTemplateChips'); if (!box) return;
-        try { if (localStorage.getItem('bygf.quickOpen') === '1' && document.getElementById('quickBody') && document.getElementById('quickBody').style.display === 'none') App.UI.toggleQuickRespons(); } catch (e) { /* abaikan */ }
         const chips = App.State.quickTemplates.map((t, i) =>
             `<button type="button" class="qt-chip" onclick="App.QuickTemplate.openQuickAdd(${i})">${t.icon || '⚡'} ${t.name}</button>`
         ).join('');
