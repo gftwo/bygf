@@ -12,6 +12,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Ringkasan Fitur](#ringkasan-fitur)
 - [Struktur Proyek](#struktur-proyek)
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
+- [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
   - [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
@@ -157,6 +158,60 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 > Catatan: rincian v9.0 dan v9.1 disusun dari isi berkas dan komentar kodenya karena keduanya tidak tercatat di changelog dalam aplikasi. Sebelum v9.0, riwayat v8.1–v8.9 ada di halaman "Lihat Riwayat Update" di Setelan.
 
 ---
+
+## Roadmap 5 Bulan ke Depan (Desember 2026 – April 2027)
+
+Penomoran baru: **angka depan naik setiap bulan** (v10.0, v11.0, v12.0, …). Tiap rilis bulanan punya satu **fitur/tab unggulan** ("wah") plus minimal 5 perubahan pendukung. Perbaikan kecil di tengah bulan memakai v10.1, v10.2, dst. Urutan prioritas tetap: **Stabilitas > Keamanan > Akurasi Data > Fungsionalitas > Performa > Tampilan**. Ini rencana, bisa digeser.
+
+### 🚀 v10.0 — Desember 2026 · *Tab baru: Sehat & Kebiasaan*
+**Unggulan:** tab **Sehat** — pelacak kebiasaan harian (minum air, tidur, olahraga, ibadah, bebas jajan) dengan centang cepat, streak, dan kalender panas (heatmap) per bulan; terhubung ke maskot Bybi.
+Pendukung:
+1. Kunci aplikasi (PIN, dan sidik jari di APK).
+2. Perketat Firebase Security Rules (tiap akun hanya ke `users/{uid}` miliknya).
+3. Pemulihan otomatis dari snapshot bila data rusak atau sinkron gagal.
+4. Halaman Kesehatan Data: cek transaksi ganda, saldo tidak cocok, data yatim.
+5. Pengingat kebiasaan lewat notifikasi HP.
+6. Uji otomatis dijalankan di GitHub Actions sebelum APK dibangun.
+
+### 🚀 v11.0 — Januari 2027 · *Tab baru: Dompet Pintar (Analitik Keuangan)*
+**Unggulan:** tab **Analitik** — dasbor grafik interaktif: tren pemasukan/pengeluaran, kategori terboros, perbandingan bulan, laporan tahunan, dan **prediksi sisa uang bulan ini**.
+Pendukung:
+1. Budget per kategori dengan batas bulanan dan peringatan.
+2. Pelacak langganan (Netflix, Spotify, dll.) dengan pengingat perpanjangan.
+3. Foto struk dan tag pada transaksi.
+4. Pencarian dan filter lanjutan di Riwayat (tanggal, nominal, dompet, kategori).
+5. Ekspor Excel (.xlsx).
+6. Target "no-spend day" dengan hitungan hari hemat.
+
+### 🚀 v12.0 — Februari 2027 · *Tab baru: Akademik*
+**Unggulan:** tab **Akademik** — pusat urusan kuliah: kalkulator IPK/IPS dengan simulasi target nilai, jadwal ujian dengan hitung mundur, dan perencana belajar mingguan.
+Pendukung:
+1. Timer fokus (Pomodoro) terhubung ke tugas dan statistik waktu belajar.
+2. Prioritas tugas otomatis (tenggat + bobot).
+3. Widget "Hari ini" di layar utama Android.
+4. Tampilan jadwal per minggu dan kalender tugas.
+5. Kartu nilai per mata kuliah (komponen, bobot, nilai sementara).
+6. Pengingat belajar sebelum ujian.
+
+### 🚀 v13.0 — Maret 2027 · *Fitur baru: Linimasa Hidup & "BYgf Wrapped"*
+**Unggulan:** **Linimasa** — satu garis waktu per hari yang menggabungkan transaksi, tugas selesai, makanan, kebiasaan, mood, dan jurnal; plus **BYgf Wrapped** — ringkasan bulanan/tahunan bergaya "tahun ini kamu…" yang bisa dibagikan sebagai gambar.
+Pendukung:
+1. Buka Brankas dengan sidik jari (APK).
+2. Cek kekuatan sandi, sandi dobel, dan pengingat ganti sandi lama.
+3. Ekspor/impor Brankas terenkripsi untuk cadangan terpisah.
+4. Tag dan pencarian penuh di Notes/Jurnal, plus grafik tren mood.
+5. Foto pada jurnal harian.
+6. Pencarian global lintas semua tab dengan filter jenis.
+
+### 🚀 v14.0 — April 2027 · *Bybi 2.0: Asisten Pribadi + Performa*
+**Unggulan:** **Bybi Asisten** — ringkasan mingguan otomatis ("pengeluaranmu naik 12%, 2 tugas hampir lewat"), saran tindakan, level & XP, dan koleksi aksesori maskot yang dibuka lewat pencapaian.
+Pendukung:
+1. Pecah penyimpanan data (satu blob → beberapa bagian) agar sinkron lebih cepat, dengan migrasi aman dan backup otomatis.
+2. Lazy load modul agar aplikasi cepat dibuka.
+3. APK rilis bertanda tangan dengan cek pembaruan di dalam aplikasi.
+4. Tema baru dan pilihan warna aksen sendiri.
+5. Mode tampilan ringkas/lega dan penyempurnaan aksesibilitas.
+6. Onboarding singkat dan pembaruan README serta panduan APK.
 
 ## Catatan Keamanan
 - Kunci Firebase web (`apiKey`, dll.) memang publik; keamanan data bergantung pada **Firebase Security Rules** (batasi tiap akun hanya ke `users/{uid}`).
