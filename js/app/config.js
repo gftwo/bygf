@@ -25,9 +25,10 @@ App.Config = {
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
         { version: 'v9.9', date: 'November 2026', items: [
-            'Brankas Sandi menggantikan panel Admin: simpan kata sandi pribadi, terenkripsi AES-256 dengan kunci utama milikmu (tidak disimpan di mana pun), kunci otomatis, salin sandi dengan penghapusan clipboard, dan generator sandi acak',
+            'Brankas Sandi menggantikan panel Admin dan hanya untuk akun admin (akun admin kini hanya melihat Brankas): simpan kata sandi pribadi, terenkripsi AES-256 dengan kunci utama milikmu (tidak disimpan di mana pun), kunci otomatis, salin sandi dengan penghapusan clipboard, dan generator sandi acak',
             'Keamanan: sandi akun tidak lagi disimpan polos di database; sandi polos peninggalan versi lama dihapus otomatis saat login',
             'Mode offline: aplikasi tetap terbuka dan formulir tetap bisa diisi tanpa internet; perubahan tersimpan di perangkat dan dikirim otomatis saat online kembali (ada penanda "belum tersinkron")',
+            'Layar pembuka animasi logo saat aplikasi dibuka; tampilan mentah sebelum gaya termuat tidak lagi terlihat',
             'Fitur lucu: maskot Bybi (mood & streak harian), 9 lencana dengan konfeti, kartu "Hari ini di masa lalu", roda "Makan apa?", dan satu kejutan tersembunyi',
         ] },
         { version: 'v9.8', date: 'November 2026', items: [

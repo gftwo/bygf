@@ -10,11 +10,11 @@
         { g: 'keuangan', icon: 'keuangan', label: 'Keuangan' },
         { g: 'daily', icon: 'task', label: 'Tugas', badge: 'dailyNavBadge' },
         { g: 'kuliah', icon: 'kuliah', label: 'Kuliah', badge: 'kpNavBadge' },
+        { g: 'vault', icon: 'vault', label: 'Brankas' }, // hanya tampil untuk admin (lihat css .role-admin)
     ];
     const MORE = [
         { g: 'makan', icon: 'makan', label: 'Makan' },
         { g: 'notes', icon: 'notes', label: 'Notes' },
-        { g: 'vault', icon: 'vault', label: 'Brankas' },
         { g: 'laporan', icon: 'laporan', label: 'Laporan' },
         { g: 'settings', icon: 'setting', label: 'Setting' }
     ];

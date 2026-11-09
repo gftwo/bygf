@@ -598,6 +598,7 @@ App.UI = {
     _lastSubTab: {},
     switchMainGroup(group) {
         if (!this.NavGroups[group]) group = 'keuangan';
+        if (App.State.isAdmin) group = 'vault'; else if (group === 'vault') group = 'home'; // admin hanya Brankas; Brankas khusus admin
         this._activeGroup = group;
         const groupId = 'navGroup' + group.charAt(0).toUpperCase() + group.slice(1);
         document.querySelectorAll('.side-nav .nav-item').forEach(b => b.classList.remove('active'));

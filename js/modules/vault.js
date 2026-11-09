@@ -140,6 +140,7 @@
     }
     function render() {
         const el = root(); if (!el) return;
+        if (!(window.App && App.State && App.State.isAdmin)) { el.innerHTML = ''; return; } // khusus admin
         if (!hasCrypto()) { el.innerHTML = viewUnsupported(); return; }
         const typing = document.activeElement && el.contains(document.activeElement) && document.activeElement.id === 'vtQ';
         if (typing && session) { const l = el.querySelector('#vtList'); if (l) { l.innerHTML = listHTML(); return; } }

@@ -55,6 +55,7 @@ App.Guard = {
         return items;
     },
     showNudge() {
+        if (App.State.isAdmin) return false; // akun admin: hanya Brankas
         if (localStorage.getItem(K.nudge) === day()) return false;
         const items = this.nudgeItems(); if (!items.length) return false;
         let m = document.getElementById('guardNudge'); if (m) m.remove();

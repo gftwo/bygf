@@ -22,7 +22,7 @@ App.Theme = {
     },
     // Mode terang/gelap kini ditentukan oleh tema (neon = gelap). Dipertahankan agar kode lama yang memanggilnya tidak error.
     toggle(isDark, save = true) {
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); try { localStorage.setItem('bygf.splashTheme', isDark ? 'dark' : 'light'); } catch (e) { /* abaikan */ }
         if (save) { App.State.settings.theme = isDark ? 'dark' : 'light'; App.DB.save(); }
         if (App.State.charts.cat) App.UI.renderAnalytics();
     },
@@ -30,7 +30,7 @@ App.Theme = {
         name = this.resolve(name);
         const isDark = name === 'neon' || name === 'senja';
         document.documentElement.setAttribute('data-theme-preset', name);
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); try { localStorage.setItem('bygf.splashTheme', isDark ? 'dark' : 'light'); } catch (e) { /* abaikan */ }
         document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
         const card = document.getElementById('preset-' + name); if (card) card.classList.add('active');
         const darkRow = document.getElementById('darkModeRow'); if (darkRow) darkRow.style.display = 'none';

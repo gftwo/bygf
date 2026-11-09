@@ -20,6 +20,7 @@ App.Auth = {
     handleUserChange(user) {
         if (user) {
             App.State.user = user;
+            App.State.isAdmin = user.email === 'admin@keuangan.pro' || user.uid === 'dummy_admin'; // Brankas Sandi hanya untuk admin
             
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('userDisplayName').textContent = name;
@@ -47,17 +48,22 @@ App.Auth = {
                 }).catch(err => console.log(err));
             }
 
-            document.querySelectorAll('.nav-item, .sn-rail-btn').forEach(el => { el.style.display = 'flex'; });
+            // Akun admin hanya melihat Brankas Sandi; akun biasa melihat semua tab kecuali Brankas.
+            const isVault = el => el.id === 'navGroupVault' || el.dataset.group === 'vault';
+            document.querySelectorAll('.nav-item, .sn-rail-btn').forEach(el => { el.style.display = (App.State.isAdmin ? isVault(el) : !isVault(el)) ? 'flex' : 'none'; });
+            document.body.classList.toggle('role-admin', !!App.State.isAdmin);
             const railAvatar = document.querySelector('.sn-rail-avatar'); if(railAvatar) railAvatar.style.display = 'flex';
             document.getElementById('btnPdSettings').style.display = 'flex';
             setTimeout(() => { 
+                if (App.State.isAdmin) { App.UI.switchMainGroup('vault'); return; }
                 const inputTab = document.querySelector('.nav-item[onclick*="input"]'); 
                 if(inputTab) App.UI.switchTab('input', inputTab); 
             }, 50);
         } else {
-            App.State.user = null;
+            App.State.user = null; App.State.isAdmin = false; document.body.classList.remove('role-admin');
             if (window.AppModules) AppModules.setUser(null);
             App.UI.toggleAuthView(true);
+            if (window.BGSplash) BGSplash.hide(); // belum login: tampilkan layar masuk
         }
     },
     async handleLogin(e) {

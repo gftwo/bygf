@@ -83,7 +83,7 @@
             { id: 'tg20', icon: '✅', name: 'Tukang tuntas', how: 'Selesaikan 20 tugas', ok: done >= 20 },
             { id: 'goal', icon: '🐷', name: 'Target tercapai', how: 'Penuhi satu target tabungan', ok: goalDone },
             { id: 'kul', icon: '🎓', name: 'Mahasiswa rajin', how: 'Kehadiran ≥90% di semua matkul (min. 5 pertemuan)', ok: !!rajin },
-            { id: 'vault', icon: '🔐', name: 'Penjaga rahasia', how: 'Buat Brankas Sandi', ok: !!(v && v.salt) }
+            ...((window.App && App.State && App.State.isAdmin) ? [{ id: 'vault', icon: '🔐', name: 'Penjaga rahasia', how: 'Buat Brankas Sandi', ok: !!(v && v.salt) }] : [])
         ];
     }
     const SEEN = 'bygf.badgesSeen';

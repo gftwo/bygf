@@ -147,7 +147,7 @@ App.Notify = {
             classes: (window.KuliahPro && KuliahPro.upcomingClasses) ? KuliahPro.upcomingClasses(HORIZON_DAYS) : []
         };
     },
-    plan() { return buildPlan(this.collect(), this.prefs(), new Date()); },
+    plan() { return App.State.isAdmin ? [] : buildPlan(this.collect(), this.prefs(), new Date()); }, // akun admin: tanpa pengingat
     _timer: null,
     reschedule(delay) {
         clearTimeout(this._timer);

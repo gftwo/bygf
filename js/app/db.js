@@ -52,12 +52,12 @@ App.DB = {
         window.addEventListener('offline', () => setOn(false));
     },
     _finishLoad() { // dipakai bersama oleh jalur online & jalur offline (cermin lokal)
-        App.State.isLoading = false; App.Premium.applyState(); App.Theme.init(); App.UI.renderCategoriesSelect();
+        App.State.isLoading = false; if (window.BGSplash) setTimeout(() => BGSplash.hide(), 150); App.Premium.applyState(); App.Theme.init(); App.UI.renderCategoriesSelect();
             // Cuma pindah ke tab Keuangan sekali di awal (pas baru login/buka app), bukan tiap kali
             // ada data baru masuk — sebelumnya ini bikin app "kelempar balik" ke Keuangan tiap kali
             // nambah/ubah apa pun di tab Kuliah (absen, tugas, dst) karena tiap App.DB.save() bikin
             // listener realtime ini kepanggil lagi.
-            if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup('home'); }
+            if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup(App.State.isAdmin ? 'vault' : 'home'); }
             App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
     },
     listen(uid) {
@@ -67,8 +67,8 @@ App.DB = {
             if (localData) {
                 this.applyData(JSON.parse(localData));
             } else { this.save(); }
-            App.State.isLoading = false; App.Premium.applyState(); App.Theme.init(); App.UI.renderCategoriesSelect();
-            if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup('home'); }
+            App.State.isLoading = false; if (window.BGSplash) setTimeout(() => BGSplash.hide(), 150); App.Premium.applyState(); App.Theme.init(); App.UI.renderCategoriesSelect();
+            if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup(App.State.isAdmin ? 'vault' : 'home'); }
             App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
             return;
         }

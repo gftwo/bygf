@@ -265,3 +265,9 @@
 .fn-slot.fn-final{color:var(--primary);transform:scale(1.08)}
 @media (prefers-reduced-motion:reduce){.fn-bybi,.fn-party,.fn-sleepy,.fn-boing{animation:none}}
 @media (max-width:420px){.fn-wrap{flex-direction:column;text-align:center}.fn-bubble:before{display:none}.fn-meta,.fn-dots{justify-content:center}}
+
+/* ---- Peran admin: hanya Brankas ---- */
+.bn-item[data-g="vault"]{display:none}
+body.role-admin .bn-item[data-g="vault"]{display:flex}
+body.role-admin .bn-item:not([data-g="vault"]){display:none}
+body.role-admin #globalSearchBtn{display:none}
