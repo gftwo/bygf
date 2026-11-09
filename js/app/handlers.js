@@ -57,7 +57,8 @@ App.Handlers = {
         document.getElementById('payoffSisa').textContent = App.Utils.formatCurrency(p.amount);
         document.getElementById('payoffJumlah').value = p.amount.toLocaleString('id-ID');
         document.getElementById('payoffTanggal').value = today;
-        document.getElementById('payoffAkun').value = 'cash';
+        const pf = () => App.Utils.parseCurrency(document.getElementById('payoffJumlah').value); pf.inputId = 'payoffJumlah';
+        App.UI.fillPayAccount('payoffAkun', 'payoffAkunHint', pf, true);
         document.getElementById('payoffCatatan').value = `Lunas: ${p.name}`;
         document.getElementById('payoffFullBtn').onclick  = () => App.Handlers.submitPayoff('full');
         document.getElementById('payoffPartBtn').onclick  = () => App.Handlers.submitPayoff('partial');
@@ -75,7 +76,7 @@ App.Handlers = {
         if(!tanggal) return App.UI.showToast('Pilih tanggal pembayaran', 'error');
         // Catat sebagai pengeluaran di history
         App.State.transactions.push({
-            id: Date.now(), tanggal, jenisAkun: akun,
+            id: Date.now(), tanggal, jenisAkun: akun.split(':')[0], ...(akun.startsWith('saldo:') ? { subWallet: akun.split(':')[1] } : {}),
             pemasukan: 0, pengeluaran: jumlah,
             kategori: 'lainnya', keterangan: catatan,
             _source: 'paylater'
@@ -361,6 +362,8 @@ App.Handlers = {
             <div class="font-bold" style="font-size:1rem;">${d.nama}</div>
             <div style="margin-top:0.2rem;"><span class="text-xs text-muted">Sisa: </span><span class="font-bold" style="color:${isUtang?'var(--danger)':'var(--success-dark)'};">${App.Utils.formatCurrency(d.sisa)}</span></div>`;
         document.getElementById('settleDebtJumlah').value = d.sisa.toLocaleString('id-ID');
+        const sf = () => App.Utils.parseCurrency(document.getElementById('settleDebtJumlah').value); sf.inputId = 'settleDebtJumlah';
+        App.UI.fillPayAccount('settleDebtAkun', 'settleDebtAkunHint', sf, isUtang);
         document.getElementById('settleDebtTanggal').value = today;
         document.getElementById('settleDebtCatatan').value = isUtang ? `Bayar hutang ke ${d.nama}` : `Terima piutang dari ${d.nama}`;
         document.getElementById('settleDebtFullBtn').onclick = () => App.Handlers.submitSettleDebt('full');
@@ -382,7 +385,7 @@ App.Handlers = {
         const isUtang = tipe === 'utang';
         // Catat ke history — hutang = pengeluaran, piutang = pemasukan
         App.State.transactions.push({
-            id: Date.now(), tanggal, jenisAkun: akun,
+            id: Date.now(), tanggal, jenisAkun: akun.split(':')[0], ...(akun.startsWith('saldo:') ? { subWallet: akun.split(':')[1] } : {}),
             pemasukan: isUtang ? 0 : jumlah,
             pengeluaran: isUtang ? jumlah : 0,
             kategori: 'lainnya', keterangan: catatan,

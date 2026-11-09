@@ -1,7 +1,7 @@
 /* BYgf — Service worker: membuat aplikasi bisa dibuka offline (hanya cache aset; TANPA notifikasi push).
    Strategi: file aplikasi = jaringan dulu (selalu dapat versi terbaru saat online), cache sebagai cadangan offline.
    Data pengguna tidak disimpan di sini — tetap di localStorage + Firebase. Naikkan VERSION saat merilis agar cache lama dibersihkan. */
-const VERSION = 'bygf-v9.9.1';
+const VERSION = 'bygf-v9.10';
 const PRECACHE = [
  "./",
  "css/auth.css",
@@ -73,6 +73,10 @@ self.addEventListener('fetch', e => {
     if (url.origin === location.origin) { // file aplikasi: jaringan dulu
         e.respondWith(fetch(req).then(res => { if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return res; })
             .catch(() => caches.match(req).then(r => r || (req.mode === 'navigate' ? caches.match('./index.html').then(x => x || caches.match('./')) : Response.error()))));
+        return;
+    }
+    if (url.hostname === 'www.google.com' && url.pathname.startsWith('/s2/favicons')) { // logo situs (Brankas): cache dulu agar tetap tampil saat offline
+        e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => { if (res && (res.ok || res.type === 'opaque')) { const co = res.clone(); caches.open(VERSION).then(c => c.put(req, co)); } return res; })));
         return;
     }
     if (CDN_HOSTS.includes(url.hostname)) { // pustaka/font CDN: cache dulu, perbarui di belakang

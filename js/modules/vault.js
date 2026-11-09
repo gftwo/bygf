@@ -10,8 +10,11 @@
 (function () {
     'use strict';
     const KEY = 'vault', ITER = 250000, CHECK = 'BYGF-VAULT-OK', IDLE_MS = 120000, AWAY_MS = 60000, CLIP_MS = 30000;
-    const CATS = [['akun', '🌐 Akun online'], ['kampus', '🎓 Kampus'], ['uang', '💳 Keuangan'], ['sosial', '💬 Sosial'], ['lain', '🔖 Lainnya']];
-    const CAT = Object.fromEntries(CATS);
+    // [kunci, nama, domain untuk logo dari web (null = tanpa logo web), emoji cadangan bila logo gagal dimuat/offline]
+    const CATS = [['facebook', 'Facebook', 'facebook.com', '📘'], ['instagram', 'Instagram', 'instagram.com', '📷'], ['gmail', 'Gmail', 'mail.google.com', '✉️'], ['game', 'Game', null, '🎮'], ['other', 'Other', null, '🔖']];
+    const CAT = Object.fromEntries(CATS.map(c => [c[0], c]));
+    const catKey = k => CAT[k] ? k : 'other'; // kategori versi lama (akun/kampus/uang/sosial/lain) → Other
+    const logo = (k, cls) => { const c = CAT[catKey(k)]; return c[2] ? `<img class="vt-logo ${cls || ''}" src="https://www.google.com/s2/favicons?domain=${c[2]}&sz=64" alt="" width="24" height="24" loading="lazy" referrerpolicy="no-referrer" data-fb="${c[3]}">` : `<span class="vt-logo-emoji ${cls || ''}" aria-hidden="true">${c[3]}</span>`; };
     const { esc, uid } = Mx;
     const D = () => AppModules.get(KEY), root = () => document.getElementById('view-vault-home');
     const hasCrypto = () => !!(window.crypto && crypto.subtle && window.isSecureContext !== false);
@@ -93,7 +96,7 @@
         let ok = false; try { ok = (await open(key, d.check)) === CHECK; } catch (e) { ok = false; }
         if (!ok) throw new Error('salah');
         let items = []; if (d.data) { try { const a = JSON.parse(await open(key, d.data)); items = Array.isArray(a) ? a : []; } catch (e) { throw new Error('rusak'); } }
-        session = { key, items: items.filter(i => i && typeof i === 'object' && i.id), salt: d.salt, uid: curUid(), lastCt: d.data ? d.data.ct : '' };
+        session = { key, items: items.filter(i => i && typeof i === 'object' && i.id).map(i => Object.assign(i, { category: catKey(i.category) })), salt: d.salt, uid: curUid(), lastCt: d.data ? d.data.ct : '' };
         touch();
     }
 
@@ -121,7 +124,7 @@
         if (!rows.length) return session.items.length ? Mx.empty('🔍', 'Tidak ada yang cocok') : Mx.empty('🔑', 'Brankas masih kosong', 'Tekan "+ Tambah" untuk menyimpan sandi pertamamu.');
         return rows.map(i => {
             const shown = ui.reveal.has(i.id), safeUrl = /^https?:\/\//i.test(i.url || '') ? i.url : '';
-            return `<article class="vt-item" data-id="${esc(i.id)}"><div class="vt-ico" aria-hidden="true">${(CAT[i.category] || CAT.lain).split(' ')[0]}</div>
+            return `<article class="vt-item" data-id="${esc(i.id)}"><div class="vt-ico" aria-hidden="true">${logo(i.category)}</div>
             <div class="vt-main"><b>${esc(i.title)}</b>
             ${i.username ? `<div class="vt-line"><span class="vt-val">${esc(i.username)}</span><button type="button" class="mx-icon" data-act="copy-user" aria-label="Salin nama pengguna">📋</button></div>` : ''}
             <div class="vt-line"><code class="vt-val vt-pw">${shown ? esc(i.password) : '••••••••••'}</code><button type="button" class="mx-icon" data-act="reveal" aria-label="${shown ? 'Sembunyikan' : 'Tampilkan'} sandi">${shown ? '🙈' : '👁️'}</button><button type="button" class="mx-icon" data-act="copy-pass" aria-label="Salin sandi">📋</button></div>
@@ -134,7 +137,7 @@
         return `<div class="mx-head"><div><h2 class="mx-h2">🔐 Brankas Sandi</h2><p class="mx-muted">${session.items.length} sandi · terenkripsi AES-256 · kunci otomatis bila tidak dipakai 2 menit</p></div>
         <div class="mx-row"><button type="button" class="mx-btn mx-btn-primary" data-act="add">+ Tambah</button><button type="button" class="mx-btn" data-act="lock">🔒 Kunci</button></div></div>
         <div class="mx-tools"><input type="search" id="vtQ" class="mx-input" placeholder="Cari judul, pengguna, catatan…" value="${esc(ui.q)}" aria-label="Cari sandi"></div>
-        <div class="mx-tools vt-chips"><button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua</button>${CATS.map(([k, v]) => `<button type="button" class="mx-chip${ui.cat === k ? ' on' : ''}" data-act="cat" data-c="${k}">${v}</button>`).join('')}</div>
+        <div class="mx-tools vt-chips"><button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua</button>${CATS.map(([k, v]) => `<button type="button" class="mx-chip vt-chip${ui.cat === k ? ' on' : ''}" data-act="cat" data-c="${k}">${logo(k, 'vt-chip-ico')}${v}</button>`).join('')}</div>
         <div class="mx-card vt-list" id="vtList">${listHTML()}</div>
         <details class="vt-adv"><summary>Pengaturan brankas</summary><div class="mx-row"><button type="button" class="mx-btn" data-act="chpass">Ubah kunci utama</button><button type="button" class="mx-btn mx-btn-danger" data-act="reset">Reset brankas…</button></div></details>`;
     }
@@ -150,7 +153,7 @@
 
     // ----- form tambah / ubah -----
     function itemForm(item) {
-        const it = item || { title: '', username: '', password: '', url: '', category: 'akun', note: '' };
+        const it = item || { title: '', username: '', password: '', url: '', category: 'facebook', note: '' };
         Mx.modal({
             title: item ? 'Ubah sandi' : 'Tambah sandi', size: 460,
             body: `<form id="vtForm" autocomplete="off"><div class="mx-field"><label for="vtT">Nama / situs</label><input id="vtT" class="mx-input" maxlength="80" required value="${esc(it.title)}"></div>
@@ -158,7 +161,7 @@
             <div class="mx-field"><label for="vtW">Sandi</label><div class="vt-pwrow"><input id="vtW" type="password" class="mx-input" maxlength="200" required value="${esc(it.password)}" autocomplete="off"><button type="button" class="mx-icon" id="vtEye" aria-label="Tampilkan sandi">👁️</button></div>
             <div class="vt-meter" aria-hidden="true"><i id="vtBar2"></i></div><small class="mx-muted" id="vtBarTxt2"></small></div>
             <div class="vt-gen"><button type="button" class="mx-btn mx-btn-sm" id="vtGen">🎲 Buat sandi acak</button><label>Panjang <input type="number" id="vtLen" class="mx-input" min="8" max="64" value="16"></label><label class="vt-agree"><input type="checkbox" id="vtSym" checked> Simbol</label></div>
-            <div class="mx-field"><label for="vtC">Kategori</label><select id="vtC" class="mx-input">${CATS.map(([k, v]) => `<option value="${k}" ${it.category === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+            <div class="mx-field"><label id="vtCL">Kategori</label><div class="vt-catpick" role="radiogroup" aria-labelledby="vtCL">${CATS.map(([k, v]) => `<label class="vt-catopt"><input type="radio" name="vtC" value="${k}" ${catKey(it.category) === k ? 'checked' : ''}><span>${logo(k, 'vt-chip-ico')}${v}</span></label>`).join('')}</div></div>
             <div class="mx-field"><label for="vtL">Alamat situs (opsional)</label><input id="vtL" class="mx-input" maxlength="200" placeholder="https://…" value="${esc(it.url)}"></div>
             <div class="mx-field"><label for="vtN">Catatan (opsional)</label><textarea id="vtN" class="mx-input" maxlength="300">${esc(it.note)}</textarea></div>
             <p class="vt-err" id="vtFErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Simpan</button></form>`,
@@ -170,7 +173,7 @@
                 $('vtForm').addEventListener('submit', e => {
                     e.preventDefault(); if (!session) { m.close(); return; }
                     const title = $('vtT').value.trim(), pw = $('vtW').value; if (!title || !pw) { $('vtFErr').textContent = 'Nama dan sandi wajib diisi'; $('vtFErr').hidden = false; return; }
-                    const url = $('vtL').value.trim(), rec = { id: item ? item.id : uid(), title, username: $('vtU').value.trim(), password: pw, url: /^https?:\/\//i.test(url) || !url ? url : 'https://' + url, category: CAT[$('vtC').value] ? $('vtC').value : 'lain', note: $('vtN').value.trim(), created: item ? item.created : new Date().toISOString(), updated: new Date().toISOString() };
+                    const url = $('vtL').value.trim(), rec = { id: item ? item.id : uid(), title, username: $('vtU').value.trim(), password: pw, url: /^https?:\/\//i.test(url) || !url ? url : 'https://' + url, category: catKey((m.el.querySelector('input[name=vtC]:checked') || {}).value), note: $('vtN').value.trim(), created: item ? item.created : new Date().toISOString(), updated: new Date().toISOString() };
                     if (item) session.items = session.items.map(x => x.id === item.id ? rec : x); else session.items.push(rec);
                     persist(); m.close(); render(); Mx.toast(item ? 'Sandi diperbarui' : 'Sandi disimpan');
                 });
@@ -259,6 +262,7 @@
             const r = root(); if (!r) return;
             Mx.delegate(r, acts, { input: e => { touch(); if (e.target.id === 'vtQ') { ui.q = e.target.value; render(); } if (e.target.id === 'vtP1') { const s = strength(e.target.value); const bar = r.querySelector('#vtBar'); bar.style.width = (e.target.value ? s[2] : 0) + '%'; bar.style.background = s[1]; r.querySelector('#vtBarTxt').textContent = e.target.value ? s[0] : ''; } }, keydown: touch });
             r.addEventListener('submit', onSubmit); r.addEventListener('click', touch);
+            document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && t.classList.contains('vt-logo')) { const sp = document.createElement('span'); sp.className = 'vt-logo-emoji ' + t.className.replace('vt-logo', '').trim(); sp.textContent = t.dataset.fb || '🔖'; sp.setAttribute('aria-hidden', 'true'); t.replaceWith(sp); } }, true); // offline / diblokir → emoji
             document.addEventListener('visibilitychange', () => { if (document.hidden) hiddenAt = Date.now(); else if (session && hiddenAt && Date.now() - hiddenAt > AWAY_MS) lock('Brankas dikunci karena aplikasi lama ditinggalkan'); });
         },
         show() { render(); },

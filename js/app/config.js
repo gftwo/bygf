@@ -24,6 +24,15 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.10', date: 'November 2026', items: [
+            'Daftar pengingat di HP kini terlipat; pratinjau & keterangan panjang dihapus',
+            'Brankas: kategori Facebook, Instagram, Gmail, Game, Other dengan logo dari web (cadangan emoji bila offline)',
+            'Dasbor Input ditata ulang: statistik di atas, form & panel samping 2 kolom',
+            'Tab Tugas: kartu "Hari ini" (tugas hari ini + terlambat) di paling atas',
+            'Quick Respons terlipat; Pengaman Data + Import/Export digabung & terlipat',
+            'Bayar Tagihan & Utang-Piutang: pilih Cash atau e-wallet dengan saldo masing-masing',
+            'Statistik kehadiran dihapus'
+        ] },
         { version: 'v9.9', date: 'November 2026', items: [
             'Brankas Sandi menggantikan panel Admin dan hanya untuk akun admin (akun admin kini hanya melihat Brankas): simpan kata sandi pribadi, terenkripsi AES-256 dengan kunci utama milikmu (tidak disimpan di mana pun), kunci otomatis, salin sandi dengan penghapusan clipboard, dan generator sandi acak',
             'Keamanan: sandi akun tidak lagi disimpan polos di database; sandi polos peninggalan versi lama dihapus otomatis saat login',

@@ -77,19 +77,45 @@ App.UI = {
             else el.innerHTML = options;
         });
     },
-    renderBalances() {
-        if (App.State.isLoading) return; let bal = { cash: 0, saldo: 0 };
-        const subWallets = { gopay: 0, dana: 0, shopeepay: 0, seabank: 0, krombank: 0 };
+    SUB_WALLETS: [
+        { key: 'seabank', icon: '🏦', label: 'SeaBank' },
+        { key: 'krombank', icon: '🟣', label: 'KromBank' },
+        { key: 'gopay', icon: '🟢', label: 'GoPay' },
+        { key: 'dana', icon: '🔵', label: 'DANA' },
+        { key: 'shopeepay', icon: '👛', label: 'ShopeePay' }
+    ],
+    getBalances() { // saldo cash, saldo total, dan saldo tiap sub-dompet (SeaBank = dompet bawaan)
+        const bal = { cash: 0, saldo: 0 }, sub = { gopay: 0, dana: 0, shopeepay: 0, seabank: 0, krombank: 0 };
         App.State.transactions.forEach(t => {
             const amt = (t.pemasukan || 0) - (t.pengeluaran || 0);
-            if (t.jenisAkun === 'cash') bal.cash += amt; else { bal.saldo += amt; subWallets[t.subWallet && subWallets.hasOwnProperty(t.subWallet) ? t.subWallet : 'seabank'] += amt; }
+            if (t.jenisAkun === 'cash') bal.cash += amt; else { bal.saldo += amt; sub[t.subWallet && sub.hasOwnProperty(t.subWallet) ? t.subWallet : 'seabank'] += amt; }
         });
         (App.State.transfers || []).forEach(tf => {
             bal[tf.dari] -= tf.jumlah;
             bal[tf.ke] += tf.jumlah;
-            if (tf.dari === 'saldo') { const k = tf.dariSubWallet && subWallets.hasOwnProperty(tf.dariSubWallet) ? tf.dariSubWallet : 'seabank'; subWallets[k] -= tf.jumlah; }
-            if (tf.ke === 'saldo') { const k = tf.keSubWallet && subWallets.hasOwnProperty(tf.keSubWallet) ? tf.keSubWallet : 'seabank'; subWallets[k] += tf.jumlah; }
+            if (tf.dari === 'saldo') { const k = tf.dariSubWallet && sub.hasOwnProperty(tf.dariSubWallet) ? tf.dariSubWallet : 'seabank'; sub[k] -= tf.jumlah; }
+            if (tf.ke === 'saldo') { const k = tf.keSubWallet && sub.hasOwnProperty(tf.keSubWallet) ? tf.keSubWallet : 'seabank'; sub[k] += tf.jumlah; }
         });
+        return { cash: bal.cash, saldo: bal.saldo, sub };
+    },
+    // Isi pilihan "Bayar dari / Masuk ke Akun": Cash + tiap dompet, lengkap dengan saldonya. Nilai: 'cash' atau 'saldo:<dompet>'.
+    fillPayAccount(selectId, hintId, getAmount, checkEnough) {
+        const sel = document.getElementById(selectId); if (!sel) return;
+        const b = this.getBalances(), fmt = App.Utils.formatCurrency, prev = sel.value;
+        sel.innerHTML = `<option value="cash">💵 Cash / Tunai · ${fmt(b.cash)}</option>` + this.SUB_WALLETS.map(w => `<option value="saldo:${w.key}">${w.icon} ${w.label} · ${fmt(b.sub[w.key])}</option>`).join('');
+        sel.value = [...sel.options].some(o => o.value === prev) ? prev : 'cash';
+        const upd = () => {
+            const hint = document.getElementById(hintId); if (!hint) return;
+            const bal = sel.value === 'cash' ? b.cash : b.sub[sel.value.split(':')[1]] || 0, need = getAmount ? getAmount() : 0, low = checkEnough && need > bal;
+            hint.textContent = low ? `⚠️ Saldo tidak cukup (kurang ${fmt(need - bal)}) — tetap bisa dicatat, saldo jadi minus.` : `Saldo tersedia: ${fmt(bal)}`;
+            hint.style.color = low ? 'var(--danger)' : 'var(--text-muted)';
+        };
+        sel._upd = upd; sel.onchange = upd; // satu pendengar tetap per kolom jumlah (hindari menumpuk tiap modal dibuka)
+        const amt = getAmount && document.getElementById(getAmount.inputId); if (amt && !amt._payBound) { amt._payBound = true; amt.addEventListener('input', () => sel._upd && sel._upd()); } upd();
+    },
+    renderBalances() {
+        if (App.State.isLoading) return;
+        const { cash: balCash, saldo: balSaldo, sub: subWallets } = this.getBalances(), bal = { cash: balCash, saldo: balSaldo };
         // Net balance
         const netEl = document.getElementById('homeNetBalance');
         if(netEl) netEl.textContent = App.Utils.formatCurrency(bal.cash + bal.saldo);
@@ -102,13 +128,7 @@ App.UI = {
         // Rincian sub-dompet (SeaBank sebagai dompet utama/default)
         const subWalletBox = document.getElementById('subWalletBreakdown');
         if (subWalletBox) {
-            const items = [
-                { key: 'seabank', icon: '🏦', label: 'SeaBank' },
-                { key: 'krombank', icon: '🟣', label: 'KromBank' },
-                { key: 'gopay', icon: '🟢', label: 'GoPay' },
-                { key: 'dana', icon: '🔵', label: 'DANA' },
-                { key: 'shopeepay', icon: '👛', label: 'ShopeePay' }
-            ];
+            const items = this.SUB_WALLETS;
             subWalletBox.innerHTML = items.map(it => `
                 <div class="subwallet-item">
                     <span class="subwallet-label">${it.icon} ${it.label}</span>
@@ -642,6 +662,12 @@ App.UI = {
         const show = el.style.display === 'none' || !el.style.display;
         el.style.display = show ? 'block' : 'none';
         if (icon) icon.style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)';
+    },
+    toggleQuickRespons() { // Quick Respons terlipat secara bawaan; status buka/tutup diingat per perangkat
+        const b = document.getElementById('quickBody'), icon = document.getElementById('quickFoldIcon'), btn = document.getElementById('quickFold'); if (!b) return;
+        const show = b.style.display === 'none'; b.style.display = show ? 'block' : 'none';
+        if (icon) icon.style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)'; if (btn) btn.setAttribute('aria-expanded', String(show));
+        try { localStorage.setItem('bygf.quickOpen', show ? '1' : '0'); } catch (e) { /* abaikan */ }
     },
     toggleTransferHistory() {
         const el = document.getElementById('transfersList'); const icon = document.getElementById('transferHistoryToggleIcon');

@@ -420,19 +420,7 @@
             }).sort((a,b) => b.dateISO.localeCompare(a.dateISO));
         }
 
-        function renderAttendStats(){
-            const wrap = document.getElementById('kpAttendStats'); if(!wrap) return;
-            const st = attendanceStats();
-            if(!st.length){ wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
-            wrap.style.display = 'block';
-            wrap.innerHTML = `<h3 class="font-bold" style="margin:0 0 .25rem;">Statistik kehadiran</h3><p class="text-muted text-xs" style="margin:0 0 .75rem;">Libur tidak dihitung. Peringatan muncul bila kehadiran di bawah 75% atau tidak hadir 3 kali atau lebih.</p>` + st.map(x => {
-                const pct = x.pct === null ? 0 : x.pct, color = x.warn ? 'var(--danger,#ef4444)' : 'var(--success,#10b981)';
-                return `<div class="kp-stat-row"><div class="kp-stat-top"><b>${escapeHtml(x.nama)}</b><span style="color:${color};font-weight:700;">${x.pct === null ? '—' : x.pct + '%'}${x.warn ? ' ⚠️' : ''}</span></div><div class="kp-stat-bar" role="progressbar" aria-label="Kehadiran ${escapeHtml(x.nama)}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="width:${pct}%;background:${color};"></div></div><div class="text-xs text-muted">Hadir ${x.hadir} · Sakit ${x.sakit} · Izin ${x.izin} · Alpa ${x.alpa}${x.lainnya ? ' · Lainnya ' + x.lainnya : ''}${x.libur ? ' · Libur ' + x.libur : ''}</div></div>`;
-            }).join('');
-        }
-
         function renderAbsenTable(){
-            renderAttendStats();
             const filter = document.getElementById('kpAbsenFilter').value;
             let recs = allAttendanceRecords();
             if(filter) recs = recs.filter(r => r.courseId === filter);

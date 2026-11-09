@@ -271,3 +271,33 @@
 body.role-admin .bn-item[data-g="vault"]{display:flex}
 body.role-admin .bn-item:not([data-g="vault"]){display:none}
 body.role-admin #globalSearchBtn{display:none}
+
+/* ---- Tata letak Dashboard Keuangan (Input) ---- */
+.in-grid{display:grid;gap:1rem;margin-top:1rem;align-items:start}
+.in-main{min-width:0;order:2}.in-side{display:grid;gap:.75rem;min-width:0;order:3}
+.in-fold{width:100%;background:none;border:0;padding:0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:inherit;font:inherit}
+.in-fold:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
+#view-input .home-stats-row{margin-bottom:0}
+@media (min-width:1024px){
+  .in-grid{grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr)}
+  .in-main{order:1}.in-side{order:2;position:sticky;top:1rem}
+}
+
+/* ---- Kartu Setelan terlipat ---- */
+.nt-fold>summary,.st-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.2rem 0}
+.nt-fold>summary::-webkit-details-marker,.st-fold>summary::-webkit-details-marker{display:none}
+.nt-fold>summary::after,.st-fold>summary::after{content:"▾";color:var(--text-muted);transition:transform .2s;margin-left:auto}
+.nt-fold[open]>summary::after,.st-fold[open]>summary::after{transform:rotate(180deg)}
+.nt-fold>summary small,.st-fold>summary small{font-size:.72rem}
+.nt-fold>summary:focus-visible,.st-fold>summary:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
+.nt-state{padding:.1rem .5rem;border-radius:999px;font-weight:700;background:var(--bg-subtle,rgba(128,128,128,.15))}.nt-state.on{color:var(--success,#059669)}.nt-state.off{color:var(--warning,#b45309)}
+.nt-fold[open]>summary,.st-fold[open]>summary{margin-bottom:.75rem}
+.st-sub{font-size:.85rem;font-weight:700;margin:.25rem 0 .6rem}#guardCard{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px dashed var(--border-medium,rgba(128,128,128,.3))}
+
+.dy-today{margin-bottom:1rem;border-left:4px solid var(--primary)}
+
+.vt-logo{width:24px;height:24px;border-radius:6px;object-fit:contain;display:block}.vt-logo-emoji{font-size:1.4rem;line-height:1;display:inline-block}
+.vt-chip-ico{width:16px;height:16px;font-size:.95rem;vertical-align:-3px;margin-right:.35rem;display:inline-block}.vt-chip{display:inline-flex;align-items:center;white-space:nowrap}
+.vt-catpick{display:flex;flex-wrap:wrap;gap:.4rem}.vt-catopt{cursor:pointer}.vt-catopt input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.vt-catopt span{display:inline-flex;align-items:center;padding:.4rem .75rem;border-radius:999px;border:1px solid var(--border-medium,rgba(128,128,128,.35));font-size:.82rem;font-weight:600}
+.vt-catopt input:checked+span{background:var(--primary-light,rgba(79,70,229,.12));border-color:var(--primary);color:var(--primary)}.vt-catopt input:focus-visible+span{outline:2px solid var(--primary);outline-offset:2px}

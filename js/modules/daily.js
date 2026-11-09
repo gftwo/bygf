@@ -138,9 +138,14 @@
         const activeProj = ui.project && projectById(ui.project);
         const head = activeProj ? [activeProj.name, 'Tugas dalam proyek ini.'] : L;
         const tagBar = ui.tag ? `<div class="mx-chips"><button type="button" class="mx-chip on" data-act="tag" data-tag="${esc(ui.tag)}">#${esc(ui.tag)} ✕</button></div>` : '';
+        const td0 = today(), dayList = D().tasks.filter(t => t.date === td0 || isOverdue(t)).sort((a, b) => (a.done - b.done) || (isOverdue(b) - isOverdue(a)) || String(a.time || '99').localeCompare(String(b.time || '99')));
+        const dayDone = dayList.filter(t => t.done).length, dayOver = dayList.filter(isOverdue).length;
+        const todayCard = `<section class="mx-card dy-today" aria-label="Tugas hari ini"><div class="mx-head"><div><h3 class="mx-h3">☀️ Hari ini</h3><p class="mx-muted mx-xs">${esc(Mx.fmtDateLong(td0))} · ${dayList.length - dayDone} belum selesai${dayOver ? ` · ${dayOver} terlambat` : ''}</p></div></div>
+            <div class="dy-list">${dayList.length ? dayList.map(card).join('') : Mx.empty('🎉', 'Tidak ada tugas hari ini', 'Nikmati harimu, atau tambahkan tugas baru.')}</div></section>`;
         el.innerHTML = `
         <div class="mx-head"><div><h2 class="mx-h2">Tugas</h2></div>
             <div class="mx-row"><button type="button" class="mx-btn mx-btn-primary" data-act="add">＋ Tambah tugas</button></div></div>
+        ${todayCard}
         <div class="mx-stats">
             <div class="mx-stat"><span>Semua tugas</span><b>${c.total}</b><small>tercatat</small></div>
             <div class="mx-stat"><span>Belum selesai</span><b>${c.pending}</b><small>pelan-pelan, pasti selesai</small></div>

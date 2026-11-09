@@ -264,15 +264,6 @@
                 </div>
             </div>
 
-            <!-- Rincian Sub-Dompet -->
-            <div class="card" style="padding: 0.9rem 1.1rem; margin-bottom: 1rem;">
-                <button type="button" onclick="App.UI.toggleSubWalletBreakdown()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                    <span class="font-bold text-sm">👛 Rincian Saldo per Dompet</span>
-                    <span id="subWalletToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
-                </button>
-                <div id="subWalletBreakdown" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);"></div>
-            </div>
-
             <!-- Quick Stats Row -->
             <div class="home-stats-row">
                 <div class="home-stat-pill income">
@@ -291,15 +282,8 @@
                 </div>
             </div>
 
-            <!-- Quick Respons (Template Transaksi Cepat) -->
-            <div class="card" style="padding: 0.9rem 1.1rem; margin-bottom: 1rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem;">
-                    <span class="font-bold text-sm">⚡ Quick Respons</span>
-                    <button type="button" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.QuickTemplate.openManage()">Kelola</button>
-                </div>
-                <div id="quickTemplateChips" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem;"></div>
-            </div>
-
+            <div class="in-grid">
+                <div class="in-main">
             <!-- Catat Transaksi Card - Modern Redesign -->
             <div class="home-tx-card">
                 <div class="home-tx-header">
@@ -381,6 +365,29 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem; margin-top: 0.25rem;">Simpan Transaksi</button>
                 </form>
+            </div>
+                </div>
+                <aside class="in-side" aria-label="Ringkasan">
+            <!-- Rincian Sub-Dompet -->
+            <div class="card" style="padding: 0.9rem 1.1rem;">
+                <button type="button" onclick="App.UI.toggleSubWalletBreakdown()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="font-bold text-sm">👛 Rincian Saldo per Dompet</span>
+                    <span id="subWalletToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="subWalletBreakdown" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);"></div>
+            </div>
+            <!-- Quick Respons (Template Transaksi Cepat) — terlipat agar tampilan sederhana -->
+            <div class="card in-quick" id="quickCard" style="padding: 0.9rem 1.1rem;">
+                <button type="button" class="in-fold" id="quickFold" aria-expanded="false" aria-controls="quickBody" onclick="App.UI.toggleQuickRespons()">
+                    <span class="font-bold text-sm">⚡ Quick Respons</span>
+                    <span id="quickFoldIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="quickBody" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);">
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:0.5rem;"><button type="button" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.QuickTemplate.openManage()">Kelola</button></div>
+                    <div id="quickTemplateChips" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem;"></div>
+                </div>
+            </div>
+                </aside>
             </div>
         </main>
 
@@ -674,12 +681,12 @@
 
                 <div class="form-group" id="notifyCard"></div>
 
-                <div class="form-group" id="guardCard"></div>
-
                 <div class="form-group">
-                    <h3 class="font-bold" style="margin-bottom: 1rem;">📦 Import & Export Data</h3>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <details class="st-fold" id="dataFold">
+                        <summary><span class="font-bold">🛡️ Pengaman &amp; Cadangan Data</span><small class="text-muted">snapshot, import, export</small></summary>
+                        <div id="guardCard"></div>
+                        <h4 class="st-sub">📦 Import &amp; Export</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                         <div class="grid-2">
                             <button class="btn btn-outline" onclick="App.Handlers.exportData('json')">Export JSON <span class="badge" style="background:var(--warning-light); color:var(--warning-dark); border-radius:4px; padding:2px 4px;">PRO</span></button>
                             <button class="btn btn-outline" onclick="App.Handlers.exportData('csv')">Export CSV (Full Backup)</button>
@@ -690,11 +697,12 @@
                         </label>
                         <button class="btn btn-danger btn-block" onclick="App.Handlers.exportPDF()">📄 Unduh Laporan PDF <span class="badge" style="background:white; color:var(--danger); border-radius:4px; padding:2px 4px;">PRO</span></button>
                     </div>
+                    </details>
                 </div>
-                
+
                 <div style="text-align: center; margin-top: 2rem;">
                     <button type="button" class="text-xs font-bold" style="background:none; border:none; color:var(--primary); cursor:pointer; padding:0.5rem;" onclick="App.UI.openChangelog()">📜 Lihat Riwayat Update</button>
-                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.9.1</p>
+                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.10</p>
                 </div>
             </div>
         </main>
@@ -742,7 +750,6 @@
 
             <!-- ===== PANE: ABSENSI ===== -->
             <div class="kp-pane" id="kpPane-absensi" style="display:none;">
-                <div class="card" id="kpAttendStats" style="display:none;"></div>
                 <div class="card">
                     <div class="form-group" style="margin-bottom:0.75rem;max-width:220px;">
                         <label>Tanggal</label>
@@ -1216,10 +1223,8 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label>Bayar dari Akun</label>
-                    <select id="payoffAkun">
-                        <option value="cash">💵 Cash / Tunai</option>
-                        <option value="saldo">🪪 Saldo Bank</option>
-                    </select>
+                    <select id="payoffAkun"></select>
+                    <small id="payoffAkunHint" class="text-xs text-muted" aria-live="polite"></small>
                 </div>
                 <div class="form-group">
                     <label>Tanggal Bayar</label>
@@ -1303,10 +1308,8 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label id="settleDebtAkunLabel">Bayar dari Akun</label>
-                    <select id="settleDebtAkun">
-                        <option value="cash">💵 Cash / Tunai</option>
-                        <option value="saldo">🪪 Saldo Bank</option>
-                    </select>
+                    <select id="settleDebtAkun"></select>
+                    <small id="settleDebtAkunHint" class="text-xs text-muted" aria-live="polite"></small>
                 </div>
                 <div class="form-group"><label>Tanggal Bayar</label><input type="date" id="settleDebtTanggal"></div>
             </div>

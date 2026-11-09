@@ -190,9 +190,8 @@ App.Notify = {
         const sw = (g, label, extra) => `<div class="nt-row"><label class="nt-sw"><input type="checkbox" data-nt="${g}.on" ${P[g].on ? 'checked' : ''}><span>${label}</span></label>${extra || ''}</div>`;
         const tm = (g, f) => `<input type="time" class="nt-time" data-nt="${g}.${f}" value="${P[g][f]}" aria-label="Jam ${g}">`;
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        const plan = this.plan(), fmt = d => d.toLocaleString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        el.innerHTML = `<h3 class="font-bold" style="margin-bottom:.5rem;">🔔 Pengingat di HP</h3>
-        <p class="text-xs text-muted" style="margin-bottom:.75rem;">${native ? (perm === 'granted' ? '✅ Aktif — pengingat muncul walau aplikasi ditutup.' : '⚠️ Izin notifikasi belum diberikan.') : 'Notifikasi sistem hanya tersedia di aplikasi Android. Di browser kamu tetap bisa melihat pratinjau jadwalnya.'} Alokasi & Rencana Budget tidak mengirim notifikasi.</p>
+        const open = el.querySelector('details.nt-fold') ? el.querySelector('details.nt-fold').open : false; // ingat status buka/tutup saat render ulang
+        el.innerHTML = `<details class="nt-fold"${open ? ' open' : ''}><summary><span class="font-bold">🔔 Pengingat di HP</span>${native ? `<small class="nt-state ${perm === 'granted' ? 'on' : 'off'}">${perm === 'granted' ? 'Aktif' : 'Belum aktif'}</small>` : ''}</summary>
         ${native ? `<div class="nt-actions"><button type="button" class="btn btn-primary" data-nt-act="enable">${perm === 'granted' ? 'Perbarui jadwal' : 'Aktifkan pengingat'}</button><button type="button" class="btn btn-outline" data-nt-act="test">Tes notifikasi</button><button type="button" class="btn btn-outline" data-nt-act="exact">Izin alarm tepat waktu</button></div>` : ''}
         <div class="nt-list">
         ${sw('finance', '💸 Isi keuangan tiap hari', tm('finance', 'time'))}
@@ -203,8 +202,7 @@ App.Notify = {
         ${sw('kuliah', '🎓 Sebelum kuliah mulai', `<span class="nt-inline"><input type="number" class="nt-num" min="5" max="180" data-nt="kuliah.minutes" value="${P.kuliah.minutes}" aria-label="Menit sebelum kuliah"> menit</span>`)}
         ${sw('absen', '✍️ Ingatkan catat absen saat kuliah selesai')}
         ${sw('weekly', '📊 Laporan mingguan', `<span class="nt-inline"><select data-nt="weekly.day" aria-label="Hari laporan">${days.map((n, i) => `<option value="${i}" ${P.weekly.day === i ? 'selected' : ''}>${n}</option>`).join('')}</select>${tm('weekly', 'time')}</span>`)}
-        </div>
-        <details class="nt-prev"><summary>Pratinjau jadwal (${plan.length} pengingat)</summary>${plan.length ? '<ul>' + plan.slice(0, 25).map(n => `<li><b>${fmt(n.at)}</b> — ${App.Notify._esc(n.title)} <small>${App.Notify._esc(n.body)}</small></li>`).join('') + '</ul>' : '<p class="text-xs text-muted">Belum ada pengingat terjadwal.</p>'}</details>`;
+        </div></details>`;
     },
     _esc: s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])),
     _bindCard() {
