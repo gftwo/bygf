@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/home-popups.css">
     <link rel="stylesheet" href="css/kuliah.css">
     <link rel="stylesheet" href="css/reminder.css">
-    <link rel="stylesheet" href="css/modules.css">
+    <link rel="stylesheet" href="css/modules.css?v=9.10.3">
     <link rel="stylesheet" href="css/bygf-themes.css">
     <link rel="stylesheet" href="css/bygf-shell.css">
     <link rel="stylesheet" href="css/bygf-modules.css">
@@ -264,6 +264,16 @@
                 </div>
             </div>
 
+            <div class="in-grid">
+            <!-- Rincian Sub-Dompet -->
+            <div class="card" style="padding: 0.9rem 1.1rem;">
+                <button type="button" onclick="App.UI.toggleSubWalletBreakdown()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <span class="font-bold text-sm">👛 Rincian Saldo per Dompet</span>
+                    <span id="subWalletToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
+                </button>
+                <div id="subWalletBreakdown" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);"></div>
+            </div>
+
             <!-- Quick Stats Row -->
             <div class="home-stats-row">
                 <div class="home-stat-pill income">
@@ -282,8 +292,15 @@
                 </div>
             </div>
 
-            <div class="in-grid">
-                <div class="in-main">
+            <!-- Quick Respons (Template Transaksi Cepat) — chip selalu terlihat; pengelolaan ada di tombol "Kelola" -->
+            <div class="card in-quick" id="quickCard" style="padding: 0.9rem 1.1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                    <span class="font-bold text-sm">⚡ Quick Respons</span>
+                    <button type="button" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.QuickTemplate.openManage()">Kelola</button>
+                </div>
+                <div id="quickTemplateChips" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem;"></div>
+            </div>
+
             <!-- Catat Transaksi Card - Modern Redesign -->
             <div class="home-tx-card">
                 <div class="home-tx-header">
@@ -366,25 +383,6 @@
                     <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem; margin-top: 0.25rem;">Simpan Transaksi</button>
                 </form>
             </div>
-                </div>
-                <aside class="in-side" aria-label="Ringkasan">
-            <!-- Rincian Sub-Dompet -->
-            <div class="card" style="padding: 0.9rem 1.1rem;">
-                <button type="button" onclick="App.UI.toggleSubWalletBreakdown()" style="width:100%; background:none; border:none; padding:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                    <span class="font-bold text-sm">👛 Rincian Saldo per Dompet</span>
-                    <span id="subWalletToggleIcon" class="text-muted" style="transition: transform 0.2s;">▾</span>
-                </button>
-                <div id="subWalletBreakdown" style="display:none; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-medium);"></div>
-            </div>
-            <!-- Quick Respons (Template Transaksi Cepat) — chip selalu terlihat; pengelolaan ada di tombol "Kelola" -->
-            <div class="card in-quick" id="quickCard" style="padding: 0.9rem 1.1rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-                    <span class="font-bold text-sm">⚡ Quick Respons</span>
-                    <button type="button" class="text-xs text-primary font-semibold" style="background:none; border:none; cursor:pointer;" onclick="App.QuickTemplate.openManage()">Kelola</button>
-                </div>
-                <div id="quickTemplateChips" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem;"></div>
-            </div>
-                </aside>
             </div>
         </main>
 
@@ -695,7 +693,7 @@
 
                 <div style="text-align: center; margin-top: 2rem;">
                     <button type="button" class="text-xs font-bold" style="background:none; border:none; color:var(--primary); cursor:pointer; padding:0.5rem;" onclick="App.UI.openChangelog()">📜 Lihat Riwayat Update</button>
-                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.10.2</p>
+                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.10.3</p>
                 </div>
             </div>
         </main>

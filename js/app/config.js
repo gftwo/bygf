@@ -24,6 +24,9 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.10.3', date: 'November 2026', items: [
+            'Dasbor Input: tata letak satu kolom penuh berurutan — Rincian Saldo per Dompet, Masuk/Keluar bulan ini, Quick Respons, lalu form Catat Transaksi'
+        ] },
         { version: 'v9.10.2', date: 'November 2026', items: [
             'Dasbor Input: Rincian Saldo per Dompet dan Quick Respons dipindah ke atas form Catat Transaksi (berdampingan di layar lebar); tidak ada lagi tampilan terpotong di Windows',
             'Setelan: "Cadangan & Sampah" digabung ke "Pengaman & Cadangan Data", dan judulnya kini berupa tombol lipat yang lebih nyaman ditekan'

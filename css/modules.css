@@ -272,16 +272,11 @@ body.role-admin .bn-item[data-g="vault"]{display:flex}
 body.role-admin .bn-item:not([data-g="vault"]){display:none}
 body.role-admin #globalSearchBtn{display:none}
 
-/* ---- Tata letak Dashboard Keuangan (Input) ---- */
-.in-grid{display:grid;gap:1rem;margin-top:1rem;align-items:start}
-/* Rincian Saldo + Quick Respons berada DI ATAS form Catat Transaksi (berdampingan di layar lebar) */
-.in-main{min-width:0;order:2}.in-side{display:grid;gap:.75rem;min-width:0;order:1;align-items:start}
-.in-fold{width:100%;background:none;border:0;padding:0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:inherit;font:inherit}
-.in-fold:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
-#view-input .home-stats-row{margin-bottom:0}
-@media (min-width:720px){
-  .in-side{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
+/* ---- Tata letak Dashboard Keuangan (Input) ----
+   Satu kolom penuh, berurutan: Rincian Saldo → Masuk/Keluar → Quick Respons → Catat Transaksi */
+.in-grid{display:flex;flex-direction:column;gap:1rem;margin-top:1rem;min-width:0}
+.in-grid>*{min-width:0;margin-top:0;margin-bottom:0}
+#view-input .home-stats-row{margin:0}
 
 /* ---- Kartu Setelan terlipat ---- */
 .nt-fold>summary,.st-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.2rem 0}

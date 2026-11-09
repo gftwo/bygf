@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v9.10.2**
+**Versi saat ini: v9.10.3**
 
 ---
 
@@ -13,7 +13,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Struktur Proyek](#struktur-proyek)
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -60,6 +60,10 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v9.10.3
+*November 2026 — penyesuaian tata letak*
+- **Dasbor Input:** satu kolom penuh dengan urutan *Rincian Saldo per Dompet* → *Masuk/Keluar bulan ini* → *Quick Respons* → form *Catat Transaksi*.
 
 ### v9.10.2
 *November 2026 — penyesuaian tata letak*
