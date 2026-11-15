@@ -583,7 +583,11 @@ App.UI = {
         if (App.State.charts.trend) App.State.charts.trend.destroy();
         App.State.charts.trend = new Chart(document.getElementById('chartTrend'), { type: 'bar', data: { labels: keys.map(k => `${monthNames[parseInt(k.split('-')[1])-1]} ${k.substring(2,4)}`), datasets: [ { label: 'In', data: keys.map(k=>trendMap[k].i), backgroundColor: '#10b981', borderRadius: 4 }, { label: 'Out', data: keys.map(k=>trendMap[k].e), backgroundColor: '#ef4444', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: {color: textColor} } }, scales: { x: { grid: {display: false}, ticks: {color: textColor} }, y: { border: {display: false}, grid: {color: gridColor}, ticks: {color: textColor} } } } });
     },
-    switchTab(id, btn) {
+    // Rute lama (pencarian, notifikasi, Beranda) ke sub-tab Catatan Kuliah yang kini ada di dalam sub-tab "Catatan"
+    SubAlias: { 'ck-dashboard': 'ck-home', 'ck-catat': 'ck-home', 'ck-rangkuman': 'ck-home', 'ck-arsip': 'ck-home',
+        'mk-jadwal': 'mk-today', 'mk-catat': 'mk-today', 'mk-statistik': 'mk-today', 'mk-extra': 'mk-today' },
+    switchTab(id, btn, inner) {
+        if (this.SubAlias[id]) { inner = id; id = this.SubAlias[id]; }
         document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
         document.getElementById('view-'+id).classList.add('active');
         if (btn) {
@@ -596,6 +600,7 @@ App.UI = {
         if(id === 'alokasi') setTimeout(() => this.renderAllocation(), 100);
         const fab = document.getElementById('adjustmentFAB'); if (fab) fab.style.display = (id === 'history') ? 'flex' : 'none';
         if(window.AppModules) AppModules.onShow(id);
+        if (inner && id === 'ck-home' && window.AppModules && AppModules.api('lecture') && AppModules.api('lecture').openInner) AppModules.api('lecture').openInner(inner);
     },
     NavGroups: {
         home: { subs: [{ id: 'home-today', icon: '🏠', label: 'Hari Ini' }] },
@@ -603,12 +608,11 @@ App.UI = {
             { id: 'input', icon: '✍️', label: 'Input' },
             { id: 'history', icon: '🕰️', label: 'Riwayat' },
             { id: 'planning', icon: '🗂️', label: 'Kelola' },
-            { id: 'alokasi', icon: '🎯', label: 'Alokasi' },
-            { id: 'goal-home', icon: '🐷', label: 'Target' }
+            { id: 'alokasi', icon: '🎯', label: 'Alokasi' }
         ]},
-        kuliah: { subs: [{ id: 'kuliah', icon: '🎓', label: 'Kuliah' }, { id: 'ck-dashboard', icon: '📓', label: 'Ringkasan' }, { id: 'ck-catat', icon: '✍️', label: 'Catat' }, { id: 'ck-rangkuman', icon: '📚', label: 'Rangkuman' }, { id: 'ck-arsip', icon: '🗂️', label: 'Arsip' }] },
+        kuliah: { subs: [{ id: 'kuliah', icon: '🎓', label: 'Kuliah' }, { id: 'ck-home', icon: '📓', label: 'Catatan' }] },
         daily: { subs: [{ id: 'daily-home', icon: '🗓️', label: 'Tugas' }, { id: 'daily-kalender', icon: '📅', label: 'Kalender' }] },
-        makan: { subs: [{ id: 'mk-jadwal', icon: '🍽️', label: 'Jadwal' }, { id: 'mk-catat', icon: '📝', label: 'Catat' }, { id: 'mk-riwayat', icon: '🍜', label: 'Riwayat' }, { id: 'mk-statistik', icon: '📊', label: 'Statistik' }, { id: 'mk-extra', icon: '✨', label: 'Tambahan' }] },
+        makan: { subs: [{ id: 'mk-today', icon: '🍽️', label: 'Hari Ini' }, { id: 'mk-riwayat', icon: '🍜', label: 'Riwayat' }] },
         notes: { subs: [{ id: 'jr-today', icon: '📔', label: 'Hari Ini' }, { id: 'jr-history', icon: '📖', label: 'Riwayat' }, { id: 'nt-list', icon: '🗒️', label: 'Catatan Bebas' }, { id: 'nt-dashboard', icon: '🏠', label: 'Ringkasan' }] },
         vault: { subs: [{ id: 'vault-home', icon: '🔐', label: 'Brankas' }] },
         laporan: { subs: [{ id: 'laporan', icon: '📄', label: 'Laporan' }] },
@@ -633,10 +637,11 @@ App.UI = {
         } else {
             strip.style.display = 'none'; strip.innerHTML = '';
         }
-        const targetSub = this._lastSubTab[group] || cfg.subs[0].id;
+        let targetSub = this._lastSubTab[group] || cfg.subs[0].id, inner = null;
+        if (this.SubAlias[targetSub]) { inner = targetSub; targetSub = this.SubAlias[targetSub]; }
         this._lastSubTab[group] = targetSub;
         const subBtn = document.getElementById('subtab-' + targetSub) || groupBtn;
-        this.switchTab(targetSub, subBtn);
+        this.switchTab(targetSub, subBtn, inner);
     },
     showModal(id) { document.getElementById(id).classList.add('show'); },
     openChangelog() {

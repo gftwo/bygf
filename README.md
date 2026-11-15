@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v9.10.3**
+**Versi saat ini: v9.11.0**
 
 ---
 
@@ -14,7 +14,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -24,12 +24,12 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 
 | Area | Isi |
 |---|---|
-| 🏠 Beranda | Layar "Hari Ini": jadwal kuliah, tugas, jadwal makan, saldo, jurnal, maskot Bybi, lencana |
-| 💰 Keuangan | Catat transaksi (Cash / Saldo + 5 e-wallet), riwayat, Quick Respons, tagihan & cicilan, utang-piutang, alokasi budget 50/20/30, target tabungan, transaksi otomatis |
-| 🎓 Kuliah | Jadwal, absensi, tugas kuliah, catatan kuliah (ringkasan, rangkuman, arsip) |
+| 🏠 Beranda | Layar "Hari Ini": jadwal kuliah, tugas, makanan hari ini, saldo, jurnal, maskot Bybi, lencana |
+| 💰 Keuangan | Catat transaksi (Cash / Saldo + 5 e-wallet), riwayat, Quick Respons, tagihan & cicilan, utang-piutang, alokasi budget 50/20/30, transaksi otomatis |
+| 🎓 Kuliah | Sub-tab Kuliah (jadwal, absensi, tugas) dan Catatan (ringkasan, catat, rangkuman, arsip) |
 | ✅ Tugas | Kartu "Hari ini", proyek, tag, subtugas, pengulangan, kalender |
-| 🍽️ Makan | Jadwal & jurnal makanan, roda "Makan apa?" |
-| 📝 Notes | Jurnal harian (rating, hal baik, masalah, pelajaran, rencana) + catatan bebas |
+| 🍽️ Makan | Catatan makan hari ini (rating per makan, nasi sendiri/beli/tanpa), riwayat, wishlist, roda "Makan apa?" |
+| 📝 Notes | Jurnal harian (rating + refleksi opsional: hal baik, masalah, pelajaran, rencana) + catatan bebas |
 | 📊 Laporan | Bulanan/mingguan/custom, grafik, per kategori, export PDF |
 | 🔐 Brankas | Khusus akun admin: penyimpan kata sandi terenkripsi |
 | ⚙️ Setelan | 6 tema, kategori kustom, pengingat HP, pengaman & cadangan data |
@@ -61,6 +61,15 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v9.11.0
+*November 2026 — penyederhanaan beberapa tab*
+- **Keuangan:** sub-tab dan fitur **Target** dihapus dari tampilan. Modul `goals` tetap terdaftar tanpa tampilan agar data target lama tetap tersimpan, tersinkron, dan masuk backup.
+- **Kuliah:** hanya 2 sub-tab, *Kuliah* dan *Catatan*. Ringkasan, Catat, Rangkuman, dan Arsip menjadi sub-tab di dalam Catatan (rute lama dari pencarian/notifikasi tetap diarahkan ke sana).
+- **Makan:** menjadi *Hari Ini* (form catat, daftar makanan hari ini dengan rating cepat per makan, wishlist) dan *Riwayat*. Baru: penanda **Nasi sendiri / Beli nasi / Tanpa nasi** per makan beserta hitungan bulan ini, dan filter nasi di Riwayat. Jadwal makan lama tetap ada di data (tanpa tampilan); catatan lama dengan "tanpa nasi" otomatis terbaca sebagai *Tanpa nasi*.
+- **Notes:** kolom jurnal *Hal baik*, *Masalah*, *Pelajaran*, dan *Rencana besok* baru tampil setelah tombolnya ditekan; kolom yang sudah berisi tetap terbuka. *Catatan bebas* tetap selalu tampil.
+- **Setelan:** *Kategori Kustom*, *Pengingat di HP*, dan *Pengaman & Cadangan Data* menjadi kotak lipat seragam dengan garis tepi.
+- Teks keterangan yang berlebihan di tab Kuliah dan Tugas dihapus.
 
 ### v9.10.3
 *November 2026 — penyesuaian tata letak*

@@ -630,7 +630,7 @@ App.Handlers = {
 
                     // Deteksi format baru (multi-section) vs lama (transaksi saja)
                     if(content.includes('[TRANSACTIONS]') || content.includes('[CUSTOM_CATEGORIES]')) {
-                        const yes = await App.UI.confirm('Import semua data (Transaksi, Kategori Kustom, Budget, Target, Tagihan)?\nData saat ini akan ditimpa.'); if(!yes) { e.target.value=''; return; }
+                        const yes = await App.UI.confirm('Import semua data (Transaksi, Kategori Kustom, Budget, Tagihan)?\nData saat ini akan ditimpa.'); if(!yes) { e.target.value=''; return; }
                         const sections = {}; let sec = null; let sLines = [];
                         content.split('\n').forEach(rawLine => {
                             const line = rawLine.trim();

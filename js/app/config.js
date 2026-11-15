@@ -24,6 +24,14 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.11.0', date: 'November 2026', items: [
+            'Keuangan: fitur Target dihapus dari tampilan (data target lama tetap tersimpan aman)',
+            'Kuliah: sub-tab jadi 2 — Kuliah dan Catatan; Ringkasan, Catat, Rangkuman, dan Arsip kini menjadi sub-tab di dalam Catatan',
+            'Makan: disederhanakan jadi Hari Ini (catat makanan, rating per makan, wishlist) dan Riwayat; baru: penanda Nasi sendiri / Beli nasi / Tanpa nasi dan hitungan bulanan',
+            'Notes: kolom Hal baik, Masalah, Pelajaran, dan Rencana besok kini muncul setelah tombolnya ditekan (kolom yang sudah berisi tetap terbuka)',
+            'Setelan: Kategori Kustom, Pengingat di HP, dan Pengaman & Cadangan Data menjadi kotak lipat seragam dengan garis tepi',
+            'Beberapa teks keterangan dihapus agar tampilan lebih ringkas'
+        ] },
         { version: 'v9.10.3', date: 'November 2026', items: [
             'Dasbor Input: tata letak satu kolom penuh berurutan — Rincian Saldo per Dompet, Masuk/Keluar bulan ini, Quick Respons, lalu form Catat Transaksi'
         ] },

@@ -139,8 +139,7 @@
         const head = activeProj ? [activeProj.name, 'Tugas dalam proyek ini.'] : L;
         const tagBar = ui.tag ? `<div class="mx-chips"><button type="button" class="mx-chip on" data-act="tag" data-tag="${esc(ui.tag)}">#${esc(ui.tag)} ✕</button></div>` : '';
         const td0 = today(), dayList = D().tasks.filter(t => t.date === td0 || isOverdue(t)).sort((a, b) => (a.done - b.done) || (isOverdue(b) - isOverdue(a)) || String(a.time || '99').localeCompare(String(b.time || '99')));
-        const dayDone = dayList.filter(t => t.done).length, dayOver = dayList.filter(isOverdue).length;
-        const todayCard = `<section class="mx-card dy-today" aria-label="Tugas hari ini"><div class="mx-head"><div><h3 class="mx-h3">☀️ Hari ini</h3><p class="mx-muted mx-xs">${esc(Mx.fmtDateLong(td0))} · ${dayList.length - dayDone} belum selesai${dayOver ? ` · ${dayOver} terlambat` : ''}</p></div></div>
+        const todayCard = `<section class="mx-card dy-today" aria-label="Tugas hari ini"><div class="mx-head"><div><h3 class="mx-h3">☀️ Hari ini</h3></div></div>
             <div class="dy-list">${dayList.length ? dayList.map(card).join('') : Mx.empty('🎉', 'Tidak ada tugas hari ini', 'Nikmati harimu, atau tambahkan tugas baru.')}</div></section>`;
         el.innerHTML = `
         <div class="mx-head"><div><h2 class="mx-h2">Tugas</h2></div>
@@ -167,7 +166,7 @@
     function renderKalender() {
         const el = root('daily-kalender'); if (!el) return;
         const list = D().tasks.filter(t => t.date === ui.calSel).sort(sorter());
-        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">Kalender tugas</h2><p class="mx-muted">Titik angka = jumlah tugas belum selesai pada tanggal itu.</p></div><button type="button" class="mx-btn mx-btn-primary" data-act="add" data-date="${ui.calSel}">＋ Tambah di tanggal ini</button></div>
+        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">Kalender tugas</h2></div><button type="button" class="mx-btn mx-btn-primary" data-act="add" data-date="${ui.calSel}">＋ Tambah di tanggal ini</button></div>
         <div class="dy-calwrap"><div class="mx-card">${Mx.calHTML(ui.cal, calMarks(), ui.calSel)}</div>
         <div class="mx-card"><h3 class="mx-h3">${Mx.fmtDateLong(ui.calSel)}</h3><div class="dy-list">${list.length ? list.map(card).join('') : Mx.empty('📅', 'Tidak ada tugas', 'Belum ada tugas di tanggal ini.')}</div></div></div>`;
     }

@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/home-popups.css">
     <link rel="stylesheet" href="css/kuliah.css">
     <link rel="stylesheet" href="css/reminder.css">
-    <link rel="stylesheet" href="css/modules.css?v=9.10.3">
+    <link rel="stylesheet" href="css/modules.css?v=9.11.0">
     <link rel="stylesheet" href="css/bygf-themes.css">
     <link rel="stylesheet" href="css/bygf-shell.css">
     <link rel="stylesheet" href="css/bygf-modules.css">
@@ -134,7 +134,7 @@
                     <p id="authSubtitle">Catat keuangan, tugas, kuliah, makan, dan ide — semua tersinkron.</p>
                 </div>
                 <div class="auth-hero-features">
-                    <div class="auth-feature-item"><div class="auth-feature-dot">📊</div><span>Keuangan, analitik &amp; target</span></div>
+                    <div class="auth-feature-item"><div class="auth-feature-dot">📊</div><span>Keuangan &amp; analitik</span></div>
                     <div class="auth-feature-item"><div class="auth-feature-dot">🎯</div><span>Tugas, kuliah &amp; catatan harian</span></div>
                     <div class="auth-feature-item"><div class="auth-feature-dot">🔒</div><span>Data Aman & Tersinkronisasi</span></div>
                 </div>
@@ -651,11 +651,12 @@
                 </div>
 
 
-                <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div><h3 class="font-bold">Kategori Kustom</h3></div><button class="btn btn-outline btn-sm" onclick="App.UI.showModal('catModal')">+ Tambah</button>
-                    </div>
-                    <div class="list-group" id="settingsCatList"></div>
+                <div class="form-group">
+                    <details class="st-fold st-btn st-box" id="catFold">
+                        <summary><span class="font-bold">🏷️ Kategori Kustom</span><small class="text-muted">tambah &amp; kelola kategori</small></summary>
+                        <div style="display:flex; justify-content:flex-end; margin-bottom:0.75rem;"><button class="btn btn-outline btn-sm" onclick="App.UI.showModal('catModal')">+ Tambah</button></div>
+                        <div class="list-group" id="settingsCatList"></div>
+                    </details>
                 </div>
 
                 <div class="form-group" style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light);">
@@ -668,7 +669,7 @@
                 <div class="form-group" id="notifyCard"></div>
 
                 <div class="form-group">
-                    <details class="st-fold st-btn" id="dataFold">
+                    <details class="st-fold st-btn st-box" id="dataFold">
                         <summary><span class="font-bold">🛡️ Pengaman &amp; Cadangan Data</span><small class="text-muted">snapshot, sampah, import, export</small></summary>
                         <h4 class="st-sub">🗑️ Sampah &amp; Riwayat Cadangan</h4>
                         <div class="grid-2" style="gap:0.75rem; margin-bottom:1rem;">
@@ -693,7 +694,7 @@
 
                 <div style="text-align: center; margin-top: 2rem;">
                     <button type="button" class="text-xs font-bold" style="background:none; border:none; color:var(--primary); cursor:pointer; padding:0.5rem;" onclick="App.UI.openChangelog()">📜 Lihat Riwayat Update</button>
-                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.10.3</p>
+                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v9.11.0</p>
                 </div>
             </div>
         </main>

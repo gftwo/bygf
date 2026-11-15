@@ -8,19 +8,20 @@
     const KEY = 'journal';
     const RATINGS = { 1: ['😞', 'Berat'], 2: ['😕', 'Kurang'], 3: ['😐', 'Biasa'], 4: ['🙂', 'Baik'], 5: ['😄', 'Hebat'] };
     const FIELDS = [
-        ['good', '🌱 Hal baik / yang disyukuri', 'Apa yang bikin harimu terasa baik?'],
-        ['problem', '⛈️ Masalah atau hambatan', 'Apa yang mengganggu atau belum beres hari ini?'],
-        ['lesson', '💡 Pelajaran', 'Apa yang kamu pelajari hari ini?'],
-        ['tomorrow', '🎯 Rencana besok', 'Apa yang mau kamu lakukan besok?'],
+        ['good', '🌱 Hal baik / yang disyukuri', 'Apa yang bikin harimu terasa baik?', '🌱 Hal baik'],
+        ['problem', '⛈️ Masalah atau hambatan', 'Apa yang mengganggu atau belum beres hari ini?', '⛈️ Masalah'],
+        ['lesson', '💡 Pelajaran', 'Apa yang kamu pelajari hari ini?', '💡 Pelajaran'],
+        ['tomorrow', '🎯 Rencana besok', 'Apa yang mau kamu lakukan besok?', '🎯 Rencana besok'],
         ['note', '📝 Catatan bebas', 'Cerita apa saja tentang hari ini…']
     ];
+    const isOptional = f => !!f[3]; // 4 kolom refleksi: baru tampil setelah tombolnya ditekan (atau bila sudah ada isinya)
     const MAXLEN = 5000;
     const { esc, uid, today } = Mx;
     const D = () => AppModules.get(KEY), save = () => AppModules.changed(KEY);
     const root = id => document.getElementById('view-' + id);
     const arr = v => Array.isArray(v) ? v : (v && typeof v === 'object' ? Object.values(v) : []);
     const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
-    const ui = { date: today(), rating: 0, q: '', month: '', loadedFor: '' };
+    const ui = { date: today(), rating: 0, q: '', month: '', loadedFor: '', open: new Set(), openFor: '' };
     // Draf ketikan disimpan otomatis di perangkat ini supaya tidak hilang bila app ditutup sebelum menekan Simpan.
     const DRAFT = 'bygf.journalDraft';
     const readDraft = () => { try { return JSON.parse(localStorage.getItem(DRAFT) || 'null'); } catch (e) { return null; } };
@@ -73,6 +74,8 @@
         const val = k => esc(draft ? draft[k] : cur[k]);
         const week = D().entries.filter(e => e.rating && e.date >= Mx.addDays(today(), -6)), a = avg(week);
         const isToday = ui.date === today();
+        if (ui.openFor !== ui.date) { ui.open = new Set(); ui.openFor = ui.date; }
+        const shown = f => !isOptional(f) || ui.open.has(f[0]) || !!(draft ? draft[f[0]] : cur[f[0]]); // kolom berisi tidak pernah disembunyikan
         el.dataset.date = ui.date;
         el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">📔 Jurnal Harian</h2></div></div>
         <div class="mx-stats"><div class="mx-stat"><span>Rata-rata 7 hari</span><b>${a ? a.toFixed(1) : '—'}</b><small>${a ? RATINGS[Math.round(a)][0] + ' ' + RATINGS[Math.round(a)][1] : 'belum ada rating'}</small></div>
@@ -80,7 +83,8 @@
         <div class="mx-card"><div class="mx-tools jr-date"><button type="button" class="mx-btn" data-act="prev" aria-label="Hari sebelumnya">‹</button><input type="date" id="jrDate" class="mx-input" value="${ui.date}" max="${today()}" aria-label="Tanggal jurnal"><button type="button" class="mx-btn" data-act="next" aria-label="Hari berikutnya" ${isToday ? 'disabled' : ''}>›</button><button type="button" class="mx-btn" data-act="today" ${isToday ? 'disabled' : ''}>Hari ini</button></div>
         <div class="mx-label">${Mx.fmtDateLong(ui.date)} <span class="jr-draft" id="jrDraft" ${stored && dirty(cur, stored.fields, stored.rating) ? '' : 'hidden'}>• draf belum disimpan</span></div>
         <div class="mx-label">Bagaimana harimu?</div><div class="jr-rating" role="radiogroup" aria-label="Rating hari ini">${Object.entries(RATINGS).map(([k, v]) => `<button type="button" role="radio" aria-checked="${ui.rating === +k}" class="jr-rate${ui.rating === +k ? ' on' : ''}" data-act="rate" data-r="${k}"><span class="jr-emoji">${v[0]}</span><small>${k} · ${v[1]}</small></button>`).join('')}</div>
-        ${FIELDS.map(f => `<div class="mx-field"><label for="jr_${f[0]}">${f[1]}</label><textarea id="jr_${f[0]}" class="mx-input" rows="${f[0] === 'note' ? 4 : 3}" maxlength="${MAXLEN}" placeholder="${f[2]}">${val(f[0])}</textarea></div>`).join('')}
+        <div class="jr-optbar"><span class="mx-muted mx-xs">Ingin refleksi? Tekan untuk menambah (opsional)</span><div class="mx-chips">${FIELDS.filter(isOptional).map(f => `<button type="button" class="mx-chip${shown(f) ? ' on' : ''}" data-act="refl" data-k="${f[0]}" aria-pressed="${shown(f)}">${f[3]}</button>`).join('')}</div></div>
+        ${FIELDS.map(f => `<div class="mx-field${isOptional(f) ? ' jr-opt' : ''}" ${shown(f) ? '' : 'hidden'}><label for="jr_${f[0]}">${f[1]}</label><textarea id="jr_${f[0]}" class="mx-input" rows="${f[0] === 'note' ? 4 : 3}" maxlength="${MAXLEN}" placeholder="${f[2]}">${val(f[0])}</textarea></div>`).join('')}
         <small class="mx-err" id="jrErr" hidden></small>
         <div class="mx-foot">${entryOf(ui.date) ? `<button type="button" class="mx-btn mx-btn-danger" data-act="del-day">Hapus jurnal hari ini</button>` : ''}<button type="button" class="mx-btn mx-btn-primary" data-act="save">Simpan jurnal</button></div></div>`;
     }
@@ -128,6 +132,12 @@
     const setDate = d => { if (!isDate(d)) return; ui.date = d > today() ? today() : d; renderToday(); };
     const acts = {
         rate: el => { const r = +el.dataset.r; ui.rating = ui.rating === r ? 0 : r; const root_ = root('jr-today'); root_.querySelectorAll('.jr-rate').forEach(b => { const on = +b.dataset.r === ui.rating; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); }); stashDraft(); },
+        refl: el => { // buka/tutup kolom refleksi; kolom yang sudah berisi tetap terbuka
+            const k = el.dataset.k, box = root('jr-today'), ta = box.querySelector('#jr_' + k), wrap = ta && ta.closest('.jr-opt'); if (!wrap) return;
+            if (wrap.hidden) { wrap.hidden = false; ui.open.add(k); el.classList.add('on'); el.setAttribute('aria-pressed', 'true'); ta.focus(); }
+            else if (!ta.value.trim()) { wrap.hidden = true; ui.open.delete(k); el.classList.remove('on'); el.setAttribute('aria-pressed', 'false'); }
+            else Mx.toast('Kolom yang sudah berisi tetap terbuka');
+        },
         save: saveDay, prev: () => { stashDraft(); const el = root('jr-today'); delete el.dataset.date; setDate(Mx.addDays(ui.date, -1)); }, next: () => { stashDraft(); const el = root('jr-today'); delete el.dataset.date; setDate(Mx.addDays(ui.date, 1)); },
         today: () => { stashDraft(); const el = root('jr-today'); delete el.dataset.date; setDate(today()); },
         'del-day': async () => { const e = entryOf(ui.date); if (!e || !(await Mx.confirm(`Hapus jurnal ${Mx.fmtDate(ui.date)}?`))) return; D().entries = D().entries.filter(x => x.id !== e.id); writeDraft(null); ui.rating = 0; ui.loadedFor = ''; save(); const el = root('jr-today'); delete el.dataset.date; renderToday(); Mx.toast('Jurnal dihapus'); },

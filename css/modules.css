@@ -188,13 +188,6 @@
 @media (max-width: 760px) { .hm-grid { grid-template-columns: 1fr; } }
 .dy-kuliah { margin: 0 0 1rem; } .dy-krow { display: flex; align-items: center; gap: .7rem; padding: .55rem 0; border-top: 1px dashed var(--border-light); cursor: pointer; } .dy-krow > span:not(.mx-pill) { flex: 1; min-width: 0; } .dy-krow b { display: block; font-size: .9rem; } .dy-krow small { color: var(--text-muted); font-size: .75rem; } .dy-late { color: var(--danger, #ef4444); }
 
-/* ===== Target tabungan ===== */
-.gl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
-.gl-card { margin: 0; display: flex; flex-direction: column; gap: .5rem; } .gl-card.done { border-color: var(--primary); }
-.gl-top { display: flex; align-items: center; gap: .7rem; } .gl-icon { font-size: 1.8rem; line-height: 1; } .gl-title { flex: 1; min-width: 0; } .gl-title b { display: block; overflow-wrap: anywhere; } .gl-title small { color: var(--text-muted); font-size: .75rem; }
-.gl-amount { font-size: 1.1rem; } .gl-meta { display: flex; justify-content: space-between; font-size: .78rem; color: var(--text-muted); font-weight: 600; }
-.gl-foot { margin-top: auto; flex-wrap: wrap; }
-
 /* ===== Pencarian global ===== */
 .hdr-search { margin-left: auto; margin-right: .6rem; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border-medium); background: var(--bg-surface); color: var(--text-main); display: grid; place-items: center; cursor: pointer; flex: none; }
 .hdr-search:hover { border-color: var(--primary); color: var(--primary); } .hdr-search .ni, .gs-bar .ni { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -309,3 +302,24 @@ body.role-admin #globalSearchBtn{display:none}
 .st-btn[open]>summary{border-color:var(--primary);margin-bottom:1rem}
 .st-btn>summary small{display:none}
 @media (min-width:480px){.st-btn>summary small{display:inline}}
+
+/* ===== Sub-tab di dalam Catatan Kuliah (v9.11) ===== */
+.ck-tabs { overflow-x: auto; scrollbar-width: none; } .ck-tabs::-webkit-scrollbar { display: none; }
+.ck-tabs .kp-itab { flex: 1 0 auto; white-space: nowrap; }
+
+/* ===== Makan: catat hari ini (v9.11) ===== */
+.mk-qrate { display: inline-flex; gap: 0; } .mk-qrate .mk-star { font-size: 1.15rem; padding: .1rem .08rem; }
+.mk-rice .mx-chip { flex: 1 1 auto; justify-content: center; }
+.mk-more { margin: .4rem 0; border: 1px dashed var(--border-medium); border-radius: var(--radius-md); padding: .5rem .7rem; } .mk-more[open] { padding-bottom: .8rem; }
+.mk-more > summary { cursor: pointer; font-weight: 700; font-size: .85rem; } .mk-more > summary small { font-weight: 500; margin-left: .3rem; }
+
+/* ===== Jurnal: kolom refleksi opsional (v9.11) ===== */
+.jr-opt[hidden] { display: none !important; }
+.jr-optbar { display: grid; gap: .3rem; margin: .8rem 0 .5rem; padding: .7rem; border: 1px dashed var(--border-medium); border-radius: var(--radius-md); }
+
+/* ===== Setelan: Kategori, Pengingat, Pengaman = kotak lipat seragam dengan batas jelas (v9.11) ===== */
+.st-box{border:1px solid var(--border-medium,#e2e2e2);border-left:4px solid var(--primary);border-radius:14px;background:var(--bg-card,#fff);padding:.3rem}
+.st-box.st-btn>summary,.st-box.st-btn[open]>summary{border:0;box-shadow:none;background:transparent;border-radius:10px}
+.st-box.st-btn[open]>summary{border-bottom:1px dashed var(--border-medium,#e2e2e2);border-radius:10px 10px 0 0;margin-bottom:.85rem}
+.st-box>:not(summary){margin-left:.7rem;margin-right:.7rem}.st-box[open]{padding-bottom:.7rem}
+.st-box>summary small.nt-state{display:inline}

@@ -191,7 +191,7 @@ App.Notify = {
         const tm = (g, f) => `<input type="time" class="nt-time" data-nt="${g}.${f}" value="${P[g][f]}" aria-label="Jam ${g}">`;
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const open = el.querySelector('details.nt-fold') ? el.querySelector('details.nt-fold').open : false; // ingat status buka/tutup saat render ulang
-        el.innerHTML = `<details class="nt-fold"${open ? ' open' : ''}><summary><span class="font-bold">🔔 Pengingat di HP</span>${native ? `<small class="nt-state ${perm === 'granted' ? 'on' : 'off'}">${perm === 'granted' ? 'Aktif' : 'Belum aktif'}</small>` : ''}</summary>
+        el.innerHTML = `<details class="nt-fold st-fold st-btn st-box"${open ? ' open' : ''}><summary><span class="font-bold">🔔 Pengingat di HP</span>${native ? `<small class="nt-state ${perm === 'granted' ? 'on' : 'off'}">${perm === 'granted' ? 'Aktif' : 'Belum aktif'}</small>` : ''}</summary>
         ${native ? `<div class="nt-actions"><button type="button" class="btn btn-primary" data-nt-act="enable">${perm === 'granted' ? 'Perbarui jadwal' : 'Aktifkan pengingat'}</button><button type="button" class="btn btn-outline" data-nt-act="test">Tes notifikasi</button><button type="button" class="btn btn-outline" data-nt-act="exact">Izin alarm tepat waktu</button></div>` : ''}
         <div class="nt-list">
         ${sw('finance', '💸 Isi keuangan tiap hari', tm('finance', 'time'))}

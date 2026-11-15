@@ -50,7 +50,7 @@
         const kuliahBody = sched.length ? sched.map(s => row(s.libur ? '#94a3b8' : '#4f46e5', s.nama, [hm(s.jamMulai) && `${hm(s.jamMulai)}–${hm(s.jamSelesai)}`, s.mode === 'online' ? 'Online' : s.lokasi].filter(Boolean).join(' · '), s.libur ? 'Libur' : s.status === 'hadir' ? '✅ Hadir' : s.status ? '❌ Tidak hadir' : '')).join('') : Mx.empty('🎓', 'Tidak ada kuliah hari ini');
         const tugasRows = [...ag.overdue.slice(0, 4).map(t => row(pri[t.priority], t.title, 'Terlewat · ' + Mx.fmtDate(t.date), 'Terlambat')), ...ag.today.slice(0, 6).map(t => row(pri[t.priority], t.title, t.time ? 'Pukul ' + t.time : '', 'Hari ini')),
             ...kt.slice(0, 4).map(t => row('#4f46e5', '🎓 ' + t.judul, (t.matkul ? t.matkul + ' · ' : '') + 'Deadline ' + Mx.fmtDate(t.deadline.slice(0, 10)), t.deadline.slice(0, 10) < t0 ? 'Terlambat' : ''))];
-        const mealBody = meal.length ? meal.map(m => row(m.done ? '#10b981' : '#f59e0b', m.name, [m.slot, m.time].filter(Boolean).join(' · '), m.done ? '✅' : '')).join('') : Mx.empty('🍽️', 'Belum ada jadwal makan hari ini');
+        const mealBody = meal.length ? meal.map(m => row(m.done ? '#10b981' : '#f59e0b', m.name, [m.slot, m.time].filter(Boolean).join(' · '), m.done ? '✅' : '')).join('') : Mx.empty('🍽️', 'Belum ada makanan dicatat hari ini');
         const jr = entry && (entry.rating || entry.good || entry.problem || entry.lesson || entry.tomorrow || entry.note)
             ? `<div class="hm-journal"><span class="hm-emoji">${entry.rating ? RATE[entry.rating] : '📝'}</span><div><b>${entry.rating ? 'Rating ' + entry.rating + '/5' : 'Jurnal terisi'}</b><small>${esc((entry.good || entry.problem || entry.note || entry.lesson || '').slice(0, 90))}</small></div></div>`
             : `<p class="mx-muted">Belum diisi. Ceritakan suasana harimu — hanya butuh satu menit.</p><button type="button" class="mx-btn mx-btn-primary" data-go="notes" data-sub="jr-today">Isi jurnal hari ini</button>`;
@@ -74,7 +74,7 @@
         ${card('hm-jr', '📔 Jurnal hari ini', jr)}
         ${card('hm-kuliah', '🎓 Kuliah hari ini', kuliahBody, more('kuliah', 'kuliah', 'Jadwal'))}
         ${card('hm-tugas', '✅ Tugas', tugasRows.length ? tugasRows.join('') : Mx.empty('🎉', 'Tidak ada tugas yang perlu dikejar'), more('daily', 'daily-home', 'Semua tugas'))}
-        ${card('hm-meal', '🍽️ Makan hari ini', mealBody, `<button type="button" class="hm-link" data-fn="spin">🎲 Acak</button> ` + more('makan', 'mk-jadwal', 'Jadwal'))}
+        ${card('hm-meal', '🍽️ Makan hari ini', mealBody, `<button type="button" class="hm-link" data-fn="spin">🎲 Acak</button> ` + more('makan', 'mk-today', 'Catat'))}
         ${fun.tbCard}${fun.badgeCard}
         </div>`;
     }

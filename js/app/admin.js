@@ -108,7 +108,6 @@ App.Admin = {
         const realUsername = (profile.email || '').replace('@keuangan.pro', '');
         const isPrem = appData.isPremium || false;
         const txCount = (appData.transactions || []).length;
-        const goalCount = (appData.goals || []).length;
         const budgetCount = (appData.budgets || []).length;
         const isAdminUser = profile.email === 'admin@keuangan.pro';
         const isCurrentUser = App.State.user && uid === App.State.user.uid;
@@ -130,7 +129,6 @@ App.Admin = {
             <div class="admin-detail-row"><span class="text-muted">Total Transaksi</span><span class="font-bold">${txCount}</span></div>
             <div class="admin-detail-row"><span class="text-muted">Total Pemasukan</span><span class="font-bold text-success">Rp ${App.Utils.formatNumber(totIn)}</span></div>
             <div class="admin-detail-row"><span class="text-muted">Total Pengeluaran</span><span class="font-bold text-danger">Rp ${App.Utils.formatNumber(totOut)}</span></div>
-            <div class="admin-detail-row"><span class="text-muted">Target Aktif</span><span class="font-bold">${goalCount}</span></div>
             <div class="admin-detail-row"><span class="text-muted">Budget Aktif</span><span class="font-bold">${budgetCount}</span></div>
             <div class="admin-detail-row" style="border:none;"><span class="text-muted text-xs">UID</span><span class="text-xs" style="font-family:monospace; word-break:break-all;">${uid}</span></div>
         `;

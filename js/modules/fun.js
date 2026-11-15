@@ -70,7 +70,6 @@
         const days = activityDays(), st = streak(days), tx = (App.State.transactions || []).filter(t => t && !t.isAdjustment).length;
         const j = mod('journal'), je = arr(j && j.entries).filter(e => e && (e.rating || e.good || e.problem || e.lesson || e.tomorrow || e.note)).length;
         const d = mod('daily'), done = arr(d && d.tasks).filter(t => t && t.done).length;
-        const g = mod('goals'), goalDone = arr(g && g.goals).some(x => x && x.target > 0 && x.saved >= x.target);
         const att = (window.KuliahPro && KuliahPro.attendanceStats) ? KuliahPro.attendanceStats() : [];
         const rajin = att.length && att.every(a => a.total >= 5 ? a.pct >= 90 : true) && att.some(a => a.total >= 5);
         const v = mod('vault');
@@ -81,7 +80,6 @@
             { id: 'st30', icon: '🏆', name: 'Sebulan penuh', how: 'Streak 30 hari', ok: st >= 30 },
             { id: 'jr7', icon: '📔', name: 'Penulis jurnal', how: 'Isi 7 jurnal', ok: je >= 7 },
             { id: 'tg20', icon: '✅', name: 'Tukang tuntas', how: 'Selesaikan 20 tugas', ok: done >= 20 },
-            { id: 'goal', icon: '🐷', name: 'Target tercapai', how: 'Penuhi satu target tabungan', ok: goalDone },
             { id: 'kul', icon: '🎓', name: 'Mahasiswa rajin', how: 'Kehadiran ≥90% di semua matkul (min. 5 pertemuan)', ok: !!rajin },
             ...((window.App && App.State && App.State.isAdmin) ? [{ id: 'vault', icon: '🔐', name: 'Penjaga rahasia', how: 'Buat Brankas Sandi', ok: !!(v && v.salt) }] : [])
         ];

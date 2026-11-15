@@ -10,7 +10,9 @@
     const COLORS = ['#2f8f6b', '#d1693b', '#4a7bd1', '#b04fa0', '#c9a227', '#c0463f', '#3b9aa8'];
     const { esc, uid, today, byId } = Mx;
     const D = () => AppModules.get(KEY), save = () => AppModules.changed(KEY);
-    const root = id => document.getElementById('view-' + id);
+    const SUBS = [['ck-dashboard', '📓 Ringkasan'], ['ck-catat', '✍️ Catat'], ['ck-rangkuman', '📚 Rangkuman'], ['ck-arsip', '🗂️ Arsip']];
+    const HOME = 'ck-home'; // satu sub-tab "Catatan" di Kuliah; empat tampilan lama jadi sub-tab di dalamnya
+    const root = id => document.getElementById(SUBS.some(s => s[0] === id) ? 'ckPane-' + id : 'view-' + id);
     const arr = v => Array.isArray(v) ? v : (v && typeof v === 'object' ? Object.values(v) : []);
     const ui = { courseId: '', date: today(), type: 'note', archive: { q: '', course: '', from: '', to: '', tag: '' }, sumScope: 'all', sumTypes: new Set(Object.keys(TYPES)) };
 
@@ -47,7 +49,7 @@
         d.courses = []; save(); return true;
     }
     const countFor = id => D().notes.filter(n => n.courseId === id).length;
-    const go = v => App.UI.switchTab(v, document.getElementById('subtab-' + v));
+    const go = v => { if (SUBS.some(s => s[0] === v)) openInner(v); else App.UI.switchTab(v, document.getElementById('subtab-' + v)); };
     const courseOptions = (sel, withAll) => (withAll ? `<option value="">Semua mata kuliah</option>` : '') + courses().map(c => `<option value="${esc(c.id)}" ${c.id === sel ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
     const needCourse = () => Mx.empty('🎓', 'Belum ada mata kuliah', 'Tambahkan mata kuliah dulu di tab Kuliah (Jadwal).') + `<div class="mx-center"><button type="button" class="mx-btn mx-btn-primary" data-act="goto" data-v="kuliah">Buka tab Kuliah</button></div>`;
 
@@ -86,7 +88,7 @@
         if (!byId(cs, ui.courseId)) ui.courseId = cs[0].id;
         const list = d.notes.filter(n => n.courseId === ui.courseId && n.date === ui.date);
         const keepBody = el.querySelector('#ckBody') ? el.querySelector('#ckBody').value : '', keepTitle = el.querySelector('#ckTitle') ? el.querySelector('#ckTitle').value : '', keepTags = el.querySelector('#ckTags') ? el.querySelector('#ckTags').value : '';
-        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">✍️ Catat</h2><p class="mx-muted">Simpan satu poin, lalu lanjut menambah. Catatan di tanggal & mata kuliah yang sama otomatis satu kumpulan.</p></div></div>
+        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">✍️ Catat</h2></div></div>
         <div class="mx-card"><div class="mx-tools"><select id="ckCourse" class="mx-input" aria-label="Mata kuliah">${courseOptions(ui.courseId)}</select><input type="date" id="ckDate" class="mx-input" value="${ui.date}" aria-label="Tanggal pertemuan"><button type="button" class="mx-btn" data-act="today">Hari ini</button></div>
         <div class="mx-chips">${Object.entries(TYPES).map(([k, v]) => `<button type="button" class="mx-chip${ui.type === k ? ' on' : ''}" data-act="type" data-t="${k}">${v[0]} ${v[1]}</button>`).join('')}</div>
         <div class="mx-field"><input id="ckTitle" class="mx-input" maxlength="150" placeholder="Judul / poin singkat (opsional)" value="${esc(keepTitle)}"></div>
@@ -94,7 +96,6 @@
         <div class="mx-field"><input id="ckTags" class="mx-input" placeholder="Tag / kata kunci, pisahkan dengan koma" value="${esc(keepTags)}"></div>
         ${ui.type === 'todo' ? `<div class="mx-field"><label for="ckDue">Batas waktu (opsional)</label><input type="date" id="ckDue" class="mx-input"></div>` : ''}
         <small class="mx-err" id="ckErr" hidden></small><div class="mx-foot"><button type="button" class="mx-btn mx-btn-primary" data-act="add">Tambah catatan</button></div></div>
-        <div class="mx-label">${Mx.fmtDateLong(ui.date)} · ${esc(course(ui.courseId).name)}</div>
         ${list.length ? groupList(list) : Mx.empty('📝', 'Belum ada catatan di tanggal ini', 'Tulis poin pertamamu di atas 👆')}`;
     }
     function buildSummary(scope, types) {
@@ -109,7 +110,7 @@
     function renderRangkuman() {
         const el = root('ck-rangkuman'); if (!el) return; const sc = ui.sumScope === 'all' || byId(courses(), ui.sumScope) ? ui.sumScope : 'all'; ui.sumScope = sc;
         const pre = buildSummary(sc, ui.sumTypes), sums = [...D().summaries].sort((a, b) => String(b.updated).localeCompare(String(a.updated)));
-        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">📚 Rangkuman</h2><p class="mx-muted">Disusun otomatis dari catatanmu (bukan AI) — hasilnya bisa kamu edit sebelum disimpan.</p></div></div>
+        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">📚 Rangkuman</h2></div></div>
         <div class="mx-card"><div class="mx-tools"><select id="ckSumScope" class="mx-input" aria-label="Cakupan rangkuman"><option value="all" ${sc === 'all' ? 'selected' : ''}>Seluruh mata kuliah</option>${courses().map(c => `<option value="${esc(c.id)}" ${c.id === sc ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div>
         <div class="mx-chips">${Object.entries(TYPES).map(([k, v]) => `<button type="button" class="mx-chip${ui.sumTypes.has(k) ? ' on' : ''}" data-act="sumtype" data-t="${k}">${v[0]} ${v[1]}</button>`).join('')}<button type="button" class="mx-chip" data-act="sumkey">⭐ Hanya poin kunci</button></div>
         <p class="mx-muted mx-xs">${pre.count} catatan cocok.</p><pre class="mx-pre">${esc(pre.txt)}</pre><div class="mx-foot"><button type="button" class="mx-btn" data-act="sumcopy">⧉ Salin</button><button type="button" class="mx-btn mx-btn-primary" data-act="sumcreate" ${pre.count ? '' : 'disabled'}>Buat rangkuman</button></div></div>
@@ -125,7 +126,7 @@
         const body = list.length ? groupList(list) : Mx.empty('🗂️', 'Tidak ada catatan yang cocok');
         const shell = el.querySelector('#ckArcList');
         if (shell) { shell.innerHTML = `<p class="mx-muted mx-xs">${list.length} catatan ditemukan.</p>` + body; return; }
-        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">🗂️ Arsip</h2><p class="mx-muted">Seluruh catatan, bisa dicari dan disaring.</p></div><button type="button" class="mx-btn" data-act="export-txt">📤 Ekspor TXT</button></div>
+        el.innerHTML = `<div class="mx-head"><div><h2 class="mx-h2">🗂️ Arsip</h2></div><button type="button" class="mx-btn" data-act="export-txt">📤 Ekspor TXT</button></div>
         <div class="mx-card"><input id="ckArcQ" class="mx-input" type="search" placeholder="🔍 Cari judul, isi, atau tag…" value="${esc(f.q)}" aria-label="Cari catatan"><div class="mx-tools" style="margin-top:.6rem">
         <select id="ckArcCourse" class="mx-input" aria-label="Filter mata kuliah">${courseOptions(f.course, true)}</select><select id="ckArcTag" class="mx-input" aria-label="Filter tag"><option value="">Semua tag</option>${tags.map(t => `<option ${t === f.tag ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
         <label class="mx-muted mx-xs">Dari <input type="date" id="ckArcFrom" class="mx-input" value="${f.from}"></label><label class="mx-muted mx-xs">Sampai <input type="date" id="ckArcTo" class="mx-input" value="${f.to}"></label></div></div>
@@ -134,6 +135,17 @@
     const RENDER = { 'ck-dashboard': renderDashboard, 'ck-catat': renderCatat, 'ck-rangkuman': renderRangkuman, 'ck-arsip': renderArsip };
     let current = 'ck-dashboard';
     const rerender = () => { const f = RENDER[current]; if (f) f(); };
+    function shell() { // kerangka sub-tab dalam; tiap tampilan punya wadah sendiri supaya ketikan tidak hilang saat berpindah
+        return `<div class="card" style="padding:0.6rem;"><div class="kp-itabs ck-tabs" role="tablist">${SUBS.map(([k, l]) => `<button type="button" class="kp-itab${k === current ? ' active' : ''}" role="tab" aria-selected="${k === current}" data-act="sub" data-v="${k}">${l}</button>`).join('')}</div></div>${SUBS.map(([k]) => `<div id="ckPane-${k}" ${k === current ? '' : 'hidden'}></div>`).join('')}`;
+    }
+    function openInner(v) {
+        if (!RENDER[v]) v = 'ck-dashboard'; current = v;
+        const host = document.getElementById('view-' + HOME); if (!host) return;
+        host.querySelectorAll('.ck-tabs .kp-itab').forEach(b => { const on = b.dataset.v === v; b.classList.toggle('active', on); b.setAttribute('aria-selected', String(on)); });
+        SUBS.forEach(([k]) => { const p = root(k); if (p) p.hidden = k !== v; });
+        if (v === 'ck-arsip') { const p = root(v); if (p) p.innerHTML = ''; }
+        rerender();
+    }
 
     // ----- modal -----
     function noteModal(n) {
@@ -184,7 +196,7 @@
         save(); renderCatat(); const b = el.querySelector('#ckBody'); if (b) b.focus(); Mx.toast('Catatan ditambahkan');
     }
     const acts = {
-        goto: el => go(el.dataset.v), quick: el => { ui.courseId = el.dataset.id; ui.date = today(); go('ck-catat'); },
+        sub: el => openInner(el.dataset.v), goto: el => go(el.dataset.v), quick: el => { ui.courseId = el.dataset.id; ui.date = today(); go('ck-catat'); },
         add: addNote, today: () => { ui.date = today(); renderCatat(); }, type: el => { ui.type = el.dataset.t; renderCatat(); },
         chk: el => { const n = byId(D().notes, el.dataset.id); if (n) { n.done = el.checked; n.updated = new Date().toISOString(); save(); rerender(); } },
         edit: el => { const n = byId(D().notes, el.dataset.id); if (n) noteModal(n); },
@@ -201,26 +213,26 @@
     };
 
     AppModules.register(KEY, {
-        label: 'Catatan Kuliah', views: Object.keys(RENDER), normalize, validate,
+        label: 'Catatan Kuliah', views: [HOME], normalize, validate,
         init() {
-            Object.keys(RENDER).forEach(v => {
-                const r = root(v); if (!r) return;
-                Mx.delegate(r, acts, {
-                    input: e => { const id = e.target.id;
-                        if (id === 'ckArcQ') { ui.archive.q = e.target.value; renderArsip(); } },
-                    change: e => { const id = e.target.id;
-                        if (id === 'ckCourse') { ui.courseId = e.target.value; renderCatat(); } if (id === 'ckDate') { ui.date = e.target.value || today(); renderCatat(); }
-                        if (id === 'ckArcCourse') { ui.archive.course = e.target.value; renderArsip(); } if (id === 'ckArcTag') { ui.archive.tag = e.target.value; renderArsip(); }
-                        if (id === 'ckArcFrom') { ui.archive.from = e.target.value; renderArsip(); } if (id === 'ckArcTo') { ui.archive.to = e.target.value; renderArsip(); }
-                        if (id === 'ckSumScope') { ui.sumScope = e.target.value; renderRangkuman(); } },
-                    keydown: e => { if (e.target.id === 'ckBody' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addNote(); } if (e.target.id === 'ckTitle' && e.key === 'Enter') { e.preventDefault(); addNote(); } }
-                });
+            const host = document.getElementById('view-' + HOME); if (!host) return;
+            host.innerHTML = shell();
+            Mx.delegate(host, acts, {
+                input: e => { const id = e.target.id;
+                    if (id === 'ckArcQ') { ui.archive.q = e.target.value; renderArsip(); } },
+                change: e => { const id = e.target.id;
+                    if (id === 'ckCourse') { ui.courseId = e.target.value; renderCatat(); } if (id === 'ckDate') { ui.date = e.target.value || today(); renderCatat(); }
+                    if (id === 'ckArcCourse') { ui.archive.course = e.target.value; renderArsip(); } if (id === 'ckArcTag') { ui.archive.tag = e.target.value; renderArsip(); }
+                    if (id === 'ckArcFrom') { ui.archive.from = e.target.value; renderArsip(); } if (id === 'ckArcTo') { ui.archive.to = e.target.value; renderArsip(); }
+                    if (id === 'ckSumScope') { ui.sumScope = e.target.value; renderRangkuman(); } },
+                keydown: e => { if (e.target.id === 'ckBody' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addNote(); } if (e.target.id === 'ckTitle' && e.key === 'Enter') { e.preventDefault(); addNote(); } }
             });
         },
         afterLoad() { migrateCourses(); },
         migrateCourses,
-        show(v) { migrateCourses(); current = v; if (v === 'ck-arsip') { const r = root(v); if (r) r.innerHTML = ''; } rerender(); },
-        refresh() { const r = root(current); if (r && r.classList.contains('active') && !(document.activeElement && r.contains(document.activeElement) && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) rerender(); },
+        openInner,
+        show() { migrateCourses(); openInner(current); },
+        refresh() { const r = document.getElementById('view-' + HOME); if (r && r.classList.contains('active') && !(document.activeElement && r.contains(document.activeElement) && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) rerender(); },
         isBusy: () => !!document.querySelector('.mx-overlay')
     });
 })();
