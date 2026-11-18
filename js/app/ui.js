@@ -613,6 +613,8 @@ App.UI = {
         kuliah: { subs: [{ id: 'kuliah', icon: '🎓', label: 'Kuliah' }, { id: 'ck-home', icon: '📓', label: 'Catatan' }] },
         daily: { subs: [{ id: 'daily-home', icon: '🗓️', label: 'Tugas' }, { id: 'daily-kalender', icon: '📅', label: 'Kalender' }] },
         makan: { subs: [{ id: 'mk-today', icon: '🍽️', label: 'Hari Ini' }, { id: 'mk-riwayat', icon: '🍜', label: 'Riwayat' }] },
+        lemari: { subs: [{ id: 'lm-lemari', icon: '👗', label: 'Cek Lemari' }, { id: 'lm-hari', icon: '📅', label: 'Hari Ini' }, { id: 'lm-cuci', icon: '🧺', label: 'Cuci' }, { id: 'lm-riwayat', icon: '📊', label: 'Riwayat' }] },
+        sholat: { get subs() { const r = window.AppModules && AppModules.api('prayer'); return [{ id: 'sh-hari', icon: '🕌', label: 'Hari Ini' }, ...(r && r.inRamadan && r.inRamadan() ? [{ id: 'sh-ramadan', icon: '🌙', label: 'Ramadan' }] : []), { id: 'sh-sunnah', icon: '🌿', label: 'Sunnah & Puasa' }, { id: 'sh-qadha', icon: '⚖️', label: 'Qadha' }, { id: 'sh-rekap', icon: '📊', label: 'Rekap' }, { id: 'sh-capaian', icon: '🏅', label: 'Capaian' }]; } },
         notes: { subs: [{ id: 'jr-today', icon: '📔', label: 'Hari Ini' }, { id: 'jr-history', icon: '📖', label: 'Riwayat' }, { id: 'nt-list', icon: '🗒️', label: 'Catatan Bebas' }, { id: 'nt-dashboard', icon: '🏠', label: 'Ringkasan' }] },
         vault: { subs: [{ id: 'vault-home', icon: '🔐', label: 'Brankas' }] },
         laporan: { subs: [{ id: 'laporan', icon: '📄', label: 'Laporan' }] },
