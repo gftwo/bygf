@@ -18,7 +18,6 @@ const DEFAULTS = {
     kuliahTugas: { on: true },                // deadline tugas kuliah
     kuliah: { on: true, minutes: 30 },        // sebelum kuliah mulai
     absen: { on: true },                      // setelah kuliah selesai bila belum dicatat
-    sholat: { on: true },                     // 30 menit setelah waktu sholat bila belum dicatat
     weekly: { on: true, day: 0, time: '19:00' }
 };
 
@@ -119,20 +118,6 @@ function buildPlan(data, prefsIn, now) {
         if (P.absen.on && hhmm(c.jamSelesai) && !c.recorded) push(`cls:${c.courseId}:${c.dateISO}:abs`, `✍️ Catat absen: ${c.nama}`, 'Kuliah sudah selesai — tandai hadir / tidak hadir', at(c.dateISO, c.jamSelesai), { g: 'kuliah', sub: 'ck-catat' });
     });
 
-    // 7b) Sholat: 30 menit setelah waktu masuk (3 hari ke depan). Hari ini dilewati bila sudah dicatat; dijadwal ulang tiap data berubah, jadi yang sudah dicentang batal.
-    if (P.sholat.on && data.prayer && data.prayer.loc && window.PrayCalc) {
-        const L = data.prayer.loc, names = { subuh: 'Subuh', dzuhur: 'Dzuhur', ashar: 'Ashar', maghrib: 'Maghrib', isya: 'Isya' };
-        for (let i = 0; i < 3; i++) {
-            const d = addDays(todayISO, i), [y, m, dd] = d.split('-').map(Number), t = PrayCalc.times({ y, m, d: dd }, L.lat, L.lng, L.tz); if (!t) continue;
-            const rec = (data.prayer.days && data.prayer.days[d] && data.prayer.days[d].s) || {};
-            Object.keys(names).forEach(k => {
-                const startMin = PrayCalc.toMin(t[k]), end = PrayCalc.windowEnd(t, k); if (startMin == null || end == null || startMin + 30 >= end || rec[k]) return;
-                const when = new Date(at(d, '00:00').getTime() + (startMin + 30) * 60000);
-                push(`sh:${d}:${k}`, `🕌 Sudah sholat ${names[k]}?`, `Waktu ${names[k]} sudah lewat 30 menit. Ketuk untuk mencatat.`, when, { g: 'sholat', sub: 'sh-hari' });
-            });
-        }
-    }
-
     // 8) Laporan mingguan
     if (P.weekly.on) {
         for (let i = 0; i <= HORIZON_DAYS; i++) { const d = addDays(todayISO, i); if (at(d, '12:00').getDay() === P.weekly.day) push('wk:' + d, '📊 Laporan mingguan', 'Lihat ringkasan pemasukan & pengeluaran minggu ini', at(d, P.weekly.time), { g: 'laporan', sub: '' }); }
@@ -156,9 +141,7 @@ App.Notify = {
     },
     collect() {
         const st = App.State, mod = k => (window.AppModules && AppModules.has(k)) ? AppModules.get(k) : null, d = mod('daily');
-        const pr = mod('prayer');
         return {
-            prayer: pr ? { loc: pr.loc, days: pr.days } : null,
             paylaters: st.paylaters, recurring: st.recurring, transactions: st.transactions, tasks: (d && d.tasks) || [],
             kuliahTasks: (window.KuliahPro && KuliahPro.getTasks) ? KuliahPro.getTasks() : [],
             classes: (window.KuliahPro && KuliahPro.upcomingClasses) ? KuliahPro.upcomingClasses(HORIZON_DAYS) : []
@@ -218,7 +201,6 @@ App.Notify = {
         ${sw('kuliahTugas', '🎓 Deadline tugas kuliah (H-2, H-1, 2 jam)')}
         ${sw('kuliah', '🎓 Sebelum kuliah mulai', `<span class="nt-inline"><input type="number" class="nt-num" min="5" max="180" data-nt="kuliah.minutes" value="${P.kuliah.minutes}" aria-label="Menit sebelum kuliah"> menit</span>`)}
         ${sw('absen', '✍️ Ingatkan catat absen saat kuliah selesai')}
-        ${sw('sholat', '🕌 Sudah sholat? (30 menit setelah waktu masuk)')}
         ${sw('weekly', '📊 Laporan mingguan', `<span class="nt-inline"><select data-nt="weekly.day" aria-label="Hari laporan">${days.map((n, i) => `<option value="${i}" ${P.weekly.day === i ? 'selected' : ''}>${n}</option>`).join('')}</select>${tm('weekly', 'time')}</span>`)}
         </div></details>`;
     },

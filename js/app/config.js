@@ -24,11 +24,6 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
-        { version: 'v9.13.0', date: 'November 2026', items: [
-            'Tab baru: Sholat — jadwal sholat sampai tingkat kecamatan (dihitung di perangkat, tanpa internet), checklist harian dengan batas waktu dan sisa waktu, sunnah & puasa, qadha, rekap setahun, capaian, dan mode Ramadan',
-            'Pengingat HP 30 menit setelah waktu sholat bila belum dicatat (di Setelan > Pengingat di HP), serta kartu Sholat di Beranda',
-            'Data Sholat tersimpan di akun dan ikut backup'
-        ] },
         { version: 'v9.12.0', date: 'November 2026', items: [
             'Tab baru: Lemari — Cek Lemari (isi lemari dengan foto, kategori, pencarian, urutan), Hari Ini (catat pakaian yang dipakai), Cuci, dan Riwayat',
             'Tingkat kotor dihitung otomatis: Bawahan dan Kaos 5× pakai; Atasan 3× (0–1 matkul) atau 2× (2+ matkul) mengikuti jadwal Kuliah',

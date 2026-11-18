@@ -27,6 +27,7 @@
         const nt = mod('notes'); if (nt) add('Catatan Bebas', '🗒️', nt.notes.filter(n => !n.trashed && hit(n.title, n.text, n.tags.join(' '))).map(n => ({ t: n.title || '(Tanpa judul)', s: snip(n.text || n.html, q), go: () => nav('notes', 'nt-list') })));
         const j = mod('journal'); if (j) add('Jurnal', '📔', j.entries.filter(e => hit(e.date, e.good, e.problem, e.lesson, e.tomorrow, e.note)).sort((a, b) => b.date.localeCompare(a.date)).map(e => ({ t: Mx.fmtDateLong(e.date), s: snip([e.good, e.problem, e.lesson, e.tomorrow, e.note].filter(Boolean).join(' · '), q), go: () => { nav('notes', 'jr-today'); const a = AppModules.api('journal'); if (a && a.openDate) a.openDate(e.date); } })));
         const m = mod('meal'); if (m) add('Makan', '🍽️', m.records.filter(r => hit(r.name, r.place, r.location, r.desc, r.notes)).map(r => ({ t: r.name, s: [r.place, r.location].filter(Boolean).join(' · ') || Mx.fmtDate(r.date), go: () => nav('makan', 'mk-riwayat') })));
+        const w = mod('wardrobe'); if (w) add('Lemari', '👗', w.items.filter(i => hit(i.name)).map(i => ({ t: i.name, s: (w.cats.find(c => c.id === i.cat) || { name: 'Lainnya' }).name, go: () => nav('lemari', 'lm-lemari') })));
         return G;
     }
 

@@ -634,6 +634,8 @@
             const t = new Date(), iso = isoDate(t);
             return getOccurrencesForDate(t).map(o => { const rec = state.attendance[attendKey(o.courseId, iso)]; return { courseId: o.courseId, nama: o.nama, jamMulai: o.jamMulai, jamSelesai: o.jamSelesai, lokasi: o.lokasi, mode: o.mode, libur: o.isLibur, status: rec ? rec.status : '' }; });
         }
+        // Jumlah matkul pada satu tanggal (YYYY-MM-DD); matkul yang diliburkan tidak dihitung. Dipakai modul Lemari.
+        function classCount(dateISO){ const d = parseISODate(dateISO); return d ? getOccurrencesForDate(d).filter(o => !o.isLibur).length : 0; }
         function getTasks(){ return state.tasks.map(t => ({ id: t.id, judul: t.judul, courseId: t.courseId, deadline: t.deadline, done: !!t.done, matkul: (courseById(t.courseId) || {}).nama || '' })); }
         // Statistik kehadiran per matkul (libur tidak dihitung). Peringatan bila kehadiran < 75% atau tidak hadir >= 3 kali.
         function attendanceStats(){
@@ -671,7 +673,7 @@
             return out;
         }
         window.KuliahPro = {
-            getCourses, ensureCourse, todaySchedule, getTasks, attendanceStats, upcomingClasses,
+            getCourses, ensureCourse, todaySchedule, classCount, getTasks, attendanceStats, upcomingClasses,
             switchTab, shiftWeek, openCourseModal, saveCourse, deleteCourse, setScope, toggleLiburWeek,
             markHadir, openAttendanceModal, saveAttendanceReason, deleteAttendance,
             openTaskModal, saveTask, deleteTask, toggleTaskDone
