@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v9.12.0**
+**Versi saat ini: v9.13.0**
 
 ---
 
@@ -14,7 +14,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -29,6 +29,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 | 🎓 Kuliah | Sub-tab Kuliah (jadwal, absensi, tugas) dan Catatan (ringkasan, catat, rangkuman, arsip) |
 | ✅ Tugas | Kartu "Hari ini", proyek, tag, subtugas, pengulangan, kalender |
 | 🍽️ Makan | Catatan makan hari ini (rating per makan, nasi sendiri/beli/tanpa), riwayat, wishlist, roda "Makan apa?" |
+| 🕌 Sholat | Jadwal sholat sampai tingkat kecamatan (dihitung di perangkat, tanpa internet), checklist harian, sunnah & puasa, qadha, rekap setahun, capaian, mode Ramadan, pengingat HP |
 | 👗 Lemari | Isi lemari berfoto, pakaian hari ini, tingkat kotor & jadwal cuci otomatis (ikut jadwal Kuliah), padu padan favorit |
 | 📝 Notes | Jurnal harian (rating + refleksi opsional: hal baik, masalah, pelajaran, rencana) + catatan bebas |
 | 📊 Laporan | Bulanan/mingguan/custom, grafik, per kategori, export PDF |
@@ -62,6 +63,17 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v9.13.0
+*November 2026 — tab Sholat*
+- **Sholat (baru):** sub-tab *Hari Ini*, *Sunnah & Puasa*, *Qadha*, *Rekap*, *Capaian*, dan *Ramadan* (muncul otomatis saat bulan Ramadan).
+- **Hari Ini:** hitung mundur ke waktu berikutnya, 5 waktu dengan batas akhir dan sisa waktu (Subuh sampai terbit, Isya sampai tengah malam syar'i), status Belum / Sendiri / Jamaah / ✗ terlewat, Imsak, Terbit, Dhuha. Waktu yang belum masuk dikunci; hari lampau bisa diisi.
+- **Jadwal dihitung di perangkat** (`js/pray-calc.js`, metode Kemenag, Subuh −20°, Isya −18°, ihtiyati 2 menit), tanpa API dan tanpa internet. Lokasi dipilih sampai **kecamatan** (daftar di `js/data/wilayah.js`, dimuat hanya saat dibuka) atau lewat GPS; zona WIB/WITA/WIT otomatis.
+- **Qadha:** ✗ menambah utang sholat; tombol + Qadha dan batalkan, utang awal, qadha puasa dari "tidak puasa (udzur)". **Capaian:** streak 5/5 dan berjamaah, 15 lencana, target mingguan yang bisa diatur, pola waktu & hari yang paling sering terlewat. **Rekap:** kalender bulan, heatmap setahun, capaian per bulan, simpan sebagai gambar PNG.
+- **Ramadan:** hitung mundur imsak dan berbuka, puasa, tarawih, tadarus dengan progres khatam, grid hari, jadwal imsakiyah.
+- **Pengingat HP (APK):** 30 menit setelah waktu sholat bila belum dicatat (3 hari ke depan, dijadwal ulang otomatis; yang sudah dicentang batal). Di web muncul sebagai banner "Sudah sholat?" dengan Sudah / Sudah berjamaah / Ingatkan 15 menit lagi. Bisa dimatikan di Setelan > Pengingat di HP.
+- **Beranda:** kartu *Sholat* (waktu berikutnya, progres hari ini, streak, kalimat Bybi). Lencana merah di menu Sholat menunjukkan sholat yang belum dicatat setelah H+30.
+- Modul baru `js/modules/prayer.js` (data `prayer`, ikut Firebase dan backup). Tidak ada suara adzan.
 
 ### v9.12.0
 *November 2026 — tab Lemari*

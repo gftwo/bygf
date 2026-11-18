@@ -15,6 +15,7 @@
     const MORE = [
         { g: 'makan', icon: 'makan', label: 'Makan' },
         { g: 'lemari', icon: 'lemari', label: 'Lemari' },
+        { g: 'sholat', icon: 'sholat', label: 'Sholat', badge: 'shNavBadge' },
         { g: 'notes', icon: 'notes', label: 'Notes' },
         { g: 'laporan', icon: 'laporan', label: 'Laporan' },
         { g: 'settings', icon: 'setting', label: 'Setting' }
