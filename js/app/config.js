@@ -24,10 +24,12 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
-        { version: 'v9.14.0', date: 'November 2026', items: [
+        { version: 'v11.0.0', date: 'November 2026', items: [
             'Tema baru: Bybi — terang mint; menu bawah dan sidebar diganti maskot robot Bybi di pojok kanan bawah. Ketuk = bicara + animasi, tahan = menu navigasi melingkar',
             'Maskot bereaksi otomatis saat ada lencana baru di menu (Tugas, Kuliah, Makan, Lemari) dan tidur bila lama tidak disentuh',
             'Tema baru: Malam — biru malam dengan sidebar kaca; tiap menu punya submenu akordeon, bisa diciutkan jadi rel ikon, di HP berupa laci dari kiri',
+            'Lemari: sub-tab baru Padu Padan — susun outfit di boneka dengan foto asli, kemeja bisa dibuka (kancing/resleting) dengan kaos di dalam, simpan outfit, dan "Pakai hari ini" langsung tercatat',
+            '27 pakaian (kemeja, kaos, jaket, celana) dari fotomu bisa diimpor sekali tekan lewat banner di Lemari; namanya bisa diubah lewat Ubah',
             'Tema lama tidak berubah; data dan fitur yang sudah ada tetap utuh'
         ] },
         { version: 'v9.13.0', date: 'November 2026', items: [

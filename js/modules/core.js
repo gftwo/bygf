@@ -70,7 +70,7 @@
     });
 
     // Gambar hanya boleh http(s) atau data:image (cegah javascript: dsb.)
-    Mx.safeImg = s => { s = String(s || '').trim(); return (/^https?:\/\//i.test(s) || /^data:image\/(jpeg|png|webp|gif);base64,/i.test(s)) ? s : ''; };
+    Mx.safeImg = s => { s = String(s || '').trim(); return (/^https?:\/\//i.test(s) || /^data:image\/(jpeg|png|webp|gif);base64,/i.test(s) || /^icons\/lemari\/[A-Za-z0-9_-]+\.webp$/.test(s)) ? s : ''; }; // + foto bawaan Lemari (berkas di icons/lemari/)
 
     // Input gambar: URL atau unggah dari perangkat. Mengembalikan HTML + binder.
     Mx.imageFieldHTML = (id, value) => `

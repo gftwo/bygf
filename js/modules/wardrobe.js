@@ -4,6 +4,9 @@
    - cats : { id, name, emoji, washable, limit }   limit = batas tetap N kali pakai (null = ikut jumlah matkul)
    - items: { id, name, cat, photo, washedOn, created }
    - log  : { 'YYYY-MM-DD': { items: [id], matkul, saved } }   catatan pakaian per hari
+   - outfits: { id, name, o:{top,inner,bottom,shoes,neck,open}, created }   outfit tersimpan (sub-tab Padu Padan)
+   - seedDone: true setelah 27 pakaian bawaan (foto di icons/lemari/) diimpor
+   - items[].pp (opsional) = { kind, open, w, h }: foto potongan (latar transparan) yang bisa dipakai di Padu Padan
    Aturan cuci (skala 30): tiap pemakaian menambah beban lalu "waktunya dicuci" di 30.
    - Kategori ber-limit (mis. Bawahan, Kaos = 5×): beban = 30 / limit, jumlah matkul diabaikan.
    - Kategori tanpa limit: 0–1 matkul → batas 3× (beban 10), 2+ matkul → batas 2× (beban 15).
@@ -16,6 +19,12 @@
     const THRESH = 30;          // batas "waktunya dicuci"
     const DAYS_UNUSED = 14;     // barang dianggap lama tidak dipakai
     const PHOTO_W = 480, PHOTO_Q = 0.6;
+    const PP_KINDS = ['kemeja', 'jaket', 'polo', 'kaos', 'celana', 'sepatu', 'kalung'];
+    const KIND_LABEL = { kemeja: 'Kemeja', jaket: 'Jaket', polo: 'Polo', kaos: 'Kaos', celana: 'Celana', sepatu: 'Sepatu', kalung: 'Kalung' };
+    const KIND_CAT = { kemeja: 'atasan', jaket: 'atasan', polo: 'atasan', kaos: 'kaos', celana: 'bawahan', sepatu: 'sepatu', kalung: 'aksesori' };
+    const MAX_OUTFITS = 40;
+    // Pakaian bawaan dari foto pemilik: [no, nama (bisa diubah lewat Ubah), jenis, buka, lebar, tinggi]
+    const SEED = [[1, "Batik cokelat lengan panjang", "kemeja", "kancing", 560, 455], [2, "Kemeja garis cokelat tua", "kemeja", "kancing", 560, 420], [3, "Kemeja putih polos lengan panjang", "kemeja", "kancing", 545, 560], [4, "Kemeja krem kerah hitam (zip)", "kemeja", "zip", 509, 487], [5, "Kemeja krem garis lengan pendek", "kemeja", "kancing", 560, 498], [6, "Kaos abu-krem polos", "kaos", "", 560, 461], [7, "Kemeja denim hitam lengan panjang", "kemeja", "kancing", 560, 448], [8, "Kemeja khaki lengan panjang", "kemeja", "kancing", 453, 472], [9, "Kemeja navy lengan pendek (zip)", "kemeja", "zip", 554, 474], [10, "Polo zip hitam", "polo", "", 493, 468], [11, "Kemeja abu tua lengan pendek", "kemeja", "kancing", 481, 471], [12, "Kemeja PDL krem", "kemeja", "kancing", 520, 496], [13, "Batik biru-krem lengan panjang", "kemeja", "kancing", 418, 560], [14, "Jaket korduroi cokelat (zip)", "jaket", "zip", 560, 385], [15, "Hoodie zip hitam", "jaket", "zip", 560, 333], [16, "Kaos hitam polos", "kaos", "", 560, 441], [17, "Kaos hitam sablon Cultural", "kaos", "", 560, 419], [18, "Kaos navy PBAK 2026", "kaos", "", 519, 483], [19, "Kaos putih polos", "kaos", "", 488, 490], [21, "Celana training abu muda", "celana", "", 257, 503], [22, "Celana training hitam list putih", "celana", "", 272, 501], [23, "Jogger hitam tali putih", "celana", "", 214, 478], [24, "Jeans biru muda", "celana", "", 218, 501], [25, "Celana cargo khaki", "celana", "", 247, 560], [26, "Celana bahan hitam", "celana", "", 197, 489], [27, "Celana training abu-oranye", "celana", "", 233, 464], [28, "Jeans hitam washed", "celana", "", 235, 504]];
     const DATA_VERSION = 2;
     const { esc, uid, today, addDays, parse, byId } = Mx;
     const D = () => AppModules.get(KEY), save = () => AppModules.changed(KEY);
@@ -35,6 +44,12 @@
     ];
     const cleanLimit = v => { const n = parseInt(v, 10); return n >= 1 ? Math.min(30, n) : null; };
 
+    function cleanPP(p) {
+        if (!p || typeof p !== 'object' || !PP_KINDS.includes(p.kind)) return null;
+        const w = Number(p.w), h = Number(p.h); if (!(w > 0 && h > 0)) return null;
+        return { kind: p.kind, open: p.open === 'kancing' || p.open === 'zip' ? p.open : '', w: Math.round(w), h: Math.round(h) };
+    }
+
     // ---------- normalisasi & validasi (data lama tetap terbaca) ----------
     function normalize(raw) {
         raw = raw && typeof raw === 'object' ? raw : {};
@@ -46,7 +61,12 @@
         }
         const seen = new Set();
         const items = arr(raw.items).filter(i => i && i.id && i.name && !seen.has(String(i.id)) && seen.add(String(i.id)))
-            .map(i => ({ id: String(i.id), name: String(i.name).slice(0, 60), cat: String(i.cat || cats[0].id), photo: Mx.safeImg(i.photo), washedOn: isoOk(i.washedOn) ? i.washedOn : '', created: isoOk(i.created) ? i.created : today() }));
+            .map(i => { const o = { id: String(i.id), name: String(i.name).slice(0, 60), cat: String(i.cat || cats[0].id), photo: Mx.safeImg(i.photo), washedOn: isoOk(i.washedOn) ? i.washedOn : '', created: isoOk(i.created) ? i.created : today() }; const pp = cleanPP(i.pp); if (pp && o.photo) o.pp = pp; return o; });
+        const ids = new Set(items.map(i => i.id)), SLOT_IDS = ['top', 'inner', 'bottom', 'shoes', 'neck'];
+        const outfits = arr(raw.outfits).filter(f => f && f.id && f.o && typeof f.o === 'object').slice(0, MAX_OUTFITS).map(f => {
+            const o = { open: !!f.o.open }; SLOT_IDS.forEach(k => { o[k] = f.o[k] && ids.has(String(f.o[k])) ? String(f.o[k]) : null; });
+            return { id: String(f.id), name: String(f.name || 'Outfit').slice(0, 40), o, created: String(f.created || '') };
+        }).filter(f => SLOT_IDS.some(k => f.o[k]));
         const log = {};
         if (raw.log && typeof raw.log === 'object' && !Array.isArray(raw.log)) {
             Object.keys(raw.log).forEach(d => {
@@ -55,7 +75,7 @@
                 if (ids.length) log[d] = { items: ids, matkul: Math.max(0, Math.min(8, Math.round(Number(e.matkul) || 0))), saved: String(e.saved || '') };
             });
         }
-        return { v: DATA_VERSION, cats, items, log };
+        return { v: DATA_VERSION, cats, items, log, outfits, seedDone: !!raw.seedDone };
     }
     function validate(raw) {
         if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return ['format data tidak valid'];
@@ -108,7 +128,7 @@
     const autoMatkul = date => (window.KuliahPro && KuliahPro.classCount) ? KuliahPro.classCount(date) : 0;
 
     // ---------- state tampilan ----------
-    const VIEWS = { 'lm-lemari': renderLemari, 'lm-hari': renderHari, 'lm-cuci': renderCuci, 'lm-riwayat': renderRiwayat };
+    const VIEWS = { 'lm-lemari': renderLemari, 'lm-padu': renderPadu, 'lm-hari': renderHari, 'lm-cuci': renderCuci, 'lm-riwayat': renderRiwayat };
     const ui = { q: '', cat: '', sort: '', date: today(), sel: new Set(), manual: 'auto', dayLoaded: '' };
     let current = 'lm-lemari', detail = null;
     const rerender = () => { const f = VIEWS[current]; if (f && root(current)) f(); updateBadge(); };
@@ -138,7 +158,7 @@
         const chips = `<button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua (${S.items.length})</button>` + S.cats.map(c => `<button type="button" class="mx-chip${ui.cat === c.id ? ' on' : ''}" data-act="cat" data-c="${esc(c.id)}">${c.emoji} ${esc(c.name)} (${S.items.filter(i => i.cat === c.id).length})</button>`).join('');
         const sorts = [['', 'Urutan input'], ['nama', 'Nama A–Z'], ['sering', 'Paling sering dipakai'], ['kotor', 'Paling kotor'], ['lama', 'Paling lama tak dipakai']];
         r.innerHTML = `<div class="mx-head"><div><h2>Lemari</h2></div><div class="mx-row"><button type="button" class="mx-btn mx-btn-sm" data-act="cats">🏷️ Kategori</button><button type="button" class="mx-btn mx-btn-primary" data-act="add">＋ Tambah barang</button></div></div>
-        <div id="lmBanner">${washBanner()}</div>
+        ${seedBanner()}<div id="lmBanner">${washBanner()}</div>
         <div class="mx-card"><input id="lmQ" type="search" class="mx-input" placeholder="🔍 Cari nama barang…" aria-label="Cari barang" value="${esc(ui.q)}">
         <div class="mx-chips lm-chips">${chips}</div>
         <div class="lm-sort"><label for="lmSort" class="mx-muted mx-xs">Urutkan</label><select id="lmSort" class="mx-input">${sorts.map(([v, l]) => `<option value="${v}"${ui.sort === v ? ' selected' : ''}>${l}</option>`).join('')}</select></div></div>
@@ -153,6 +173,125 @@
         if (cmp) list.sort(cmp);
         box.innerHTML = list.length ? `<div class="lm-grid">${list.map(i => itemCard(i, 'view')).join('')}</div><p class="mx-muted mx-xs lm-hint">Ketuk barang untuk detail · tombol 👚 di pojok = pakai hari ini</p>`
             : Mx.empty('👗', S.items.length ? 'Tidak ada yang cocok' : 'Lemari masih kosong', S.items.length ? '' : 'Tekan "Tambah barang" untuk mulai mengisi lemari.');
+    }
+
+
+    // ---------- Padu Padan (cek outfit di boneka) ----------
+    const PD = { R: 1.72, TOP_Y: 11, TOP_H: 35, BOT_Y: 36, BOT_H: 52, SHOE_Y: 90, SHOE_H: 9, MAXW: 97 };   // persen dari kotak boneka; R = tinggi/lebar kotak
+    const PD_SLOTS = [
+        { id: 'top', label: 'Atasan', kinds: ['kemeja', 'jaket', 'polo', 'kaos'] },
+        { id: 'inner', label: 'Dalaman', kinds: ['kaos'] },
+        { id: 'bottom', label: 'Bawahan', kinds: ['celana'] },
+        { id: 'shoes', label: 'Sepatu', kinds: ['sepatu'] },
+        { id: 'neck', label: 'Kalung', kinds: ['kalung'] }
+    ];
+    const SLOT_KEYS = PD_SLOTS.map(s => s.id);
+    const pd = { o: { top: null, inner: null, bottom: null, shoes: null, neck: null, open: false }, slot: 'top', kind: 'all', naming: false };
+    const ppItems = () => D().items.filter(i => i.pp && i.photo);
+    const ppById = id => { const it = id && itemById(id); return it && it.pp && it.photo ? it : null; };
+    const canOpen = it => !!(it && it.pp.open);
+    function pdFit(it, hPct) {
+        const ar = it.pp.w / it.pp.h; let h = hPct, w = h * ar * PD.R;
+        if (w > PD.MAXW) { w = PD.MAXW; h = w / PD.R / ar; }
+        return { w, h };
+    }
+    const pdLayer = (cls, it, y, w, h) => `<div class="pd-layer ${cls}" style="top:${y}%;width:${w}%;height:${h}%"><img alt="" src="${esc(it.photo)}"></div>`;
+    const PD_MANQ = `<svg class="pd-manq" viewBox="0 0 100 172" aria-hidden="true"><ellipse cx="50" cy="6.4" rx="5.4" ry="6.4"/><rect x="47" y="11" width="6" height="8" rx="3"/><path d="M31 21 Q50 15 69 21 L67 64 Q50 68 33 64 Z" stroke-width="2" stroke-linejoin="round"/><path d="M42 66 L41 150" stroke-width="11" stroke-linecap="round" fill="none"/><path d="M58 66 L59 150" stroke-width="11" stroke-linecap="round" fill="none"/><ellipse cx="41" cy="162" rx="6.5" ry="4"/><ellipse cx="59" cy="162" rx="6.5" ry="4"/></svg>`;
+    function stageHTML(o) {
+        const top = ppById(o.top), inner = ppById(o.inner), bot = ppById(o.bottom), shoes = ppById(o.shoes), neck = ppById(o.neck);
+        let h = PD_MANQ;
+        if (shoes) { const f = pdFit(shoes, PD.SHOE_H); h += pdLayer('pd-z-shoes', shoes, PD.SHOE_Y, f.w, f.h); }
+        if (bot) { const f = pdFit(bot, PD.BOT_H); h += pdLayer('pd-z-bottom', bot, PD.BOT_Y, f.w, f.h); }
+        if (top) {
+            const f = pdFit(top, PD.TOP_H), opened = !!o.open && canOpen(top);
+            if (opened && inner) {   // dalaman: hanya jalur tengah yang tampak di celah atasan
+                const ih = Math.min(f.h * 0.97, pdFit(inner, f.h * 0.97).h), iw = ih * (inner.pp.w / inner.pp.h) * PD.R;
+                const cut = (100 - Math.min(100, f.w * 0.22 * 1.25 / iw * 100)) / 2, src = esc(inner.photo);
+                h += `<div class="pd-layer pd-z-inner" style="top:${PD.TOP_Y + f.h * 0.02}%;width:${iw}%;height:${ih}%"><div class="pd-innerwrap" style="clip-path:inset(0 ${cut}% 0 ${cut}%)"><img alt="" src="${src}"><div class="pd-shade" style="-webkit-mask-image:url('${src}');mask-image:url('${src}')"></div></div></div>`;
+            }
+            const src = esc(top.photo);
+            h += `<div class="pd-layer pd-z-top${opened ? ' open' : ''}" style="top:${PD.TOP_Y}%;width:${f.w}%;height:${f.h}%"><div class="pd-half l"><img alt="" src="${src}"></div><div class="pd-half r"><img alt="" src="${src}"></div></div>`;
+        }
+        if (neck) { const f = pdFit(neck, 10); h += pdLayer('pd-z-neck', neck, 16, f.w, f.h); }
+        return h;
+    }
+    const outfitNames = o => [o.top, o.inner && o.open && canOpen(ppById(o.top)) ? o.inner : null, o.bottom, o.shoes, o.neck].map(id => id && itemById(id)).filter(Boolean).map(i => i.name);
+    const outfitIds = o => SLOT_KEYS.filter(k => k !== 'inner' || (o.open && canOpen(ppById(o.top)))).map(k => o[k]).filter(id => id && itemById(id));
+
+    function seedBanner() {
+        const S = D(); if (S.seedDone) return '';
+        return `<div class="lm-banner lm-seed" role="status"><span>👕 ${SEED.length} pakaian dari fotomu siap diimpor ke Lemari</span><button type="button" class="mx-btn mx-btn-primary mx-btn-sm" data-act="seed">Impor</button></div>`;
+    }
+    function ensureCat(id, name, emoji, washable, limit) {
+        const S = D(); if (!byId(S.cats, id)) S.cats.push({ id, name, emoji, washable, limit }); return id;
+    }
+    function importSeed() {
+        const S = D(); if (S.seedDone) return 0;
+        ensureCat('atasan', 'Atasan', '👕', true, null); ensureCat('bawahan', 'Bawahan', '👖', true, 5); ensureCat('kaos', 'Kaos', '🎽', true, 5);
+        let n = 0;
+        SEED.forEach(([no, name, kind, open, w, h]) => {
+            const id = 'pp' + String(no).padStart(2, '0'); if (byId(S.items, id)) return;
+            const cat = KIND_CAT[kind], c = byId(S.cats, cat) ? cat : S.cats[0].id;
+            S.items.push({ id, name, cat: c, photo: 'icons/lemari/c' + String(no).padStart(2, '0') + '.webp', washedOn: '', created: today(), pp: { kind, open, w, h } }); n++;
+        });
+        S.seedDone = true; save(); return n;
+    }
+
+    function renderPadu() {
+        const r = root('lm-padu'), S = D(), o = pd.o;
+        SLOT_KEYS.forEach(k => { if (o[k] && !ppById(o[k])) o[k] = null; });   // barang yang dihapus/diganti fotonya
+        const top = ppById(o.top), openable = canOpen(top);
+        if (!openable) o.open = false;
+        const all = ppItems(), slot = PD_SLOTS.find(s => s.id === pd.slot) || PD_SLOTS[0];
+        const slotItems = s => all.filter(i => s.kinds.includes(i.pp.kind));
+        const kinds = slot.kinds.filter(k => all.some(i => i.pp.kind === k));
+        if (pd.kind !== 'all' && !kinds.includes(pd.kind)) pd.kind = 'all';
+        const list = slotItems(slot).filter(i => pd.kind === 'all' || i.pp.kind === pd.kind);
+        let hint = '';
+        if (!top) hint = 'Pilih atasan dan bawahan untuk mulai.';
+        else if (openable && o.open && !o.inner) hint = 'Terbuka. Pilih kaos di tab Dalaman untuk dipakai di dalam.';
+        else if (openable && !o.open && o.inner) hint = 'Dalaman baru terlihat kalau atasan dibuka.';
+        else if (!openable) hint = 'Atasan ini tidak bisa dibuka.';
+        const tabs = PD_SLOTS.map(s => { const n = slotItems(s).length; return `<button type="button" role="tab" class="mx-chip${s.id === slot.id ? ' on' : ''}" aria-selected="${s.id === slot.id}" data-act="pslot" data-s="${s.id}"${n ? '' : ' disabled'}>${s.label}${o[s.id] ? ' ✓' : ''}${n ? '' : ' (kosong)'}</button>`; }).join('');
+        const kindChips = kinds.length > 1 ? `<div class="mx-chips pd-kinds">${['all', ...kinds].map(k => `<button type="button" class="mx-chip${pd.kind === k ? ' on' : ''}" data-act="pkind" data-k="${k}">${k === 'all' ? 'Semua' : KIND_LABEL[k]}</button>`).join('')}</div>` : '';
+        const thumbs = list.length
+            ? `<button type="button" class="pd-th pd-none" aria-pressed="${!o[slot.id]}" data-act="ppick" data-s="${slot.id}" data-id="">Tanpa</button>` + list.map(i => `<button type="button" class="pd-th" aria-pressed="${o[slot.id] === i.id}" aria-label="${esc(i.name)}" title="${esc(i.name)}" data-act="ppick" data-s="${slot.id}" data-id="${esc(i.id)}"><img alt="" loading="lazy" decoding="async" src="${esc(i.photo)}"><span class="pd-nm">${esc(i.name)}</span></button>`).join('')
+            : `<div class="mx-muted pd-empty">${all.length ? `Belum ada ${slot.label.toLowerCase()} di Lemari.` : 'Belum ada pakaian berfoto potongan. Impor pakaian bawaan dari banner di atas.'}</div>`;
+        const saved = S.outfits.map(f => `<div class="pd-sv"><div class="pd-mini"><div class="pd-box" data-o="${esc(f.id)}">${stageHTML(f.o)}</div></div><b title="${esc(f.name)}">${esc(f.name)}</b><div class="mx-row"><button type="button" class="mx-btn mx-btn-sm" data-act="puse" data-id="${esc(f.id)}">Pakai</button><button type="button" class="mx-btn mx-btn-sm mx-btn-danger" data-act="pdel" data-id="${esc(f.id)}" aria-label="Hapus ${esc(f.name)}">Hapus</button></div></div>`).join('');
+        r.innerHTML = `<div class="mx-head"><div><h2>Padu Padan</h2></div></div>${seedBanner()}
+        <div class="pd-wrap"><div class="pd-left"><div class="pd-stage"><div class="pd-box" id="pdStage" role="img" aria-label="Pratinjau outfit: ${esc(outfitNames(o).join(', ') || 'kosong')}">${stageHTML(o)}</div></div></div>
+        <div class="pd-right"><div class="mx-card">
+            ${openable ? `<div class="mx-row pd-openrow"><b>${top.pp.open === 'zip' ? 'Resleting' : 'Kancing'}</b><div class="pd-seg" role="group" aria-label="Buka atau tutup atasan"><button type="button" aria-pressed="${!o.open}" data-act="popen" data-v="0">Tertutup</button><button type="button" aria-pressed="${o.open}" data-act="popen" data-v="1">Terbuka</button></div></div>` : ''}
+            <p class="mx-muted mx-xs pd-hint">${hint}</p>
+            <div class="mx-chips pd-tabs" role="tablist" aria-label="Bagian outfit">${tabs}</div>${kindChips}
+            <div class="pd-thumbs">${thumbs}</div>
+            <div class="mx-row pd-actions"><button type="button" class="mx-btn mx-btn-primary" data-act="psave">Simpan outfit</button><button type="button" class="mx-btn" data-act="pwear">Pakai hari ini</button><button type="button" class="mx-btn" data-act="pclear">Kosongkan</button></div>
+        </div>
+        <h3 class="pd-h">Outfit tersimpan</h3>${saved ? `<div class="pd-saved">${saved}</div>` : '<p class="mx-muted">Belum ada. Susun outfit lalu ketuk Simpan outfit.</p>'}</div></div>`;
+    }
+    function openSaveOutfit() {
+        const o = pd.o; if (!o.top && !o.bottom) return Mx.toast('Pilih pakaian dulu', 'error');
+        Mx.modal({
+            title: 'Simpan outfit', size: 380,
+            body: `<form novalidate><div class="mx-field"><label for="pdOutfitName">Nama outfit</label><input id="pdOutfitName" name="name" class="mx-input" maxlength="40" value="Outfit ${D().outfits.length + 1}"></div><div class="mx-foot"><button type="button" class="mx-btn" data-mx-cancel>Batal</button><button type="submit" class="mx-btn mx-btn-primary">Simpan</button></div></form>`,
+            onMount: api => {
+                const f = api.body.querySelector('form'); f.querySelector('[data-mx-cancel]').addEventListener('click', api.close);
+                f.addEventListener('submit', e => {
+                    e.preventDefault(); const S = D(), name = f.elements.name.value.trim() || 'Outfit ' + (S.outfits.length + 1);
+                    S.outfits.unshift({ id: uid(), name, o: { ...pd.o }, created: today() }); S.outfits = S.outfits.slice(0, MAX_OUTFITS);
+                    save(); api.close(); renderPadu(); Mx.toast('Outfit tersimpan: ' + name);
+                });
+                setTimeout(() => { f.elements.name.focus(); f.elements.name.select(); }, 30);
+            }
+        });
+    }
+    function wearOutfit() {
+        const ids = outfitIds(pd.o); if (!ids.length) return Mx.toast('Pilih pakaian dulu', 'error');
+        const S = D(), t = today(), e = S.log[t];
+        if (e) ids.forEach(id => { if (!e.items.includes(id)) e.items.push(id); });
+        else S.log[t] = { items: ids, matkul: autoMatkul(t), saved: new Date().toISOString() };
+        if (ui.dayLoaded === t) ui.dayLoaded = '';
+        save(); updateBadge(); Mx.toast('Dicatat ke Pakaian Hari Ini: ' + outfitNames(pd.o).join(' + '));
     }
 
     // ---------- Hari Ini ----------
@@ -266,7 +405,7 @@
                     const fail = m => { err.textContent = m; err.hidden = false; };
                     if (!name) return fail('Nama wajib diisi.');
                     if (S2.items.some(i => (!it || i.id !== it.id) && i.name.toLowerCase() === name.toLowerCase())) return fail('Nama barang sudah ada.');
-                    if (it) Object.assign(itemById(it.id), { name, cat: f.elements.cat.value, photo });
+                    if (it) { const cur = itemById(it.id); Object.assign(cur, { name, cat: f.elements.cat.value, photo }); if (cur.pp && photo !== it.photo) delete cur.pp; } // foto diganti => bukan potongan transparan lagi, tidak dipakai di Padu Padan
                     else S2.items.push({ id: uid(), name, cat: f.elements.cat.value, photo, washedOn: '', created: today() });
                     save(); api.close(); rerender(); Mx.toast('Barang disimpan');
                 });
@@ -318,6 +457,24 @@
 
     // ---------- aksi ----------
     const acts = {
+        seed: () => { const n = importSeed(); rerender(); Mx.toast(n ? `${n} pakaian diimpor ke Lemari` : 'Sudah diimpor'); },
+        pslot: el => { pd.slot = el.dataset.s; pd.kind = 'all'; renderPadu(); },
+        pkind: el => { pd.kind = el.dataset.k; renderPadu(); },
+        ppick: el => { const k = el.dataset.s, id = el.dataset.id || null; pd.o[k] = id && pd.o[k] !== id ? id : null; renderPadu(); },
+        popen: el => {
+            pd.o.open = el.dataset.v === '1';
+            if (pd.o.open && !pd.o.inner && ppItems().some(i => i.pp.kind === 'kaos')) { pd.slot = 'inner'; pd.kind = 'all'; }
+            renderPadu();
+        },
+        pclear: () => { pd.o = { top: null, inner: null, bottom: null, shoes: null, neck: null, open: false }; pd.slot = 'top'; pd.kind = 'all'; renderPadu(); },
+        psave: openSaveOutfit,
+        pwear: wearOutfit,
+        puse: el => { const f = byId(D().outfits, el.dataset.id); if (!f) return; pd.o = { ...f.o }; renderPadu(); const st = document.getElementById('pdStage'); if (st) st.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); },
+        pdel: async el => {
+            const S = D(), f = byId(S.outfits, el.dataset.id); if (!f) return;
+            if (!(await Mx.confirm(`Hapus outfit "${f.name}"?`))) return;
+            S.outfits = S.outfits.filter(x => x.id !== f.id); save(); renderPadu();
+        },
         cat: el => { ui.cat = el.dataset.c; renderLemari(); },
         add: () => openItemForm(null),
         cats: openCats,
