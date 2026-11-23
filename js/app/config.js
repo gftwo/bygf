@@ -24,6 +24,12 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v9.14.0', date: 'November 2026', items: [
+            'Tema baru: Bybi — terang mint; menu bawah dan sidebar diganti maskot robot Bybi di pojok kanan bawah. Ketuk = bicara + animasi, tahan = menu navigasi melingkar',
+            'Maskot bereaksi otomatis saat ada lencana baru di menu (Tugas, Kuliah, Makan, Lemari) dan tidur bila lama tidak disentuh',
+            'Tema baru: Malam — biru malam dengan sidebar kaca; tiap menu punya submenu akordeon, bisa diciutkan jadi rel ikon, di HP berupa laci dari kiri',
+            'Tema lama tidak berubah; data dan fitur yang sudah ada tetap utuh'
+        ] },
         { version: 'v9.13.0', date: 'November 2026', items: [
             'Tab baru: Sholat — jadwal sholat sampai tingkat kecamatan (dihitung di perangkat, tanpa internet), checklist harian dengan batas waktu dan sisa waktu, sunnah & puasa, qadha, rekap setahun, capaian, dan mode Ramadan',
             'Pengingat HP 30 menit setelah waktu sholat bila belum dicatat (di Setelan > Pengingat di HP), serta kartu Sholat di Beranda',

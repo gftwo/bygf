@@ -1,0 +1,162 @@
+/* ==========================================================================
+   BYgf — Navigasi untuk dua tema khusus
+   · BYBI  : tidak ada sidebar/bottom bar. Maskot robot melayang di kanan bawah (js/bybi-nav.js).
+             Ketuk = ngobrol, tahan = menu navigasi melingkar.
+   · MALAM : sidebar kaca buram dengan submenu akordeon seperti video referensi (js/glass-nav.js).
+             Desktop = panel melayang di kiri; HP/tablet = laci dari kiri + tombol menu melayang.
+   Hanya lapisan tampilan; semua id/class yang dipakai JS lain tetap utuh.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. BYBI — maskot robot
+   ========================================================================== */
+:root[data-theme-preset="bybi"] { --nav-w: 0px; }
+:root[data-theme-preset="bybi"] .side-nav,
+:root[data-theme-preset="bybi"] .bn-bar,
+:root[data-theme-preset="bybi"] .bn-sheet { display: none !important; }
+:root[data-theme-preset="bybi"] .app-container { padding: 1.25rem clamp(1rem, 4vw, 3rem) calc(112px + env(safe-area-inset-bottom)); }
+:root[data-theme-preset="bybi"] .app-container > * { max-width: 1040px; }
+:root[data-theme-preset="bybi"] #adjustmentFAB { bottom: calc(100px + env(safe-area-inset-bottom)); }
+
+.app-container > .bb-root, .app-container > .bb-menu, .app-container > .gn-fab { max-width: none !important; margin: 0 !important; }
+.bb-root { position: fixed; right: calc(14px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 900; width: 64px; height: 64px; --bb-eye: hsl(var(--hue-primary) 100% 72%); }
+.bb-bot { position: relative; width: 64px; height: 64px; border: 0; background: none; padding: 0; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; border-radius: 50%; }
+.bb-bot:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.bb-bot svg.bb-svg { width: 100%; height: 100%; overflow: visible; display: block; transition: transform .15s; }
+.bb-bot.press svg.bb-svg { transform: scale(.92); }
+.bb-fe { fill: var(--bb-eye); }
+.bb-se { fill: none; stroke: var(--bb-eye); stroke-width: 3; stroke-linecap: round; }
+.bb-face { filter: drop-shadow(0 0 2.5px hsl(var(--hue-primary) 100% 65%)); }
+.bb-float { animation: bb-float 3.2s ease-in-out infinite; }
+.bb-shadow { animation: bb-shadow 3.2s ease-in-out infinite; transform-origin: 50px 95px; }
+.bb-glow { animation: bb-glow 3.2s ease-in-out infinite; transform-origin: 50px 92px; }
+.bb-bulb { animation: bb-pulse 2.4s ease-in-out infinite; transform-origin: 50px 9px; }
+.bb-arm-r { transform-origin: 76px 66px; }
+.bb-eyes ellipse { animation: bb-blink 4.6s infinite; transform-box: fill-box; transform-origin: center; }
+.bb-zzz { display: none; }
+.bb-zzz text { font: 700 9px system-ui, sans-serif; fill: var(--bb-eye); animation: bb-zz 2.4s ease-in infinite; }
+.bb-zzz text:nth-child(2) { animation-delay: .8s; } .bb-zzz text:nth-child(3) { animation-delay: 1.6s; }
+.bb-root[data-mood="sleepy"] .bb-zzz { display: block; }
+.bb-root[data-mood="sleepy"] .bb-float { animation-duration: 5s; }
+.bb-a-boing { animation: bb-boing .55s cubic-bezier(.3, 1.6, .5, 1); }
+.bb-a-dance { animation: bb-dance .5s ease-in-out 4; }
+.bb-a-shake { animation: bb-shake .45s ease-in-out 2; }
+.bb-a-wave .bb-arm-r { animation: bb-wave .6s ease-in-out 3; }
+@keyframes bb-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+@keyframes bb-shadow { 0%, 100% { transform: scale(1); opacity: .28 } 50% { transform: scale(.8); opacity: .16 } }
+@keyframes bb-glow { 0%, 100% { opacity: .7; transform: scale(1) } 50% { opacity: .3; transform: scale(.75) } }
+@keyframes bb-pulse { 0%, 100% { opacity: 1; transform: scale(1) } 50% { opacity: .55; transform: scale(.85) } }
+@keyframes bb-blink { 0%, 92%, 100% { transform: scaleY(1) } 95% { transform: scaleY(.1) } }
+@keyframes bb-zz { 0% { opacity: 0; transform: translate(0, 6px) } 30% { opacity: 1 } 100% { opacity: 0; transform: translate(6px, -12px) } }
+@keyframes bb-boing { 0% { transform: scale(1) } 30% { transform: scale(1.18, .82) } 60% { transform: scale(.92, 1.1) } 100% { transform: scale(1) } }
+@keyframes bb-dance { 0%, 100% { transform: rotate(-7deg) translateY(0) } 50% { transform: rotate(7deg) translateY(-8px) } }
+@keyframes bb-shake { 0%, 100% { transform: translateX(0) } 25% { transform: translateX(-5px) } 75% { transform: translateX(5px) } }
+@keyframes bb-wave { 0%, 100% { transform: rotate(0) } 50% { transform: rotate(-35deg) } }
+.bb-dot { position: absolute; top: -3px; left: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; background: #ef4444; color: #fff; font: 800 .68rem/20px var(--font-body); text-align: center; box-shadow: 0 0 0 2px var(--bg-body), 0 2px 6px rgba(0, 0, 0, .3); pointer-events: none; }
+.bb-dot[hidden] { display: none; }
+.bb-bubble { position: absolute; right: 2px; bottom: 76px; width: max-content; max-width: min(230px, calc(100vw - 40px)); background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-medium); border-radius: 16px 16px 4px 16px; padding: .6rem .8rem; font-size: .84rem; font-weight: 700; line-height: 1.35; box-shadow: 0 10px 28px -10px rgba(0, 0, 0, .35); transform-origin: bottom right; animation: bb-pop .22s cubic-bezier(.3, 1.5, .5, 1); }
+.bb-bubble[hidden] { display: none; }
+@keyframes bb-pop { from { opacity: 0; transform: scale(.7) } to { opacity: 1; transform: scale(1) } }
+.bb-spark { position: absolute; left: 50%; top: 40%; font-size: 14px; pointer-events: none; animation: bb-fly .8s ease-out forwards; }
+@keyframes bb-fly { to { transform: translate(var(--dx), var(--dy)) scale(.4); opacity: 0 } }
+
+/* Menu tahan (lingkaran ikon di sekitar robot) */
+.bb-menu { position: fixed; inset: 0; z-index: 950; }
+.bb-menu[hidden] { display: none; }
+.bb-scrim { position: absolute; inset: 0; background: rgba(10, 30, 20, .4); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0; transition: opacity .2s; }
+.bb-menu.open .bb-scrim { opacity: 1; }
+.bb-mi { position: absolute; width: 46px; height: 46px; margin: 0; padding: 0; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .75); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main);
+    background: radial-gradient(circle at 32% 25%, #fff, #e6eee9 60%, #b8c8be); box-shadow: inset 0 -3px 6px rgba(0, 0, 0, .14), inset 0 2px 3px #fff, 0 8px 18px -6px rgba(0, 0, 0, .5);
+    opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.3); transition: transform .28s cubic-bezier(.3, 1.4, .5, 1), opacity .2s; transition-delay: var(--d); }
+.bb-menu.open .bb-mi { opacity: 1; transform: none; }
+.bb-mi.hot { transform: scale(1.2) !important; background: radial-gradient(circle at 32% 25%, hsl(var(--hue-primary) 70% 72%), hsl(var(--hue-primary) 60% 40%) 70%, hsl(var(--hue-primary) 65% 26%)); color: #fff; transition-delay: 0s; }
+.bb-mi.cur { outline: 2px solid var(--primary); outline-offset: 2px; }
+.bb-mi:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.bb-mi svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bb-mi span { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 3px; font: 700 10px var(--font-body); color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .85); white-space: nowrap; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+    .bb-float, .bb-shadow, .bb-glow, .bb-bulb, .bb-eyes ellipse, .bb-zzz text, .bb-a-boing, .bb-a-dance, .bb-a-shake, .bb-a-wave .bb-arm-r, .bb-bubble, .bb-spark { animation: none; }
+    .bb-mi, .bb-scrim { transition: none; }
+}
+
+/* ==========================================================================
+   2. MALAM — sidebar kaca + akordeon
+   ========================================================================== */
+/* elemen tambahan hanya tampil di tema Malam */
+.gn-chev, .gn-sub, .gn-collapse, .gn-fab { display: none; }
+
+:root[data-theme-preset="malam"] .bn-bar,
+:root[data-theme-preset="malam"] .bn-sheet { display: none !important; }
+:root[data-theme-preset="malam"] .side-nav { z-index: 130; }
+:root[data-theme-preset="malam"] .sn-panel {
+    display: flex !important; flex-direction: column; overflow-y: auto; overflow-x: hidden; scrollbar-width: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .05)), rgba(18, 28, 100, .5);
+    backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgba(200, 212, 255, .22); border-radius: 28px;
+    box-shadow: 0 24px 60px -20px rgba(3, 6, 40, .85), inset 0 1px 0 rgba(255, 255, 255, .18);
+    padding: 1.1rem .75rem; gap: .5rem; z-index: 130;
+}
+:root[data-theme-preset="malam"] .sn-panel::-webkit-scrollbar { display: none; }
+:root[data-theme-preset="malam"] .sn-brand { padding: .35rem .5rem .8rem; border-bottom: 0; gap: .6rem; align-items: center; }
+:root[data-theme-preset="malam"] .sn-brand-icon { width: 34px; height: 34px; }
+:root[data-theme-preset="malam"] .sn-brand .bg-logo .bg-logo-bg { fill: var(--primary-dark); }
+:root[data-theme-preset="malam"] .sn-brand-text { flex: 1; min-width: 0; color: var(--nav-fg); }
+:root[data-theme-preset="malam"] .sn-illustration { display: none !important; }
+:root[data-theme-preset="malam"] .sn-menu { gap: .1rem; }
+:root[data-theme-preset="malam"] .nav-item { position: relative; width: 100%; display: flex; align-items: center; gap: .85rem; padding: .7rem .8rem; border-radius: 14px; text-align: left; }
+:root[data-theme-preset="malam"] .nav-item .nav-label { flex: 1; font-size: .9rem; font-weight: 600; letter-spacing: .01em; }
+:root[data-theme-preset="malam"] .nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-fg); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+:root[data-theme-preset="malam"] .nav-item:focus-visible, :root[data-theme-preset="malam"] .gn-sub-item:focus-visible, :root[data-theme-preset="malam"] .gn-collapse:focus-visible, :root[data-theme-preset="malam"] .gn-fab:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+:root[data-theme-preset="malam"] .gn-chev { display: inline-flex; width: 1rem; height: 1rem; flex: none; color: var(--nav-dim); transition: transform .25s; }
+:root[data-theme-preset="malam"] .gn-chev svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+:root[data-theme-preset="malam"] .nav-item[aria-expanded="false"] .gn-chev { transform: rotate(0); }
+:root[data-theme-preset="malam"] .nav-item[aria-expanded="true"] .gn-chev { transform: rotate(180deg); }
+:root[data-theme-preset="malam"] .nav-item:not([data-gn-multi]) .gn-chev { display: none; }
+
+/* submenu akordeon */
+:root[data-theme-preset="malam"] .gn-sub { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .28s ease, visibility 0s .28s; }
+:root[data-theme-preset="malam"] .gn-sub.open { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .28s ease, visibility 0s; }
+:root[data-theme-preset="malam"] .gn-sub-in { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: .05rem; }
+:root[data-theme-preset="malam"] .gn-sub-item { display: flex; align-items: center; gap: .9rem; width: 100%; border: 0; background: transparent; color: var(--nav-dim); font: inherit; font-size: .85rem; font-weight: 500; text-align: left; padding: .55rem .8rem .55rem 1.2rem; border-radius: 12px; cursor: pointer; transition: background .15s, color .15s; }
+:root[data-theme-preset="malam"] .gn-sub-item::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .55; flex: none; margin-left: .15rem; margin-right: .35rem; }
+:root[data-theme-preset="malam"] .gn-sub-item:hover { background: var(--nav-hover); color: var(--nav-fg); }
+:root[data-theme-preset="malam"] .gn-sub-item.on { color: #fff; font-weight: 700; background: rgba(255, 255, 255, .1); }
+:root[data-theme-preset="malam"] .gn-sub-item.on::before { opacity: 1; box-shadow: 0 0 8px 1px rgba(200, 215, 255, .9); }
+
+/* tombol ciutkan (hamburger) di kepala panel */
+:root[data-theme-preset="malam"] .gn-collapse { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 0; border-radius: 10px; background: transparent; color: var(--nav-dim); cursor: pointer; flex: none; }
+:root[data-theme-preset="malam"] .gn-collapse:hover { background: var(--nav-hover); color: var(--nav-fg); }
+:root[data-theme-preset="malam"] .gn-collapse svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+@media (min-width: 1024px) {
+    :root[data-theme-preset="malam"] { --nav-w: 304px; }
+    :root[data-theme-preset="malam"].gn-collapsed { --nav-w: 112px; }
+    :root[data-theme-preset="malam"] .sn-panel { inset: 16px auto 16px 16px; width: 272px; transition: width .25s ease; }
+    :root[data-theme-preset="malam"].gn-collapsed .sn-panel { width: 80px; padding-left: .6rem; padding-right: .6rem; }
+    :root[data-theme-preset="malam"].gn-collapsed .sn-brand { flex-direction: column; gap: .5rem; padding-bottom: .6rem; }
+    :root[data-theme-preset="malam"].gn-collapsed .sn-brand-text, :root[data-theme-preset="malam"].gn-collapsed .nav-label, :root[data-theme-preset="malam"].gn-collapsed .gn-chev, :root[data-theme-preset="malam"].gn-collapsed .gn-sub { display: none !important; }
+    :root[data-theme-preset="malam"].gn-collapsed .nav-item { justify-content: center; padding: .75rem 0; }
+    :root[data-theme-preset="malam"] .sn-scrim { display: none !important; }
+    :root[data-theme-preset="malam"] .app-header .brand-icon { display: none; }
+}
+
+@media (max-width: 1023px) {
+    :root[data-theme-preset="malam"] { --nav-w: 0px; }
+    /* laci dari kiri */
+    :root[data-theme-preset="malam"] .sn-panel { position: fixed; inset: 12px auto 12px 12px; width: min(300px, calc(100vw - 48px)); transform: translateX(calc(-100% - 24px)) !important; transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+    :root[data-theme-preset="malam"] .sn-panel { visibility: hidden; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s .3s; }
+    :root[data-theme-preset="malam"] .sn-panel.is-open { transform: none !important; visibility: visible; transition: transform .3s cubic-bezier(.2, .8, .2, 1), visibility 0s; }
+    :root[data-theme-preset="malam"] .sn-scrim { display: block !important; position: fixed; inset: 0; z-index: 125; background: rgba(4, 7, 40, .55); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s; }
+    :root[data-theme-preset="malam"] .sn-scrim.is-open { opacity: 1; pointer-events: auto; }
+    :root[data-theme-preset="malam"] .app-container { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+    /* tombol menu melayang (menampilkan menu aktif) */
+    :root[data-theme-preset="malam"] .gn-fab { display: inline-flex; align-items: center; gap: .55rem; position: fixed; left: 14px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 105; height: 48px; padding: 0 1rem 0 .85rem; border-radius: 99px; color: #fff; font: 700 .85rem var(--font-body); cursor: pointer;
+        border: 1px solid rgba(200, 212, 255, .3); background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .06)), rgba(18, 28, 100, .62); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); box-shadow: 0 14px 30px -10px rgba(3, 6, 40, .85), inset 0 1px 0 rgba(255, 255, 255, .2); }
+    :root[data-theme-preset="malam"] .gn-fab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    :root[data-theme-preset="malam"] .gn-fab:active { transform: scale(.96); }
+    :root[data-theme-preset="malam"] #adjustmentFAB { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme-preset="malam"] .sn-panel, :root[data-theme-preset="malam"] .gn-sub, :root[data-theme-preset="malam"] .gn-chev, :root[data-theme-preset="malam"] .sn-scrim { transition: none; }
+}
+:root[data-theme-preset="malam"] .auth-hero { background: radial-gradient(circle at 70% 16%, rgba(255, 255, 255, .5), transparent 12%), linear-gradient(180deg, #1b2b8a, #0b1346); }

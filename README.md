@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v9.13.0**
+**Versi saat ini: v9.14.0**
 
 ---
 
@@ -14,7 +14,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v9.14.0](#v9140) · [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -63,6 +63,12 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v9.14.0
+*November 2026 — dua tema baru dengan navigasi sendiri*
+- **Tema Bybi** (terang mint): menu bawah dan sidebar disembunyikan; navigasi lewat maskot robot Bybi yang melayang di kanan bawah. Ketuk = ucapan sesuai tab yang dibuka + animasi; tahan 0,4 dtk = menu melingkar ke semua tab (akun admin hanya melihat Brankas). Bereaksi otomatis pada lencana menu (Tugas, Kuliah, Makan, Lemari), tidur setelah 15 dtk. Mendukung keyboard (Enter/Spasi, M/↑ buka menu, Esc tutup) dan *reduced motion*. File: `js/bybi-nav.js`.
+- **Tema Malam** (biru malam, kaca): sidebar kaca dengan submenu akordeon dari sub-tab tiap grup, penanda aktif, tombol ciutkan jadi rel ikon (tersimpan), di HP berupa laci kiri + tombol menu melayang. Latar langit malam, bulan, dan danau. File: `js/glass-nav.js`.
+- Kedua tema hanya lapisan tampilan: navigasi tetap lewat `App.UI.switchMainGroup`, id menu dan lencana tidak berubah; tema lama tidak terdampak. Berkas baru: `css/bygf-nav-themes.css`.
 
 ### v9.13.0
 *November 2026 — tab Sholat*

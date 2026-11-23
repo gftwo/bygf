@@ -143,3 +143,61 @@
 }
 :root[data-theme-preset="senja"] .ambient-bg { background: radial-gradient(circle at 100% 0%, hsla(var(--hue-primary), 92%, 60%, .22), transparent 48%), radial-gradient(circle at 0% 100%, rgba(150,70,200,.2), transparent 50%); }
 :root[data-theme-preset="senja"] .btn-primary { color: #1a0f1c; }
+
+/* ---------- 7. BYBI (terang mint) — navigasi: maskot robot melayang (tahan = menu). Lihat js/bybi-nav.js ---------- */
+:root[data-theme-preset="bybi"] {
+    --hue-primary: 158;
+    --font-display: 'Nunito', system-ui, sans-serif; --font-body: 'Nunito', system-ui, sans-serif;
+    --bg-body: #eaf4ee; --bg-surface: #ffffff; --bg-surface-hover: #e2f0e8; --bg-glass: rgba(255,255,255,.9);
+    --text-main: #10261d; --text-muted: #53685e; --text-light: #8ea298;
+    --border-light: #d3e5db; --border-medium: #b6d3c4;
+    --primary: hsl(var(--hue-primary), 60%, 32%); --primary-dark: hsl(var(--hue-primary), 65%, 24%);
+    --primary-light: hsl(var(--hue-primary), 45%, 90%);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 62%, 35%), hsl(calc(var(--hue-primary) + 24), 58%, 40%));
+    --success: #1f8f5f; --success-dark: #166e49; --success-light: #d5f0e2;
+    --danger: #cf4258; --danger-dark: #a8304a; --danger-light: #fbe1e6;
+    --warning: #c4851a; --warning-dark: #96640f; --warning-light: #f8ebc9;
+    --shadow-sm: 0 1px 2px rgba(16,38,29,.06); --shadow-md: 0 1px 0 rgba(255,255,255,.9) inset, 0 8px 22px -12px rgba(16,60,40,.28);
+    --shadow-lg: 0 16px 38px -16px rgba(16,60,40,.36); --shadow-float: 0 24px 50px -18px rgba(16,60,40,.42);
+    --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 26px;
+    --nav-bg: #ffffff; --nav-fg: #10261d; --nav-dim: #53685e; --nav-hover: rgba(16,60,40,.07);
+    --nav-active-bg: var(--primary-gradient); --nav-active-fg: #fff;
+}
+:root[data-theme-preset="bybi"] .ambient-bg { background: radial-gradient(circle at 8% 0%, hsla(var(--hue-primary), 70%, 62%, .22), transparent 46%), radial-gradient(circle at 96% 92%, hsla(calc(var(--hue-primary) + 70), 75%, 70%, .18), transparent 50%); }
+:root[data-theme-preset="bybi"] .card { background: linear-gradient(180deg, #ffffff, #f7fcf9); }
+:root[data-theme-preset="bybi"] .btn-primary { box-shadow: 0 8px 18px -8px hsla(var(--hue-primary), 70%, 25%, .6), 0 1px 0 rgba(255,255,255,.35) inset; }
+
+/* ---------- 8. MALAM (gelap biru, kaca buram) — navigasi: sidebar kaca dengan submenu akordeon. Lihat js/glass-nav.js ---------- */
+:root[data-theme-preset="malam"] {
+    --hue-primary: 228;
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif; --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --bg-body: #0b1243; --bg-surface: #16205f; --bg-surface-hover: #1f2b7a; --bg-glass: rgba(22,32,95,.8);
+    --text-main: #eef1ff; --text-muted: #aeb8f0; --text-light: #7a86cc;
+    --border-light: rgba(170,185,255,.18); --border-medium: rgba(170,185,255,.32);
+    --primary: hsl(var(--hue-primary), 85%, 68%); --primary-dark: hsl(var(--hue-primary), 80%, 58%);
+    --primary-light: hsla(var(--hue-primary), 90%, 72%, .16);
+    --primary-gradient: linear-gradient(135deg, hsl(var(--hue-primary), 76%, 56%), hsl(calc(var(--hue-primary) + 26), 70%, 58%));
+    --success: #3fdba0; --success-dark: #22b982; --success-light: rgba(63,219,160,.15);
+    --danger: #ff6b85; --danger-dark: #ff4a6a; --danger-light: rgba(255,107,133,.16);
+    --warning: #ffd36b; --warning-dark: #ffbf3d; --warning-light: rgba(255,211,107,.16);
+    --shadow-sm: 0 0 0 1px rgba(170,185,255,.12); --shadow-md: 0 0 0 1px rgba(170,185,255,.14), 0 12px 30px -14px rgba(4,8,50,.8);
+    --shadow-lg: 0 0 0 1px rgba(170,185,255,.16), 0 20px 50px -18px rgba(4,8,50,.9); --shadow-float: 0 26px 60px -18px rgba(4,8,50,.95);
+    --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 26px;
+    --nav-bg: rgba(20,30,105,.42); --nav-fg: #eef1ff; --nav-dim: #b3bdf3; --nav-hover: rgba(255,255,255,.09);
+    --nav-active-bg: rgba(255,255,255,.17); --nav-active-fg: #ffffff;
+}
+/* Latar danau malam: langit, bulan, bintang, gunung, pantulan (semua CSS/SVG ringan, tanpa gambar eksternal) */
+:root[data-theme-preset="malam"] .ambient-bg {
+    top: 0; left: 0; width: 100%; height: 100%;
+    background:
+        radial-gradient(circle at 72% 14%, #fff 0 20px, rgba(255,255,255,.55) 22px, rgba(190,205,255,.28) 56px, rgba(150,170,255,.1) 120px, transparent 220px),
+        url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22360%22 height=%22360%22 viewBox=%220 0 360 360%22%3E%3Ccircle cx=%22171%22 cy=%2283%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%2243%22 cy=%22280%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%22304%22 cy=%2235%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%2225%22 cy=%2250%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%2241%22 cy=%22129%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%2236%22 cy=%22295%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22328%22 cy=%22327%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22301%22 cy=%22305%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22119%22 cy=%2229%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22154%22 cy=%22220%22 r=%220.7%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22298%22 cy=%22163%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%2258%22 cy=%22303%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22196%22 cy=%2255%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22294%22 cy=%2236%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22260%22 cy=%22354%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22166%22 cy=%22244%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22191%22 cy=%22159%22 r=%220.7%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22130%22 cy=%2247%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%22274%22 cy=%22259%22 r=%220.8%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22153%22 cy=%22317%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22268%22 cy=%22220%22 r=%220.7%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%2283%22 cy=%22256%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22348%22 cy=%2245%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%22180%22 cy=%22185%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22302%22 cy=%22239%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22144%22 cy=%22248%22 r=%221.4%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%2237%22 cy=%22164%22 r=%221.4%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22151%22 cy=%22203%22 r=%221.4%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%2217%22 cy=%22242%22 r=%220.8%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22318%22 cy=%2265%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%22117%22 cy=%22153%22 r=%220.7%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Ccircle cx=%22209%22 cy=%22206%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.35%22/%3E%3Ccircle cx=%2291%22 cy=%22235%22 r=%221%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%2276%22 cy=%22226%22 r=%221.2%22 fill=%22%23fff%22 fill-opacity=%220.65%22/%3E%3Ccircle cx=%22218%22 cy=%22189%22 r=%221.4%22 fill=%22%23fff%22 fill-opacity=%220.85%22/%3E%3Ccircle cx=%22124%22 cy=%2283%22 r=%220.6%22 fill=%22%23fff%22 fill-opacity=%220.5%22/%3E%3Cpath d=%22M88 64Q88 70 94 70Q88 70 88 76Q88 70 82 70Q88 70 88 64Z%22 fill=%22%23fff%22 fill-opacity=%22.9%22/%3E%3Cpath d=%22M262 209Q262 214 267 214Q262 214 262 219Q262 214 257 214Q262 214 262 209Z%22 fill=%22%23fff%22 fill-opacity=%22.9%22/%3E%3C/svg%3E") 0 0 / 360px 360px repeat,
+        url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1600 440%22 preserveAspectRatio=%22xMidYMax slice%22%3E%3Cdefs%3E%3ClinearGradient id=%22l%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%232e3fb3%22/%3E%3Cstop offset=%221%22 stop-color=%22%23141d66%22/%3E%3C/linearGradient%3E%3ClinearGradient id=%22m%22 x1=%220%22 y1=%220%22 x2=%220%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%233a4ac0%22 stop-opacity=%22.0%22/%3E%3Cstop offset=%221%22 stop-color=%22%233a4ac0%22 stop-opacity=%22.5%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M0 252L180 192 330 234 520 150 700 240 880 182 1060 238 1240 162 1420 232 1600 192V330H0Z%22 fill=%22%232f3ea6%22 fill-opacity=%22.55%22/%3E%3Cpath d=%22M0 288L220 228 420 278 640 212 860 282 1080 238 1300 292 1600 242V330H0Z%22 fill=%22%23243192%22 fill-opacity=%22.85%22/%3E%3Cpath d=%22M0 308Q400 288 800 308T1600 302V330H0Z%22 fill=%22%23131c66%22/%3E%3Crect y=%22316%22 width=%221600%22 height=%22124%22 fill=%22url%28%23l%29%22/%3E%3Cpath d=%22M0 316L180 376 330 334 520 418 700 328 880 386 1060 330 1240 406 1420 336 1600 376V316Z%22 fill=%22url%28%23m%29%22 fill-opacity=%22.35%22/%3E%3Cellipse cx=%221152%22 cy=%22376%22 rx=%2296%22 ry=%2219%22 fill=%22%23b8c4ff%22 fill-opacity=%22.14%22/%3E%3Cellipse cx=%221152%22 cy=%22376%22 rx=%2244%22 ry=%229%22 fill=%22%23dbe2ff%22 fill-opacity=%22.6%22/%3E%3Cg stroke=%22%239fb0ff%22 stroke-opacity=%22.16%22 stroke-width=%222%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M240 352h160M900 345h230M1230 358h200M520 372h140M60 384h120%22/%3E%3C/g%3E%3C/svg%3E") 72% 100% / max(100%, 1000px) auto no-repeat,
+        linear-gradient(180deg, #1b2b8a 0%, #121c68 48%, #0b1346 100%);
+}
+:root[data-theme-preset="malam"] body { background: #0b1346; }
+:root[data-theme-preset="malam"] .card, :root[data-theme-preset="malam"] .mx-card { background: linear-gradient(160deg, rgba(255,255,255,.11), rgba(255,255,255,.04)), rgba(18,27,92,.58); backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); border: 1px solid rgba(190,205,255,.2); }
+:root[data-theme-preset="malam"] .btn-primary { box-shadow: 0 8px 22px -8px hsla(var(--hue-primary), 90%, 55%, .65); }
+:root[data-theme-preset="malam"] .text-primary { color: #b9c6ff; }
+:root[data-theme-preset="malam"] .sub-tab-pill.active { background: var(--primary-gradient); color: #fff; }
+:root[data-theme-preset="malam"] .app-header { border-bottom-color: rgba(190,205,255,.2); }

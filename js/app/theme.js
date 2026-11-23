@@ -1,10 +1,11 @@
 import { App } from './core.js';
 
 // Tema BYgf: tiap tema punya warna, font, bentuk, DAN tata letak navigasi sendiri (lihat css/bygf-*.css).
+// 'bybi' = navigasi lewat maskot robot (tahan untuk menu, js/bybi-nav.js); 'malam' = sidebar kaca dengan submenu akordeon (js/glass-nav.js).
 App.Theme = {
-    presets: ['editorial', 'neon', 'minimal', 'playful', 'laut', 'senja'],
-    presetDefaultHue: { editorial: 14, neon: 265, minimal: 240, playful: 335, laut: 190, senja: 24 },
-    metaColor: { editorial: '#2a2018', neon: '#06060d', minimal: '#ffffff', playful: '#ffc93c', laut: '#ffffff', senja: '#120b19' },
+    presets: ['editorial', 'neon', 'minimal', 'playful', 'laut', 'senja', 'bybi', 'malam'],
+    presetDefaultHue: { editorial: 14, neon: 265, minimal: 240, playful: 335, laut: 190, senja: 24, bybi: 158, malam: 228 },
+    metaColor: { editorial: '#2a2018', neon: '#06060d', minimal: '#ffffff', playful: '#ffc93c', laut: '#ffffff', senja: '#120b19', bybi: '#eaf4ee', malam: '#0e1655' },
     // Pilihan tema lama (tersimpan di akun) dipetakan ke tema baru terdekat
     legacyMap: { klasik: 'minimal', mono: 'minimal', biru: 'minimal', kuning: 'editorial', sunset: 'editorial', forest: 'editorial', midnight: 'neon', aurora: 'neon' },
     resolve(name) {
@@ -28,7 +29,7 @@ App.Theme = {
     },
     changePreset(name, save = true) {
         name = this.resolve(name);
-        const isDark = name === 'neon' || name === 'senja';
+        const isDark = name === 'neon' || name === 'senja' || name === 'malam';
         document.documentElement.setAttribute('data-theme-preset', name);
         document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); try { localStorage.setItem('bygf.splashTheme', isDark ? 'dark' : 'light'); } catch (e) { /* abaikan */ }
         document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
