@@ -555,6 +555,11 @@ App.Handlers = {
     },
     processRecurring() { /* dipertahankan agar kompatibel; penjadwalan sekarang lewat checkStartupAlerts() + konfirmasi manual */ },
 
+    buildBackup() {   // isi berkas Backup JSON (sama dengan Export JSON); dipakai cadangan otomatis ke folder HP
+        let todosData = null; try { const raw = localStorage.getItem('tugasPro.v2'); if(raw) todosData = JSON.parse(raw); } catch(e){}
+        let kuliahData = null; try { const raw = localStorage.getItem('kuliahPro.v1'); if(raw) kuliahData = JSON.parse(raw); } catch(e){}
+        return JSON.stringify({ isPremium: App.State.isPremium, transactions: App.State.transactions, recurring: App.State.recurring, customCategories: App.State.customCategories, budgets: App.State.budgets, paylaters: App.State.paylaters, transfers: App.State.transfers, debts: App.State.debts, quickTemplates: App.State.quickTemplates, budgetAllocation: App.State.budgetAllocation, categoryBucketMap: App.State.categoryBucketMap, todos: todosData, kuliah: kuliahData, modules: window.AppModules ? AppModules.collect() : undefined, settings: App.State.settings }, null, 2);
+    },
     exportData(type) {
         if(type === 'json' && !App.State.isPremium) { App.UI.showModal('premiumModal'); return; }
         let text = '', filename = '';
@@ -705,7 +710,7 @@ App.Handlers = {
         }; reader.readAsText(file);
     },
     exportReportPDF() {
-        if(!window.jspdf || !window.jspdf.jsPDF) return App.UI.showToast('Library gagal dimuat.', 'error');
+        if(!window.jspdf || !window.jspdf.jsPDF || !window.jspdf.jsPDF.API.autoTable) { App.UI.showToast('Memuat pustaka PDF...', 'info'); return (window.LazyLibs ? LazyLibs.pdf() : Promise.reject()).then(() => this.exportReportPDF()).catch(() => App.UI.showToast('Library gagal dimuat.', 'error')); }
         App.UI.showToast('Menyiapkan Laporan PDF...', 'info');
         setTimeout(() => {
             const { start, end, label } = App.UI.getReportDateRange();
@@ -774,7 +779,8 @@ App.Handlers = {
     },
     exportPDF() {
         if(!App.State.isPremium) { App.UI.showModal('premiumModal'); return; }
-        if(!window.jspdf || !window.jspdf.jsPDF) return App.UI.showToast('Library gagal dimuat.', 'error'); App.UI.showToast('Menyiapkan Laporan PDF...', 'info');
+        if(!window.jspdf || !window.jspdf.jsPDF || !window.jspdf.jsPDF.API.autoTable) { App.UI.showToast('Memuat pustaka PDF...', 'info'); return (window.LazyLibs ? LazyLibs.pdf() : Promise.reject()).then(() => this.exportPDF()).catch(() => App.UI.showToast('Library gagal dimuat.', 'error')); }
+        App.UI.showToast('Menyiapkan Laporan PDF...', 'info');
         setTimeout(() => {
             const doc = new window.jspdf.jsPDF(); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.text("Laporan BYgf", 14, 20); doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100); doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28);
             const tableRows = []; let totIn=0, totOut=0; const sortedTx = [...App.State.transactions].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));

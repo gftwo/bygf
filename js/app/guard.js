@@ -5,7 +5,7 @@ import { App } from './core.js';
    - Snapshot otomatis mingguan ke penyimpanan perangkat ini (3 terakhir) — tidak menggantikan backup file.
    - Pengingat backup file bila sudah > 7 hari, dan pengingat jurnal (setelah jam 18) lewat popup dalam aplikasi.
    ========================================================================== */
-const SNAP_DAYS = 7, KEEP = 3, MAX_BYTES = 1500000, STALE_DAYS = 7;
+const SNAP_DAYS = 7, KEEP = 3, MAX_BYTES = 1500000, MAX_BYTES_IDB = 12000000, STALE_DAYS = 7;
 const K = { snaps: uid => 'bygf.snaps.' + uid, last: 'bygf.lastBackupAt', nudge: 'bygf.nudgeDay' };
 const day = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const daysSince = iso => iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : null;
@@ -13,7 +13,13 @@ const uid = () => App.State.user && App.State.user.uid;
 const read = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
 
 App.Guard = {
-    snapshots() { const u = uid(); return u ? (read(K.snaps(u)) || []) : []; },
+    snapshots() { const u = uid(); if (!u) return []; const big = App.LocalStore ? App.LocalStore.get('snaps:' + u) : null; return (big && big.length) ? big : (read(K.snaps(u)) || []); },
+    _storeSnaps(u, list) {   // localStorage bila muat, selain itu IndexedDB (penyimpanan lokal besar)
+        const json = JSON.stringify(list);
+        if (App.LocalStore) App.LocalStore.put('snaps:' + u, list);
+        if (json.length <= MAX_BYTES) { try { localStorage.setItem(K.snaps(u), json); return true; } catch (e) { /* penuh: cukup IndexedDB */ } } else { try { localStorage.removeItem(K.snaps(u)); } catch (e) { /* abaikan */ } }
+        return !!(App.LocalStore && App.LocalStore.available);
+    },
     lastBackupAt() { return localStorage.getItem(K.last) || ''; },
     markBackup() { try { localStorage.setItem(K.last, new Date().toISOString()); } catch (e) { /* abaikan */ } this.renderCard(); },
     hasData() { const s = App.State; return (s.transactions || []).length > 0 || (window.AppModules && AppModules.keys().some(k => k !== 'home' && JSON.stringify(AppModules.get(k)).length > 40)); },
@@ -21,12 +27,10 @@ App.Guard = {
         const u = uid(); if (!u) return false;
         const data = App.DB.getLocalMirror(u); if (!data) { if (manual) App.UI.showToast('Belum ada data untuk disimpan', 'error'); return false; }
         const json = JSON.stringify(data);
-        if (json.length > MAX_BYTES) { if (manual) App.UI.showToast('Data terlalu besar untuk snapshot lokal — gunakan Export JSON', 'error'); return false; }
+        if (json.length > (App.LocalStore && App.LocalStore.available ? MAX_BYTES_IDB : MAX_BYTES)) { if (manual) App.UI.showToast('Data terlalu besar untuk snapshot lokal — gunakan Export JSON', 'error'); return false; }
         const list = this.snapshots(); list.unshift({ at: new Date().toISOString(), size: json.length, tx: (data.transactions || []).length, json });
         while (list.length > KEEP) list.pop();
-        try { localStorage.setItem(K.snaps(u), JSON.stringify(list)); } catch (e) { // penyimpanan penuh: coba simpan 1 saja
-            try { localStorage.setItem(K.snaps(u), JSON.stringify(list.slice(0, 1))); } catch (e2) { if (manual) App.UI.showToast('Penyimpanan browser penuh', 'error'); return false; }
-        }
+        if (!this._storeSnaps(u, list) && !this._storeSnaps(u, list.slice(0, 1))) { if (manual) App.UI.showToast('Penyimpanan browser penuh', 'error'); return false; }
         if (manual) App.UI.showToast('Snapshot tersimpan'); this.renderCard(); return true;
     },
     autoSnapshot() { const l = this.snapshots(); if (this.hasData() && (!l.length || daysSince(l[0].at) >= SNAP_DAYS)) this.snapshotNow(false); },
@@ -36,7 +40,7 @@ App.Guard = {
         const file = new File([s.json], 'snapshot.json', { type: 'application/json' });
         App.Handlers.importFile({ target: { files: [file], value: '' } });
     },
-    removeSnap(i) { const u = uid(), l = this.snapshots(); l.splice(i, 1); try { localStorage.setItem(K.snaps(u), JSON.stringify(l)); } catch (e) { /* abaikan */ } this.renderCard(); },
+    removeSnap(i) { const u = uid(), l = this.snapshots(); l.splice(i, 1); this._storeSnaps(u, l); this.renderCard(); },
     renderCard() {
         const el = document.getElementById('guardCard'); if (!el) return;
         const last = this.lastBackupAt(), n = daysSince(last), snaps = this.snapshots();

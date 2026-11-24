@@ -77,7 +77,7 @@
     function lock(msg) {
         const was = !!session; session = null; clearTimeout(idleT); ui.reveal.clear(); ui.q = ''; ui.cat = '';
         document.querySelectorAll('.vt-modal-ov').forEach(x => x.remove()); // tutup form yang masih berisi sandi
-        render(); if (was && msg) Mx.toast(msg, 'info');
+        ui.bioTried = false; render(); if (was && msg) Mx.toast(msg, 'info');
     }
     function persist() { // enkripsi ulang seluruh isi lalu simpan (antrean agar urutan tulis aman)
         const s = session; if (!s) return Promise.resolve();
@@ -106,6 +106,54 @@
         touch();
     }
 
+    // ----- sidik jari (hanya di APK): kunci utama dibungkus kunci Android Keystore yang butuh sidik jari; sandi kunci utama tetap jalan sebagai cadangan -----
+    const NB = () => (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.BygfNative) || null;
+    const bioFlag = () => 'bygf.vaultBio.' + curUid();
+    const bioOn = () => { try { return !!NB() && localStorage.getItem(bioFlag()) === D().salt && !!D().salt; } catch (e) { return false; } };
+    const bioOff = async () => { try { localStorage.removeItem(bioFlag()); } catch (e) { /* abaikan */ } try { const n = NB(); if (n && n.disableBiometric) await n.disableBiometric(); } catch (e) { /* abaikan */ } };
+    async function bioAvailable() { try { const n = NB(); if (!n || !n.isBiometricAvailable) return false; return !!(await n.isBiometricAvailable()).available; } catch (e) { return false; } }
+    async function bioEnable(pass) {
+        try {
+            const n = NB(); const r = await n.enableBiometric({ secret: pass });
+            if (r && r.ok) { localStorage.setItem(bioFlag(), D().salt); Mx.toast('Sidik jari aktif untuk Brankas'); return true; }
+        } catch (e) { if (!/cancel|batal|user/i.test(String(e && (e.message || e)))) Mx.toast('Gagal mengaktifkan sidik jari', 'error'); }
+        return false;
+    }
+    async function bioUnlock() {
+        if (ui.busy || !bioOn()) return; ui.busy = true;
+        try {
+            const r = await NB().unlockBiometric(); if (!r || !r.secret) throw new Error('kosong');
+            try { await unlock(r.secret); ui.fails = 0; render(); }
+            catch (x) { if (x.message === 'salah') { await bioOff(); Mx.toast('Kunci utama sudah berubah — masukkan kunci utama lalu aktifkan sidik jari lagi', 'info'); render(); } else Mx.toast('Isi brankas tidak bisa dibaca (data rusak)', 'error'); }
+        } catch (e) { if (/gugur|belum diaktifkan|kunci tidak ada/i.test(String(e && (e.message || e)))) { await bioOff(); render(); Mx.toast('Sidik jari perlu diaktifkan lagi', 'info'); } /* selain itu: dibatalkan/sensor gagal → pakai kunci utama */ }
+        ui.busy = false; const i = root() && root().querySelector('#vtPass'); if (i && !session) i.focus();
+    }
+
+    // ----- ekspor / impor brankas terenkripsi (berkas hanya berisi ciphertext; dibuka dengan kunci utama yang sama) -----
+    const stamp = () => new Date().toISOString().slice(0, 10);
+    async function exportVault() {
+        const d = D(); if (!d.salt || !d.check) return Mx.toast('Brankas belum dibuat', 'error');
+        const text = JSON.stringify({ bygf: 'vault', v: 1, exportedAt: new Date().toISOString(), vault: { v: 1, salt: d.salt, check: d.check, data: d.data } }, null, 2), name = `BYgf-Brankas-${stamp()}.bygfvault`;
+        try {
+            if (App.Native && App.Native.saveFile) { const where = await App.Native.saveFile(name, text); Mx.toast('Brankas diekspor ke ' + where); return; }
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); Mx.toast('Brankas diekspor (terenkripsi)');
+        } catch (e) { console.error(e); Mx.toast('Gagal mengekspor brankas', 'error'); }
+    }
+    async function importVault(file) {
+        if (!file) return;
+        try {
+            if (file.size > 8000000) return Mx.toast('Berkas terlalu besar', 'error');
+            const j = JSON.parse(await file.text()), raw = j && j.bygf === 'vault' ? j.vault : null, errs = validate(raw);
+            if (!raw || errs.length || !raw.salt || !pair(raw.check)) return Mx.toast('Berkas bukan ekspor Brankas yang valid', 'error');
+            const cur = D();
+            if (cur.salt && !(await Mx.confirm('Brankas yang ada di sini akan DIGANTI dengan isi berkas ini. Salinan lama disimpan di perangkat. Lanjutkan?'))) return;
+            if (cur.salt && window.App && App.LocalStore) App.LocalStore.put('vaultprev:' + curUid(), { at: new Date().toISOString(), vault: JSON.parse(JSON.stringify(cur)) });
+            const n = normalize(raw); session = null; clearTimeout(idleT); await bioOff();
+            cur.salt = n.salt; cur.check = n.check; cur.data = n.data; AppModules.changed(KEY); render(); Mx.toast('Brankas diimpor — buka dengan kunci utama dari brankas itu');
+        } catch (e) { console.error(e); Mx.toast('Gagal membaca berkas brankas', 'error'); }
+    }
+    const toolRow = () => `<div class="mx-row vt-io"><button type="button" class="mx-btn" data-act="export">⬇️ Ekspor</button><label class="mx-btn" for="vtImp" style="cursor:pointer">⬆️ Impor<input type="file" id="vtImp" accept=".bygfvault,.json,application/json" hidden></label></div>`;
+
     // ----- tampilan -----
     const cardWrap = (inner) => `<section class="mx-card vt-card">${inner}</section>`;
     function viewUnsupported() { return cardWrap(Mx.empty('⚠️', 'Brankas tidak tersedia', 'Peramban ini tidak mendukung enkripsi (butuh alamat https). Buka lewat GitHub Pages / aplikasi Android.')); }
@@ -116,12 +164,14 @@
         <div class="vt-meter" aria-hidden="true"><i id="vtBar"></i></div><small class="mx-muted" id="vtBarTxt"></small>
         <div class="mx-field"><label for="vtP2">Ulangi kunci utama</label><input id="vtP2" type="password" class="mx-input" autocomplete="new-password" required></div>
         <label class="vt-agree"><input type="checkbox" id="vtAgree"> <span>Saya mengerti: jika lupa kunci utama, isi brankas hilang permanen.</span></label>
-        <p class="vt-err" id="vtErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Buat Brankas</button></form>`);
+        <p class="vt-err" id="vtErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Buat Brankas</button></form>
+        <p class="mx-muted" style="margin-top:1rem">Sudah punya brankas dari perangkat lain?</p>${toolRow()}`);
     }
     function viewLocked() {
         return cardWrap(`<div class="vt-hero">🔒</div><h2 class="mx-h2">Brankas terkunci</h2><p class="mx-muted">Masukkan kunci utama untuk membuka sandi-sandimu.</p>
         <form id="vtUnlock" autocomplete="off"><div class="mx-field"><label for="vtPass">Kunci utama</label><input id="vtPass" type="password" class="mx-input" autocomplete="current-password" required></div>
-        <p class="vt-err" id="vtErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary" id="vtGo">Buka</button></form>`);
+        <p class="vt-err" id="vtErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary" id="vtGo">Buka</button></form>
+        ${bioOn() ? '<button type="button" class="mx-btn" data-act="bio-unlock" style="margin-top:.6rem">👆 Buka dengan sidik jari</button>' : ''}${toolRow()}`);
     }
     function listHTML() {
         const q = ui.q.trim().toLocaleLowerCase('id-ID');
@@ -167,6 +217,7 @@
     function viewOpen() {
         return `<div class="mx-head"><div><h2 class="mx-h2">🔐 Brankas Sandi</h2><p class="mx-muted">${session.items.length} sandi · terenkripsi AES-256 · kunci otomatis bila tidak dipakai 2 menit</p></div>
         <div class="mx-row"><button type="button" class="mx-btn mx-btn-primary" data-act="add">+ Tambah</button><button type="button" class="mx-btn" data-act="lock">🔒 Kunci</button></div></div>
+        ${NB() ? `<div class="mx-row vt-io"><button type="button" class="mx-btn" data-act="${bioOn() ? 'bio-off' : 'bio-on'}">${bioOn() ? '👆 Matikan sidik jari' : '👆 Aktifkan sidik jari'}</button></div>` : ''}${toolRow()}
         <div class="mx-tools"><input type="search" id="vtQ" class="mx-input" placeholder="Cari judul, pengguna, catatan…" value="${esc(ui.q)}" aria-label="Cari sandi"></div>
         <div class="mx-tools vt-chips"><button type="button" class="mx-chip${ui.cat ? '' : ' on'}" data-act="cat" data-c="">Semua</button>${allCats().map(([k, v]) => `<button type="button" class="mx-chip vt-chip${ui.cat === k ? ' on' : ''}" data-act="cat" data-c="${k}">${logo(k, 'vt-chip-ico')}${esc(v)}</button>`).join('')}<button type="button" class="mx-chip" data-act="addcat" aria-label="Tambah kategori">+ Kategori</button></div>
         <div class="mx-card vt-list" id="vtList">${listHTML()}</div>
@@ -235,10 +286,31 @@
         'copy-user': el => { const i = find(el); if (i) copySecret(i.username, 'Nama pengguna'); },
         cat: el => { ui.cat = el.dataset.c || ''; render(); },
         lock: () => lock('Brankas dikunci'),
+        export: () => exportVault(),
+        'bio-unlock': () => bioUnlock(),
+        'bio-off': async () => { await bioOff(); Mx.toast('Sidik jari dimatikan'); render(); },
+        'bio-on': () => bioPrompt(),
         chpass: () => changeMaster(),
         reset: () => resetVault()
     };
 
+    function bioPrompt() {
+        Mx.modal({
+            title: 'Aktifkan sidik jari', size: 400, body: `<form id="vtBio" autocomplete="off"><p class="mx-muted">Masukkan kunci utama sekali untuk dikaitkan dengan sidik jari. Kunci utama tetap bisa dipakai kapan saja.</p><div class="mx-field"><label for="vtBP">Kunci utama</label><input id="vtBP" type="password" class="mx-input" required autocomplete="current-password"></div>
+            <p class="vt-err" id="vtBErr" role="alert" hidden></p><button type="submit" class="mx-btn mx-btn-primary">Lanjut</button></form>`,
+            onMount(m) {
+                m.el.classList.add('vt-modal-ov'); const $ = id => m.el.querySelector('#' + id);
+                $('vtBio').addEventListener('submit', async e => {
+                    e.preventDefault(); const pass = $('vtBP').value, err = t => { $('vtBErr').textContent = t; $('vtBErr').hidden = false; };
+                    try { const k = await derive(pass, unb64(D().salt)); let ok = false; try { ok = (await open(k, D().check)) === CHECK; } catch (x) { ok = false; } if (!ok) return err('Kunci utama salah'); }
+                    catch (x) { return err('Gagal memeriksa kunci utama'); }
+                    if (!(await bioAvailable())) return err('Sidik jari belum diatur di HP ini (Pengaturan › Keamanan)');
+                    m.close(); if (await bioEnable(pass)) render();
+                });
+                setTimeout(() => $('vtBP').focus(), 30);
+            }
+        });
+    }
     function changeMaster() {
         Mx.modal({
             title: 'Ubah kunci utama', size: 420, body: `<form id="vtCh" autocomplete="off"><div class="mx-field"><label for="vtO">Kunci utama saat ini</label><input id="vtO" type="password" class="mx-input" required autocomplete="current-password"></div>
@@ -254,7 +326,7 @@
                         const old = await derive($('vtO').value, unb64(D().salt)); let ok = false; try { ok = (await open(old, D().check)) === CHECK; } catch (x) { ok = false; }
                         if (!ok) return err('Kunci utama saat ini salah');
                         const salt = crypto.getRandomValues(new Uint8Array(16)), key = await derive($('vtN1').value, salt);
-                        D().salt = b64(salt); D().check = await seal(key, CHECK); session.key = key; session.salt = D().salt; await persist(); m.close(); Mx.toast('Kunci utama diganti');
+                        D().salt = b64(salt); D().check = await seal(key, CHECK); session.key = key; session.salt = D().salt; await persist(); await bioOff(); m.close(); Mx.toast('Kunci utama diganti' + (NB() ? ' — aktifkan sidik jari lagi' : '')); render();
                     } catch (x) { err('Gagal mengganti kunci'); }
                 });
             }
@@ -268,7 +340,7 @@
                 m.el.classList.add('vt-modal-ov');
                 m.el.querySelector('#vtRstGo').addEventListener('click', () => {
                     if (m.el.querySelector('#vtRst').value.trim() !== 'HAPUS') return Mx.toast('Ketik HAPUS dengan huruf besar', 'error');
-                    session = null; clearTimeout(idleT); AppModules.get(KEY).salt = ''; D().check = null; D().data = null; AppModules.changed(KEY); m.close(); render(); Mx.toast('Brankas direset');
+                    session = null; clearTimeout(idleT); bioOff(); AppModules.get(KEY).salt = ''; D().check = null; D().data = null; AppModules.changed(KEY); m.close(); render(); Mx.toast('Brankas direset');
                 });
             }
         });
@@ -286,7 +358,7 @@
             e.preventDefault(); const inp = root().querySelector('#vtPass'), err = root().querySelector('#vtErr'), bad = t => { err.textContent = t; err.hidden = false; inp.value = ''; inp.focus(); };
             if (Date.now() < ui.lockUntil) return bad(`Terlalu banyak percobaan, tunggu ${Math.ceil((ui.lockUntil - Date.now()) / 1000)} detik`);
             const btn = root().querySelector('#vtGo'); btn.disabled = true; btn.textContent = 'Membuka…';
-            try { await unlock(inp.value); ui.fails = 0; render(); }
+            try { const pw = inp.value; await unlock(pw); ui.fails = 0; render(); if (NB() && !bioOn() && !ui.bioAsked) { ui.bioAsked = true; if (await bioAvailable() && await Mx.confirm('Buka Brankas dengan sidik jari lain kali?')) { if (await bioEnable(pw)) render(); } } }
             catch (x) {
                 btn.disabled = false; btn.textContent = 'Buka';
                 if (x.message === 'salah') { ui.fails++; if (ui.fails >= 5) { ui.lockUntil = Date.now() + 10000; ui.fails = 0; bad('Kunci utama salah. Terlalu banyak percobaan — tunggu 10 detik.'); } else bad('Kunci utama salah'); }
@@ -301,10 +373,11 @@
             const r = root(); if (!r) return;
             Mx.delegate(r, acts, { input: e => { touch(); if (e.target.id === 'vtQ') { ui.q = e.target.value; render(); } if (e.target.id === 'vtP1') { const s = strength(e.target.value); const bar = r.querySelector('#vtBar'); bar.style.width = (e.target.value ? s[2] : 0) + '%'; bar.style.background = s[1]; r.querySelector('#vtBarTxt').textContent = e.target.value ? s[0] : ''; } }, keydown: touch });
             r.addEventListener('submit', onSubmit); r.addEventListener('click', touch);
+            r.addEventListener('change', e => { if (e.target.id === 'vtImp') { const f = e.target.files && e.target.files[0]; e.target.value = ''; importVault(f); } });
             document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && t.classList.contains('vt-logo')) { const sp = document.createElement('span'); sp.className = 'vt-logo-emoji ' + t.className.replace('vt-logo', '').trim(); sp.textContent = t.dataset.fb || '🔖'; sp.setAttribute('aria-hidden', 'true'); t.replaceWith(sp); } }, true); // offline / diblokir → emoji
             document.addEventListener('visibilitychange', () => { if (document.hidden) hiddenAt = Date.now(); else if (session && hiddenAt && Date.now() - hiddenAt > AWAY_MS) lock('Brankas dikunci karena aplikasi lama ditinggalkan'); });
         },
-        show() { render(); },
+        show() { render(); if (!session && bioOn() && !ui.bioTried && hasCrypto()) { ui.bioTried = true; setTimeout(() => { if (!session && root() && root().classList.contains('active')) bioUnlock(); }, 350); } },
         refresh() { // data berubah dari akun/perangkat lain, atau ganti akun
             if (session && (session.uid !== curUid() || D().salt !== session.salt)) { lock(session.uid !== curUid() ? '' : 'Kunci utama diganti di perangkat lain — brankas dikunci'); return; }
             if (session && D().data && D().data.ct !== session.lastCt) { // isi diubah di perangkat lain: baca ulang

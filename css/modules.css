@@ -441,3 +441,6 @@ button.sh-d { cursor: pointer; } .sh-d.l1 { background: #cfe4d8; color: #245f45;
 .lm-seed { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
 @media (prefers-reduced-motion: reduce) { .pd-half, .pd-nm { transition: none; } }
 .lm-ph img[src^="icons/lemari/"], .lm-th img[src^="icons/lemari/"], .lm-big img[src^="icons/lemari/"], .lm-pv img[src^="icons/lemari/"] { object-fit: contain; background: #fff; padding: 3px; }
+
+/* Brankas: ekspor/impor & sidik jari */
+.vt-io { margin-top: .6rem; gap: .5rem; flex-wrap: wrap; }

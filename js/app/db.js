@@ -19,7 +19,10 @@ App.DB = {
         if(data.settings) App.State.settings = {...App.State.settings, ...data.settings};
     },
     getLocalMirror(uid) {
-        try { const raw = localStorage.getItem('cloud_cache_' + uid); return raw ? JSON.parse(raw) : null; } catch(e) { return null; }
+        let ls = null; try { const raw = localStorage.getItem('cloud_cache_' + uid); ls = raw ? JSON.parse(raw) : null; } catch(e) { ls = null; }
+        const idb = App.LocalStore ? App.LocalStore.get('mirror:' + uid) : null;   // penyimpanan lokal besar (bila localStorage penuh/tertinggal)
+        if (ls && idb) return (new Date(idb.updatedAt || 0) > new Date(ls.updatedAt || 0)) ? idb : ls;
+        return ls || idb || null;
     },
     saveLocalMirror(uid, dataToSave) {
         try {
@@ -37,7 +40,14 @@ App.DB = {
                 } catch(e){}
             }
             localStorage.setItem(cacheKey, JSON.stringify(dataToSave));
-        } catch(e) { console.warn('Gagal simpan cadangan lokal:', e); }
+        } catch(e) { console.warn('Gagal simpan cadangan lokal (localStorage penuh?), memakai penyimpanan besar:', e); }
+        if (App.LocalStore) App.LocalStore.put('mirror:' + uid, dataToSave);   // salinan kedua di IndexedDB
+    },
+    _scheduleRetry() {   // kirim ulang otomatis: 5 dtk, 15 dtk, 45 dtk, 2 mnt, 5 mnt (lalu berhenti; tersimpan lokal & dikirim saat online/dibuka lagi)
+        const waits = [5000, 15000, 45000, 120000, 300000]; this._retryN = this._retryN || 0;
+        if (this._retryN >= waits.length) { App.UI.updateSyncStatus('error'); return; }
+        clearTimeout(this._retryT);
+        this._retryT = setTimeout(() => { this._retryN++; if (this.hasPending() && App.State.user && navigator.onLine !== false) this.save(); }, waits[this._retryN]);
     },
     pendingKey(uid) { return 'bygf.pendingSync.' + uid; },
     hasPending(uid) { try { return !!localStorage.getItem(this.pendingKey(uid || (App.State.user && App.State.user.uid))); } catch(e) { return false; } },
@@ -58,7 +68,7 @@ App.DB = {
             // nambah/ubah apa pun di tab Kuliah (absen, tugas, dst) karena tiap App.DB.save() bikin
             // listener realtime ini kepanggil lagi.
             if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup(App.State.isAdmin ? 'vault' : 'home'); }
-            App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
+            App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); if(App.Native) App.Native.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
     },
     listen(uid) {
         App.UI.updateSyncStatus('connecting'); if (this.listener) this.listener();
@@ -69,7 +79,7 @@ App.DB = {
             } else { this.save(); }
             App.State.isLoading = false; if (window.BGSplash) setTimeout(() => BGSplash.hide(), 150); App.Premium.applyState(); App.Theme.init(); App.UI.renderCategoriesSelect();
             if(!App.State._navInitDone){ App.State._navInitDone = true; App.UI.switchMainGroup(App.State.isAdmin ? 'vault' : 'home'); }
-            App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
+            App.UI.renderAll(); if(App.Guard && !App.State._guardDone){ App.State._guardDone = true; App.Guard.onLoaded(); if(App.Notify) App.Notify.onLoaded(); if(App.Native) App.Native.onLoaded(); } setTimeout(() => { if(window.AppNotifyQueue) window.AppNotifyQueue.register('finance-alert', () => App.Handlers.checkStartupAlerts()); else App.Handlers.checkStartupAlerts(); }, 700);
             return;
         }
 
@@ -87,7 +97,13 @@ App.DB = {
             App.UI.updateSyncStatus('active');
             const localCache = this.getLocalMirror(uid);
             if (snapshot.exists()) {
-                const data = snapshot.val();
+                let data = snapshot.val();
+                const broken = App.Health ? App.Health.problems(data) : [];
+                if (broken.length) {   // 🩹 data cloud rusak: pakai salinan sehat (cadangan lokal → riwayat → snapshot); data rusak diamankan dulu
+                    const rec = App.Health.recover(uid, data);
+                    if (rec) { App.UI.showToast('Data cloud rusak (' + broken[0] + ') — dipulihkan dari ' + rec.from, 'success'); this.applyData(rec.data); this.save(); this._finishLoad(); return; }
+                    App.UI.showToast('Data cloud tampak rusak (' + broken[0] + ') dan tidak ada salinan sehat di perangkat ini', 'error');
+                }
                 // 🛡️ Kalau cadangan lokal di HP ini ternyata lebih baru & lebih lengkap dari yang di cloud
                 // (misalnya sempat offline, atau data cloud sempat kereset), pakai yang lokal & dorong ulang ke cloud.
                 const pending = this.hasPending(uid), lt = localCache && localCache.updatedAt ? new Date(localCache.updatedAt) : null, ct = data.updatedAt ? new Date(data.updatedAt) : null;
@@ -141,8 +157,9 @@ App.DB = {
                set(ref(this.dbInstance, `users/${uid}/appData`), dataToSave).then(() => { // server mengakui: hapus penanda hanya bila tidak ada simpanan yang lebih baru
                    try { if (localStorage.getItem(pk) === stamp) localStorage.removeItem(pk); } catch(e) { /* abaikan */ }
                    this._pendingSync = false; if (App.State.online !== false) App.UI.updateSyncStatus('active');
-               }).catch(e => { console.warn('Gagal sync ke akun (akan dicoba lagi):', e); this._pendingSync = true; });
-           } catch(e){ console.warn('Gagal sync ke akun (diabaikan):', e); this._pendingSync = true; }
+                   this._retryN = 0; clearTimeout(this._retryT);
+               }).catch(e => { console.warn('Gagal sync ke akun (akan dicoba lagi):', e); this._pendingSync = true; this._scheduleRetry(); });
+           } catch(e){ console.warn('Gagal sync ke akun (diabaikan):', e); this._pendingSync = true; this._scheduleRetry(); }
        }
   }
 };

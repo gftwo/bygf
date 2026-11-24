@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_tasks_desc">Tugas yang jatuh tempo atau belum selesai</string>
+    <string name="widget_balance_desc">Saldo total dengan tombol sembunyikan</string>
+    <string name="widget_class_desc">Jadwal kuliah hari ini; lanjut ke besok bila sudah selesai</string>
+    <string name="widget_wear_desc">Pakaian hari ini dan yang waktunya dicuci</string>
+    <string name="widget_note_desc">Ketuk untuk menulis catatan cepat</string>
+</resources>

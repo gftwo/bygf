@@ -50,9 +50,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap&family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800;900" rel="stylesheet">
     
     <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/lazy-libs.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" integrity="sha384-wHFvAtjmgnkA2PJcMsDaCgdipf7X7YV44X/igbLHpvGiq6T5/PvFKl93grpvtbQT" crossorigin="anonymous"></script>
     <script src="js/notify-queue.js"></script>
     
@@ -64,11 +62,11 @@
     <link rel="stylesheet" href="css/home-popups.css">
     <link rel="stylesheet" href="css/kuliah.css">
     <link rel="stylesheet" href="css/reminder.css">
-    <link rel="stylesheet" href="css/modules.css?v=11.0.0">
+    <link rel="stylesheet" href="css/modules.css?v=11.1.0">
     <link rel="stylesheet" href="css/bygf-themes.css">
     <link rel="stylesheet" href="css/bygf-shell.css">
     <link rel="stylesheet" href="css/bygf-modules.css">
-    <link rel="stylesheet" href="css/bygf-nav-themes.css?v=11.0.0">
+    <link rel="stylesheet" href="css/bygf-nav-themes.css?v=11.1.0">
 
 </head>
 <body>
@@ -679,6 +677,8 @@
 
                 <div class="form-group" id="notifyCard"></div>
 
+                <div class="form-group" id="updateCard"></div>
+
                 <div class="form-group">
                     <details class="st-fold st-btn st-box" id="dataFold">
                         <summary><span class="font-bold">🛡️ Pengaman &amp; Cadangan Data</span><small class="text-muted">snapshot, sampah, import, export</small></summary>
@@ -688,6 +688,8 @@
                             <button class="btn btn-outline" onclick="App.Backup.openHistory()">🕒 Riwayat Cadangan</button>
                         </div>
                         <div id="guardCard"></div>
+                        <div id="healthCard" style="margin-bottom:1rem;"></div>
+                        <div id="autoBackupCard" style="margin-bottom:1rem;"></div>
                         <h4 class="st-sub">📦 Import &amp; Export</h4>
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                         <div class="grid-2">
@@ -705,7 +707,7 @@
 
                 <div style="text-align: center; margin-top: 2rem;">
                     <button type="button" class="text-xs font-bold" style="background:none; border:none; color:var(--primary); cursor:pointer; padding:0.5rem;" onclick="App.UI.openChangelog()">📜 Lihat Riwayat Update</button>
-                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v11.0.0</p>
+                    <p class="text-xs font-bold" id="appVersionFooter" style="opacity:0.5; margin-top:0.35rem;">BYgf v11.1.0</p>
                 </div>
             </div>
         </main>

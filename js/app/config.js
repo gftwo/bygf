@@ -24,6 +24,16 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v11.1.0', date: 'November 2026', items: [
+            'Brankas: buka dengan sidik jari (APK) — kunci utama tetap jadi cadangan; ekspor/impor Brankas terenkripsi ke berkas terpisah',
+            'Widget homescreen (APK): Tugas, Saldo (bisa disembunyikan), Jadwal Kuliah (lanjut ke besok bila hari ini selesai), Pakaian, dan Catatan cepat',
+            'Badge angka di ikon aplikasi (tugas jatuh tempo + pakaian waktunya dicuci) dan tombol izin latar belakang agar pengingat tidak dimatikan sistem',
+            'Cadangan otomatis ke folder HP (Documents/BYgf, 7 berkas terakhir) dan cek pembaruan APK dari GitHub Releases',
+            'Kesehatan Data di Setelan: transaksi ganda, id kembar, saldo minus, data yatim, ukuran data; perbaikan aman (snapshot dulu, ganda masuk Sampah)',
+            'Pemulihan otomatis bila data cloud rusak (dari cadangan lokal, riwayat, atau snapshot) dan kirim ulang otomatis bila sinkron gagal',
+            'Penyimpanan lokal besar (IndexedDB) untuk cadangan data dan snapshot; Chart.js dan jsPDF dimuat hanya saat dipakai sehingga aplikasi lebih cepat dibuka',
+            'Aturan Firebase siap pakai di folder firebase/ (tiap akun hanya ke data miliknya); perlu ditempel manual di Firebase Console'
+        ] },
         { version: 'v11.0.0', date: 'November 2026', items: [
             'Tema baru: Bybi — terang mint; menu bawah dan sidebar diganti maskot robot Bybi di pojok kanan bawah. Ketuk = bicara + animasi, tahan = menu navigasi melingkar',
             'Maskot bereaksi otomatis saat ada lencana baru di menu (Tugas, Kuliah, Makan, Lemari) dan tidur bila lama tidak disentuh',

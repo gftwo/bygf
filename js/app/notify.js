@@ -188,6 +188,7 @@ App.Notify = {
             await this._apply(); App.UI.showToast('Pengingat HP aktif', 'success');
         } catch (e) { App.UI.showToast('Gagal mengaktifkan pengingat', 'error'); console.warn(e); }
     },
+    async openBattery() { const N = window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.BygfNative; if (!N || !N.openBatterySettings) return App.UI.showToast('Hanya di aplikasi Android', 'info'); try { await N.openBatterySettings(); App.UI.showToast('Pilih BYgf lalu "Tidak dibatasi" / "Izinkan" agar pengingat tidak dimatikan sistem', 'info'); } catch (e) { App.UI.showToast('Tidak bisa membuka pengaturan baterai', 'error'); } },
     async openExactSettings() { const LN = plugin(); if (!LN || !LN.changeExactNotificationSetting) return; try { await LN.changeExactNotificationSetting(); } catch (e) { /* abaikan */ } },
     async test() {
         const LN = plugin(); if (!LN) return;
@@ -209,7 +210,7 @@ App.Notify = {
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const open = el.querySelector('details.nt-fold') ? el.querySelector('details.nt-fold').open : false; // ingat status buka/tutup saat render ulang
         el.innerHTML = `<details class="nt-fold st-fold st-btn st-box"${open ? ' open' : ''}><summary><span class="font-bold">🔔 Pengingat di HP</span>${native ? `<small class="nt-state ${perm === 'granted' ? 'on' : 'off'}">${perm === 'granted' ? 'Aktif' : 'Belum aktif'}</small>` : ''}</summary>
-        ${native ? `<div class="nt-actions"><button type="button" class="btn btn-primary" data-nt-act="enable">${perm === 'granted' ? 'Perbarui jadwal' : 'Aktifkan pengingat'}</button><button type="button" class="btn btn-outline" data-nt-act="test">Tes notifikasi</button><button type="button" class="btn btn-outline" data-nt-act="exact">Izin alarm tepat waktu</button></div>` : ''}
+        ${native ? `<div class="nt-actions"><button type="button" class="btn btn-primary" data-nt-act="enable">${perm === 'granted' ? 'Perbarui jadwal' : 'Aktifkan pengingat'}</button><button type="button" class="btn btn-outline" data-nt-act="test">Tes notifikasi</button><button type="button" class="btn btn-outline" data-nt-act="exact">Izin alarm tepat waktu</button><button type="button" class="btn btn-outline" data-nt-act="battery">🔋 Izinkan di latar belakang</button></div>` : ''}
         <div class="nt-list">
         ${sw('finance', '💸 Isi keuangan tiap hari', tm('finance', 'time'))}
         ${sw('bills', '📅 Tagihan & cicilan (H-3, H-1, hari-H)', tm('bills', 'time'))}
@@ -226,7 +227,7 @@ App.Notify = {
     _bindCard() {
         const el = document.getElementById('notifyCard'); if (!el || el._bound) return; el._bound = true;
         el.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.nt; if (!k) return; const [g, f] = k.split('.'); let v = e.target.type === 'checkbox' ? e.target.checked : e.target.type === 'number' || e.target.tagName === 'SELECT' ? parseInt(e.target.value) : e.target.value; if (e.target.type === 'time' && !hhmm(v)) return; this.setPref(g, f, v); });
-        el.addEventListener('click', e => { const b = e.target.closest('[data-nt-act]'); if (!b) return; const a = b.dataset.ntAct; if (a === 'enable') this.enable(); else if (a === 'test') this.test(); else if (a === 'exact') this.openExactSettings(); });
+        el.addEventListener('click', e => { const b = e.target.closest('[data-nt-act]'); if (!b) return; const a = b.dataset.ntAct; if (a === 'enable') this.enable(); else if (a === 'test') this.test(); else if (a === 'battery') this.openBattery(); else if (a === 'exact') this.openExactSettings(); });
     },
     onLoaded() { // dipanggil setelah data akun termuat
         this._bindCard(); this._bindTap(); this.renderCard();

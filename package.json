@@ -1,6 +1,6 @@
 {
   "name": "bygf-android",
-  "version": "9.9.0",
+  "version": "11.1.0",
   "private": true,
   "description": "Pembungkus Android (Capacitor) untuk BYgf. Situs web tetap dilayani apa adanya dari root repo (GitHub Pages).",
   "scripts": {
@@ -9,8 +9,11 @@
   },
   "dependencies": {
     "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
     "@capacitor/core": "^6.2.0",
-    "@capacitor/local-notifications": "^6.1.0"
+    "@capacitor/filesystem": "^6.0.3",
+    "@capacitor/local-notifications": "^6.1.0",
+    "@capawesome/capacitor-badge": "^6.0.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",

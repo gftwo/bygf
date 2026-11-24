@@ -14,12 +14,16 @@ import './ui.js';
 import './handlers.js';
 import './insights.js';
 import './pwa.js';
+import './localstore.js';
 import './guard.js';
+import './health.js';
 import './notify.js';
+import './native.js';
 
 // Titik masuk aplikasi: App sudah terisi semua modul di atas.
 
 App.Init = function () {
+        if (this.LocalStore) this.LocalStore.init();   // muat penyimpanan lokal besar ke memori (tidak menghalangi)
         this.UI.init();
         if (typeof __firebase_config !== 'undefined') { const canvasConfig = JSON.parse(__firebase_config); this.Config.Firebase.apiKey = canvasConfig.apiKey; this.Config.Firebase.authDomain = canvasConfig.authDomain; this.Config.Firebase.projectId = canvasConfig.projectId; this.Config.Firebase.storageBucket = canvasConfig.storageBucket; this.Config.Firebase.messagingSenderId = canvasConfig.messagingSenderId; this.Config.Firebase.appId = canvasConfig.appId; }
         const fApp = initializeApp(this.Config.Firebase); this.Auth.init(fApp); this.DB.dbInstance = getDatabase(fApp);

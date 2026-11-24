@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v11.0.0**
+**Versi saat ini: v11.1.0**
 
 ---
 
@@ -14,7 +14,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v11.0.0](#v1100) · [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v11.1.0](#v1110) · [v11.0.0](#v1100) · [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -63,6 +63,18 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v11.1.0
+*November 2026 — keamanan, data, dan fitur Android*
+- **Brankas:** buka dengan sidik jari (APK; kunci utama dibungkus kunci Android Keystore yang wajib sidik jari, kunci utama tetap jadi cadangan), ekspor/impor Brankas terenkripsi (`.bygfvault`, hanya ciphertext, dibuka dengan kunci utama yang sama; impor menyimpan salinan brankas lama).
+- **Widget homescreen (APK):** Tugas, Saldo (tombol sembunyikan), Jadwal Kuliah (hanya yang belum selesai; bila hari ini selesai lanjut ke hari berikutnya), Pakaian (hari ini + yang waktunya dicuci), Catatan cepat. Ketuk widget membuka tab terkait (`bygf://…`). Diperbarui tiap data tersimpan/aplikasi dibuka dan tiap 30 menit oleh sistem.
+- **Badge ikon** (tugas jatuh tempo + pakaian waktunya dicuci; bergantung launcher HP), **pengingat bertahan** (jadwal dipasang ulang tiap aplikasi dibuka, plugin notifikasi memulihkan jadwal setelah HP restart, tombol izin latar belakang), **cek pembaruan APK** (GitHub Releases), **cadangan otomatis ke folder HP** (`Documents/BYgf`, 7 berkas).
+- **Kesehatan Data** (Setelan › Pengaman & Cadangan Data): transaksi ganda/id kembar/angka tidak wajar/saldo minus/data yatim/ukuran data. Perbaikan selalu didahului snapshot; transaksi ganda dipindah ke Sampah.
+- **Pemulihan otomatis:** data cloud yang strukturnya rusak diganti salinan sehat (cadangan lokal → riwayat → snapshot) dan yang rusak diamankan di IndexedDB; sinkron gagal dikirim ulang (5 dtk → 5 mnt).
+- **Penyimpanan lokal besar (IndexedDB)** melengkapi localStorage untuk cermin data dan snapshot (batas snapshot naik dari 1,5 MB ke 12 MB). Pemecahan data di Firebase belum dilakukan (lihat catatan rilis); ukuran data dipantau di Kesehatan Data.
+- **Lazy load:** Chart.js dan jsPDF/autoTable dimuat saat dibutuhkan (`js/lazy-libs.js`).
+- **Firebase Rules:** `firebase/database.rules.json` + `firebase/ATURAN.md` (belum diterapkan; tempel manual).
+- Build APK: `native/android/apply.py` memasang widget, plugin `BygfNative`, dan dependensi `androidx.biometric` di CI. Dependensi baru: `@capacitor/app`, `@capacitor/filesystem`, `@capawesome/capacitor-badge`.
 
 ### v11.0.0
 *November 2026 — dua tema baru dengan navigasi sendiri + Padu Padan di Lemari. Mulai rilis ini nomor depan naik 1 setiap ada tab/tema baru.*
