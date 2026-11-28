@@ -61,6 +61,7 @@ App.Guard = {
     showNudge() {
         if (App.State.isAdmin) return false; // akun admin: hanya Brankas
         if (localStorage.getItem(K.nudge) === day()) return false;
+        try { const np = JSON.parse(localStorage.getItem('bygf.notifyPrefs') || 'null'); if (np && np.popupBackup && np.popupBackup.mode === 'off') return false; } catch (e) { /* abaikan */ }   // dimatikan di Setelan → Notifikasi
         const items = this.nudgeItems(); if (!items.length) return false;
         let m = document.getElementById('guardNudge'); if (m) m.remove();
         m = document.createElement('div'); m.id = 'guardNudge'; m.className = 'modal-overlay show'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', 'Pengingat'); m.style.zIndex = 10500;

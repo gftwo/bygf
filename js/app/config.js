@@ -24,6 +24,12 @@ App.Config = {
     ],
     AccountIcons: { cash: '💵', saldo: '🪪' },
     Changelog: [
+        { version: 'v11.2.0', date: 'November 2026', items: [
+            'Notifikasi: tiap jenis punya 3 mode — Mati, Biasa (bisa digeser), Stay (tidak bisa digeser, hilang otomatis saat urusannya selesai: tugas dicentang, absen/outfit/transaksi dicatat, dst.)',
+            'Setelan Notifikasi dirapikan jadi kartu sendiri per kategori; semua notifikasi (termasuk popup di dalam aplikasi) bisa diatur dari sini',
+            'Pengingat baru di Lemari: isi outfit hari ini (default 18.00), hilang bila Pakaian Hari Ini sudah dicatat',
+            'Perbaikan APK: build CI kini benar-benar memasang widget homescreen, plugin native, dan sidik jari (langkah apply.py sebelumnya belum dipanggil)'
+        ] },
         { version: 'v11.1.0', date: 'November 2026', items: [
             'Brankas: buka dengan sidik jari (APK) — kunci utama tetap jadi cadangan; ekspor/impor Brankas terenkripsi ke berkas terpisah',
             'Widget homescreen (APK): Tugas, Saldo (bisa disembunyikan), Jadwal Kuliah (lanjut ke besok bila hari ini selesai), Pakaian, dan Catatan cepat',

@@ -4,7 +4,7 @@ Website pribadi untuk mencatat keuangan, kuliah, tugas, makanan, jurnal, dan kes
 Dihosting di **GitHub Pages** (juga bisa Netlify), data tersimpan di **Firebase Realtime Database** per akun,
 dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat GitHub Actions.
 
-**Versi saat ini: v11.1.0**
+**Versi saat ini: v11.2.0**
 
 ---
 
@@ -14,7 +14,7 @@ dan tersedia sebagai **aplikasi Android (APK)** yang dibangun otomatis lewat Git
 - [Aplikasi Android (APK)](#aplikasi-android-apk)
 - [Roadmap 5 Bulan ke Depan](#roadmap-5-bulan-ke-depan-desember-2026--april-2027)
 - [Riwayat Perubahan](#riwayat-perubahan)
-  - [v11.1.0](#v1110) · [v11.0.0](#v1100) · [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
+  - [v11.2.0](#v1120) · [v11.1.0](#v1110) · [v11.0.0](#v1100) · [v9.13.0](#v9130) · [v9.12.0](#v9120) · [v9.11.0](#v9110) · [v9.10.3](#v9103) · [v9.10.2](#v9102) · [v9.10.1](#v9101) · [v9.10](#v910) · [v9.9.1](#v991) · [v9.9](#v99) · [v9.8](#v98) · [v9.7](#v97) · [v9.6](#v96) · [v9.5](#v95) · [v9.4](#v94) · [v9.3](#v93) · [v9.2](#v92) · [v9.1](#v91) · [v9.0](#v90)
 - [Catatan Keamanan](#catatan-keamanan)
 - [Catatan Pengembangan](#catatan-pengembangan)
 
@@ -63,6 +63,14 @@ workflow agar APK memuat versi terbaru. Notifikasi sistem hanya berjalan di APK.
 ---
 
 ## Riwayat Perubahan
+
+### v11.2.0
+*November 2026 — notifikasi 3 mode + pengingat Lemari + perbaikan build widget*
+- **Mode notifikasi per jenis:** Mati · Biasa (bisa digeser) · Stay (`ongoing`, tidak bisa digeser). Saklar lama dimigrasi otomatis (hidup → Biasa, mati → Mati). Popup di dalam aplikasi (tugas hari ini, jurnal & backup) hanya Mati/Muncul.
+- **Stay hilang otomatis:** tiap data tersimpan, notifikasi yang sudah tampil dicocokkan ulang dengan data; yang urusannya selesai dihapus (tugas dicentang, deadline kuliah selesai, absen dicatat, outfit dicatat, transaksi hari itu ada, tagihan lunas, transaksi otomatis dijalankan, sholat dicentang). Satu urusan hanya menyisakan notifikasi terbarunya. Laporan mingguan: hilang saat diketuk. Notifikasi yang belum selesai dipertahankan sampai 7 hari. Android 14+ dapat mengizinkan pengguna menggesernya pada kondisi tertentu.
+- **Setelan Notifikasi** menjadi kartu sendiri, dikelompokkan: Keuangan, Tugas & Kuliah, Lemari, Sholat, Di dalam aplikasi.
+- **Lemari:** pengingat "Isi outfit hari ini" (default 18.00); dilewati/dihapus bila Pakaian Hari Ini sudah dicatat; ketuk membuka Lemari › Hari Ini.
+- **Perbaikan build APK:** `android.yml` belum memanggil `native/android/apply.py`, sehingga widget, plugin `BygfNative`, dan sidik jari tidak ikut terpasang. Langkah itu kini ditambahkan.
 
 ### v11.1.0
 *November 2026 — keamanan, data, dan fitur Android*

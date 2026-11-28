@@ -180,6 +180,7 @@
         };
 
         const showFn = () => {
+            try { const np = JSON.parse(localStorage.getItem('bygf.notifyPrefs') || 'null'); if (np && np.popupTugas && np.popupTugas.mode === 'off') return false; } catch(e){}   // dimatikan di Setelan → Notifikasi
             const hasAgenda = renderPopup();
             if(!hasAgenda) return false;
             popup.classList.add('show');

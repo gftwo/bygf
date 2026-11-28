@@ -519,7 +519,7 @@
         onChange() { updateBadge(); },
         summary() {   // dipakai widget homescreen: pakaian hari ini + yang waktunya dicuci
             const S = D(), e = S.log[today()], name = id => { const it = itemById(id); return it ? it.name : ''; };
-            return { today: e ? e.items.map(name).filter(Boolean) : [], dirty: S.items.filter(needsWash).map(i => i.name) };
+            return { today: e ? e.items.map(name).filter(Boolean) : [], dirty: S.items.filter(needsWash).map(i => i.name), count: S.items.length };
         },
         init() {
             Object.keys(VIEWS).forEach(v => {
